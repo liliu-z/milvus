@@ -176,12 +176,22 @@ func NewLoader(
 	duf := NewDiskUsageFetcher(ctx)
 	go duf.Start()
 
+	// Create load guard with default configuration
+	config := DefaultLoadGuardConfig()
+	loadGuard, err := NewSegmentLoadGuard(config)
+	if err != nil {
+		log.Warn("failed to create load guard, falling back to legacy resource management", zap.Error(err))
+		loadGuard = nil
+	}
+
 	loader := &segmentLoader{
 		manager:                   manager,
 		cm:                        cm,
 		loadingSegments:           typeutil.NewConcurrentMap[int64, *loadResult](),
 		committedResourceNotifier: syncutil.NewVersionedNotifier(),
 		duf:                       duf,
+		loadGuard:                 loadGuard,
+		segmentInfos:              typeutil.NewConcurrentMap[int64, *SegmentInfo](),
 	}
 
 	return loader
@@ -225,6 +235,11 @@ type segmentLoader struct {
 	committedResourceNotifier *syncutil.VersionedNotifier
 
 	duf *diskUsageFetcher
+
+	// New load guard for enhanced resource management
+	loadGuard *SegmentLoadGuard
+	// Track segment infos for load guard
+	segmentInfos *typeutil.ConcurrentMap[int64, *SegmentInfo]
 }
 
 var _ Loader = (*segmentLoader)(nil)
@@ -282,9 +297,13 @@ func (loader *segmentLoader) Load(ctx context.Context,
 	var requestResourceResult requestResourceResult
 
 	if !isLazyLoad(collection, segmentType) {
-		// Check memory & storage limit
+		// Check memory & storage limit using LoadGuard if available
 		// no need to check resource for lazy load here
-		requestResourceResult, err = loader.requestResource(ctx, infos...)
+		if loader.loadGuard != nil {
+			requestResourceResult, err = loader.requestResourceWithLoadGuard(ctx, infos...)
+		} else {
+			requestResourceResult, err = loader.requestResource(ctx, infos...)
+		}
 		if err != nil {
 			log.Warn("request resource failed", zap.Error(err))
 			return nil, err
@@ -1816,4 +1835,153 @@ func checkSegmentGpuMemSize(fieldGpuMemSizeList []uint64, OverloadedMemoryThresh
 		currentGpuMem[minId] += minGpuMem
 	}
 	return nil
+}
+
+// requestResourceWithLoadGuard requests resources using the new load guard
+func (loader *segmentLoader) requestResourceWithLoadGuard(ctx context.Context, infos ...*querypb.SegmentLoadInfo) (requestResourceResult, error) {
+	if loader.loadGuard == nil {
+		// Fallback to legacy resource management
+		return loader.requestResource(ctx, infos...)
+	}
+
+	if len(infos) == 0 {
+		return requestResourceResult{}, nil
+	}
+
+	segmentIDs := lo.Map(infos, func(info *querypb.SegmentLoadInfo, _ int) int64 {
+		return info.GetSegmentID()
+	})
+	log := log.Ctx(ctx).With(
+		zap.Int64s("segmentIDs", segmentIDs),
+	)
+
+	loader.mut.Lock()
+	defer loader.mut.Unlock()
+
+	result := requestResourceResult{
+		CommittedResource: loader.committedResource,
+		ConcurrencyLevel:  funcutil.Min(hardware.GetCPUNum(), len(infos)),
+	}
+
+	// Check admission for each segment using LoadGuard
+	var totalMemorySize, totalDiskSize uint64
+	var segmentInfosToAdmit []*SegmentInfo
+
+	for _, loadInfo := range infos {
+		// Get collection to create SegmentInfo
+		collection := loader.manager.Collection.Get(loadInfo.GetCollectionID())
+		if collection == nil {
+			return result, merr.WrapErrCollectionNotFound(loadInfo.GetCollectionID())
+		}
+
+		// Create SegmentInfo from LoadInfo
+		segmentInfo, err := SegmentInfoFromLoadInfo(collection.Schema(), loadInfo)
+		if err != nil {
+			log.Warn("failed to create segment info for load guard",
+				zap.Int64("segmentID", loadInfo.GetSegmentID()),
+				zap.Error(err))
+			return result, err
+		}
+
+		// Check shallow load admission
+		if err := loader.loadGuard.SegmentLoadAdmission(ctx, segmentInfo); err != nil {
+			log.Warn("segment load rejected by load guard",
+				zap.Int64("segmentID", loadInfo.GetSegmentID()),
+				zap.Error(err))
+			
+			// Cleanup any segments that were already admitted
+			for _, admittedSegInfo := range segmentInfosToAdmit {
+				loader.loadGuard.OnSegmentReleased(admittedSegInfo)
+			}
+			
+			return result, err
+		}
+
+		segmentInfosToAdmit = append(segmentInfosToAdmit, segmentInfo)
+		totalMemorySize += segmentInfo.TotalSize()
+		// For now, assume disk size is the same as memory size
+		totalDiskSize += segmentInfo.TotalSize()
+
+		// Track segment info for later use
+		loader.segmentInfos.Insert(segmentInfo.SegmentID, segmentInfo)
+	}
+
+	result.Resource.MemorySize = totalMemorySize
+	result.Resource.DiskSize = totalDiskSize
+
+	toMB := func(mem uint64) float64 {
+		return float64(mem) / 1024 / 1024
+	}
+
+	loader.committedResource.Add(result.Resource)
+	log.Info("request resource using load guard (unit in MiB)",
+		zap.Float64("memory", toMB(result.Resource.MemorySize)),
+		zap.Float64("committedMemory", toMB(loader.committedResource.MemorySize)),
+		zap.Float64("disk", toMB(result.Resource.DiskSize)),
+		zap.Float64("committedDisk", toMB(loader.committedResource.DiskSize)),
+		zap.Int("segmentCount", len(segmentInfosToAdmit)),
+	)
+
+	return result, nil
+}
+
+// cellLoadAdmission checks if a cell can be loaded using LoadGuard
+func (loader *segmentLoader) cellLoadAdmission(ctx context.Context, cell *Cell) error {
+	if loader.loadGuard == nil {
+		return nil // No guard available, allow load
+	}
+
+	return loader.loadGuard.CellLoadAdmission(ctx, cell)
+}
+
+// onCellLoaded notifies LoadGuard that a cell has been loaded
+func (loader *segmentLoader) onCellLoaded(cell *Cell) {
+	if loader.loadGuard != nil {
+		loader.loadGuard.OnCellLoaded(cell)
+	}
+}
+
+// onCellEvicted notifies LoadGuard that a cell has been evicted
+func (loader *segmentLoader) onCellEvicted(cell *Cell) {
+	if loader.loadGuard != nil {
+		loader.loadGuard.OnCellEvicted(cell)
+	}
+}
+
+// onCellLoadFailed notifies LoadGuard that a cell load failed
+func (loader *segmentLoader) onCellLoadFailed(cell *Cell) {
+	if loader.loadGuard != nil {
+		loader.loadGuard.OnCellLoadFailed(cell)
+	}
+}
+
+// onSegmentReleased notifies LoadGuard that a segment has been released
+func (loader *segmentLoader) onSegmentReleased(segmentID int64) {
+	if loader.loadGuard == nil {
+		return
+	}
+
+	if segmentInfo, ok := loader.segmentInfos.GetAndRemove(segmentID); ok {
+		loader.loadGuard.OnSegmentReleased(segmentInfo)
+	}
+}
+
+// getLoadGuardStats returns current LoadGuard statistics
+func (loader *segmentLoader) getLoadGuardStats() map[string]interface{} {
+	if loader.loadGuard == nil {
+		return map[string]interface{}{
+			"load_guard_enabled": false,
+		}
+	}
+
+	stats := loader.loadGuard.GetStats()
+	stats["load_guard_enabled"] = true
+	return stats
+}
+
+// Close closes the loader and cleans up resources
+func (loader *segmentLoader) Close() {
+	if loader.loadGuard != nil {
+		loader.loadGuard.Close()
+	}
 }
