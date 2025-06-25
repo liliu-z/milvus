@@ -2801,6 +2801,12 @@ type queryNodeConfig struct {
 	// memory limit
 	LoadMemoryUsageFactor               ParamItem `refreshable:"true"`
 	OverloadedMemoryThresholdPercentage ParamItem `refreshable:"false"`
+	
+	// caching layer load guard
+	CacheRatio                          ParamItem `refreshable:"true"`
+	LoadGuardLowWatermark              ParamItem `refreshable:"true"`
+	LoadGuardHighWatermark             ParamItem `refreshable:"true"`
+	LoadGuardEvictionIntervalMs        ParamItem `refreshable:"true"`
 
 	// enable disk
 	EnableDisk             ParamItem `refreshable:"true"`
@@ -3317,6 +3323,72 @@ This defaults to true, indicating that Milvus creates temporary index for growin
 		},
 	}
 	p.OverloadedMemoryThresholdPercentage.Init(base.mgr)
+
+	p.CacheRatio = ParamItem{
+		Key:          "queryNode.loadGuard.cacheRatio",
+		Version:      "2.6.0",
+		DefaultValue: "0.2",
+		Doc:          "The ratio of resources reserved for evictable cache data. This determines the proportion of memory/disk that can be used for hot data caching.",
+		Export:       true,
+		Formatter: func(v string) string {
+			ratio := getAsFloat(v)
+			if ratio < 0.0 {
+				return "0.0"
+			}
+			if ratio > 1.0 {
+				return "1.0"
+			}
+			return v
+		},
+	}
+	p.CacheRatio.Init(base.mgr)
+
+	p.LoadGuardLowWatermark = ParamItem{
+		Key:          "queryNode.loadGuard.lowWatermark",
+		Version:      "2.6.0",
+		DefaultValue: "0.7",
+		Doc:          "Low watermark for eviction. When eviction is triggered, resources will be freed until usage drops below this threshold.",
+		Export:       true,
+		Formatter: func(v string) string {
+			ratio := getAsFloat(v)
+			if ratio < 0.0 {
+				return "0.0"
+			}
+			if ratio > 1.0 {
+				return "1.0"
+			}
+			return v
+		},
+	}
+	p.LoadGuardLowWatermark.Init(base.mgr)
+
+	p.LoadGuardHighWatermark = ParamItem{
+		Key:          "queryNode.loadGuard.highWatermark",
+		Version:      "2.6.0",
+		DefaultValue: "0.8",
+		Doc:          "High watermark for eviction. When resource usage exceeds this threshold, eviction will be triggered.",
+		Export:       true,
+		Formatter: func(v string) string {
+			ratio := getAsFloat(v)
+			if ratio < 0.0 {
+				return "0.0"
+			}
+			if ratio > 1.0 {
+				return "1.0"
+			}
+			return v
+		},
+	}
+	p.LoadGuardHighWatermark.Init(base.mgr)
+
+	p.LoadGuardEvictionIntervalMs = ParamItem{
+		Key:          "queryNode.loadGuard.evictionIntervalMs",
+		Version:      "2.6.0",
+		DefaultValue: "3000",
+		Doc:          "Interval in milliseconds for the eviction background thread to check resource usage and trigger eviction if needed.",
+		Export:       true,
+	}
+	p.LoadGuardEvictionIntervalMs.Init(base.mgr)
 
 	p.CacheMemoryLimit = ParamItem{
 		Key:          "queryNode.cache.memoryLimit",

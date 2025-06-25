@@ -1817,3 +1817,28 @@ func checkSegmentGpuMemSize(fieldGpuMemSizeList []uint64, OverloadedMemoryThresh
 	}
 	return nil
 }
+
+// CreateSegmentLoader creates the appropriate segment loader based on configuration
+func CreateSegmentLoader(ctx context.Context, manager *Manager, cm storage.ChunkManager) (Loader, error) {
+	evictionEnabled := paramtable.Get().QueryNodeCfg.TieredEvictionEnabled.GetAsBool()
+	cacheRatio := paramtable.Get().QueryNodeCfg.CacheRatio.GetAsFloat()
+	
+	// Use caching layer loader if eviction is enabled or cache ratio is configured
+	if evictionEnabled || (cacheRatio >= 0 && cacheRatio <= 1.0) {
+		// Use synchronized loader with caching layer
+		log.Info("Creating synchronized segment loader with caching layer",
+			zap.Float64("cacheRatio", cacheRatio),
+			zap.Bool("evictionEnabled", evictionEnabled))
+		
+		loader, err := NewSynchronizedSegmentLoader(ctx, manager, cm)
+		if err != nil {
+			log.Warn("Failed to create synchronized segment loader, falling back to traditional loader", zap.Error(err))
+			return NewLoader(ctx, manager, cm), nil
+		}
+		return loader, nil
+	}
+
+	// Default to traditional loader
+	log.Info("Creating traditional segment loader (tiered storage disabled)")
+	return NewLoader(ctx, manager, cm), nil
+}
