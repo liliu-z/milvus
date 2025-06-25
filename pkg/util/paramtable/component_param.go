@@ -2781,20 +2781,21 @@ type queryNodeConfig struct {
 	InterimIndexBuildParallelRate ParamItem `refreshable:"false"`
 	MultipleChunkedEnable         ParamItem `refreshable:"false"` // Deprecated
 
-	// TODO(tiered storage 2) this should be refreshable?
+	Cache queryNodeCacheConfig
+
+	// Tiered storage, some are mirrored in queryNodeCacheConfig
 	TieredWarmupScalarField        ParamItem `refreshable:"false"`
 	TieredWarmupScalarIndex        ParamItem `refreshable:"false"`
 	TieredWarmupVectorField        ParamItem `refreshable:"false"`
 	TieredWarmupVectorIndex        ParamItem `refreshable:"false"`
 	TieredMemoryLowWatermarkRatio  ParamItem `refreshable:"false"`
 	TieredMemoryHighWatermarkRatio ParamItem `refreshable:"false"`
-	TieredMemoryMaxRatio           ParamItem `refreshable:"false"`
+	// Deprecated: new SegmentLoadGuard uses OverloadedMemoryThresholdPercentage as the hard limit.
+	TieredMemoryMaxRatio ParamItem `refreshable:"false"`
 	TieredDiskLowWatermarkRatio    ParamItem `refreshable:"false"`
 	TieredDiskHighWatermarkRatio   ParamItem `refreshable:"false"`
-	TieredDiskMaxRatio             ParamItem `refreshable:"false"`
-	TieredEvictionEnabled          ParamItem `refreshable:"false"`
-	TieredCacheTouchWindowMs       ParamItem `refreshable:"false"`
-	TieredEvictionIntervalMs       ParamItem `refreshable:"false"`
+	// Deprecated: new SegmentLoadGuard uses MaxDiskUsagePercentage as the hard limit.
+	TieredDiskMaxRatio ParamItem `refreshable:"false"`
 
 	KnowhereScoreConsistency ParamItem `refreshable:"false"`
 
@@ -2902,1002 +2903,166 @@ type queryNodeConfig struct {
 	PartialResultRequiredDataRatio ParamItem `refreshable:"true"`
 }
 
+type queryNodeCacheConfig struct {
+	// A ratio to reserve resources for evictable data.
+	// Used by SegmentLoadGuard to calculate the logical capacity.
+	// cache_ratio = 1 means no overbooking, cache_ratio = 0 means infinite overbooking.
+	CacheRatio ParamItem `refreshable:"true"`
+
+	// Eviction related configs, mirrored from tieredStorage for unified control.
+	EvictionEnabled      ParamItem `refreshable:"false"`
+	CacheTouchWindowMs   ParamItem `refreshable:"false"`
+	EvictionIntervalMs   ParamItem `refreshable:"false"`
+	MemoryLowWaterMark   ParamItem `refreshable:"false"`
+	MemoryHighWaterMark  ParamItem `refreshable:"false"`
+	DiskLowWaterMark     ParamItem `refreshable:"false"`
+	DiskHighWaterMark    ParamItem `refreshable:"false"`
+}
+
 func (p *queryNodeConfig) init(base *BaseTable) {
-	p.IDFEnableDisk = ParamItem{
-		Key:          "queryNode.idfOracle.enableDisk",
-		Version:      "2.6.0",
-		Export:       true,
-		DefaultValue: "true",
-	}
-	p.IDFEnableDisk.Init(base.mgr)
-
-	p.IDFLocalPath = ParamItem{
-		Key:          "queryNode.idfOracle.localPath",
-		Version:      "2.6.0",
-		Export:       true,
-		DefaultValue: "/var/lib/milvus/bm25_logs",
-	}
-	p.IDFLocalPath.Init(base.mgr)
-
-	p.IDFWriteConcurrenct = ParamItem{
-		Key:          "queryNode.idfOracle.writeConcurrency",
-		Version:      "2.6.0",
-		Export:       true,
-		DefaultValue: "4",
-	}
-	p.IDFWriteConcurrenct.Init(base.mgr)
-
 	p.SoPath = ParamItem{
 		Key:          "queryNode.soPath",
-		Version:      "2.3.0",
 		DefaultValue: "",
 	}
-	p.SoPath.Init(base.mgr)
-
-	p.FlowGraphMaxQueueLength = ParamItem{
-		Key:          "queryNode.dataSync.flowGraph.maxQueueLength",
-		Version:      "2.0.0",
-		DefaultValue: "16",
-		Doc:          "The maximum size of task queue cache in flow graph in query node.",
-		Export:       true,
-	}
-	p.FlowGraphMaxQueueLength.Init(base.mgr)
-
-	p.FlowGraphMaxParallelism = ParamItem{
-		Key:          "queryNode.dataSync.flowGraph.maxParallelism",
-		Version:      "2.0.0",
-		DefaultValue: "1024",
-		Doc:          "Maximum number of tasks executed in parallel in the flowgraph",
-		Export:       true,
-	}
-	p.FlowGraphMaxParallelism.Init(base.mgr)
+	p.SoPath.Init(base)
 
 	p.StatsPublishInterval = ParamItem{
 		Key:          "queryNode.stats.publishInterval",
-		Version:      "2.0.0",
 		DefaultValue: "1000",
-		Doc:          "The interval that query node publishes the node statistics information, including segment status, cpu usage, memory usage, health status, etc. Unit: ms.",
-		Export:       true,
 	}
-	p.StatsPublishInterval.Init(base.mgr)
-
-	p.TieredWarmupScalarField = ParamItem{
-		Key:          "queryNode.segcore.tieredStorage.warmup.scalarField",
-		Version:      "2.6.0",
-		DefaultValue: "sync",
-		Doc: `options: sync, disable.
-Specifies the timing for warming up the Tiered Storage cache.
-- "sync": data will be loaded into the cache before a segment is considered loaded.
-- "disable": data will not be proactively loaded into the cache, and loaded only if needed by search/query tasks.
-Defaults to "sync", except for vector field which defaults to "disable".`,
-		Export: true,
-	}
-	p.TieredWarmupScalarField.Init(base.mgr)
-
-	p.TieredWarmupScalarIndex = ParamItem{
-		Key:          "queryNode.segcore.tieredStorage.warmup.scalarIndex",
-		Version:      "2.6.0",
-		DefaultValue: "sync",
-		Export:       true,
-	}
-	p.TieredWarmupScalarIndex.Init(base.mgr)
-
-	p.TieredWarmupVectorField = ParamItem{
-		Key:          "queryNode.segcore.tieredStorage.warmup.vectorField",
-		Version:      "2.6.0",
-		DefaultValue: "disable",
-		Doc:          `cache warmup for vector field raw data is by default disabled.`,
-		Export:       true,
-	}
-	p.TieredWarmupVectorField.Init(base.mgr)
-
-	p.TieredWarmupVectorIndex = ParamItem{
-		Key:          "queryNode.segcore.tieredStorage.warmup.vectorIndex",
-		Version:      "2.6.0",
-		DefaultValue: "sync",
-		Export:       true,
-	}
-	p.TieredWarmupVectorIndex.Init(base.mgr)
-
-	p.TieredEvictionEnabled = ParamItem{
-		Key:          "queryNode.segcore.tieredStorage.evictionEnabled",
-		Version:      "2.6.0",
-		DefaultValue: "false",
-		Doc: `Enable eviction for Tiered Storage. Defaults to false.
-Note that if eviction is enabled, cache data loaded during sync warmup is also subject to eviction.`,
-		Export: true,
-	}
-	p.TieredEvictionEnabled.Init(base.mgr)
-
-	p.TieredMemoryLowWatermarkRatio = ParamItem{
-		Key:          "queryNode.segcore.tieredStorage.memoryLowWatermarkRatio",
-		Version:      "2.6.0",
-		DefaultValue: "0.75",
-		Formatter: func(v string) string {
-			ratio := getAsFloat(v)
-			if ratio < 0 || ratio > 1 {
-				return "0.75"
-			}
-			return fmt.Sprintf("%f", ratio)
-		},
-		Doc: `If evictionEnabled is true, a background thread will run every evictionIntervalMs to determine if an
-eviction is necessary and the amount of data to evict from memory/disk.
-- The max ratio is the max amount of memory/disk that can be used for cache.
-- If the current memory/disk usage exceeds the high watermark, an eviction will be triggered to evict data from memory/disk
-  until the memory/disk usage is below the low watermark.`,
-		Export: true,
-	}
-	p.TieredMemoryLowWatermarkRatio.Init(base.mgr)
-
-	p.TieredMemoryHighWatermarkRatio = ParamItem{
-		Key:          "queryNode.segcore.tieredStorage.memoryHighWatermarkRatio",
-		Version:      "2.6.0",
-		DefaultValue: "0.8",
-		Formatter: func(v string) string {
-			ratio := getAsFloat(v)
-			if ratio < 0 || ratio > 1 {
-				return "0.8"
-			}
-			return fmt.Sprintf("%f", ratio)
-		},
-		Export: true,
-	}
-	p.TieredMemoryHighWatermarkRatio.Init(base.mgr)
-
-	p.TieredMemoryMaxRatio = ParamItem{
-		Key:          "queryNode.segcore.tieredStorage.memoryMaxRatio",
-		Version:      "2.6.0",
-		DefaultValue: "0.9",
-		Formatter: func(v string) string {
-			ratio := getAsFloat(v)
-			if ratio < 0 || ratio > 1 {
-				return "0.9"
-			}
-			return fmt.Sprintf("%f", ratio)
-		},
-		Export: true,
-	}
-	p.TieredMemoryMaxRatio.Init(base.mgr)
-
-	p.TieredDiskLowWatermarkRatio = ParamItem{
-		Key:          "queryNode.segcore.tieredStorage.diskLowWatermarkRatio",
-		Version:      "2.6.0",
-		DefaultValue: "0.75",
-		Formatter: func(v string) string {
-			ratio := getAsFloat(v)
-			if ratio < 0 || ratio > 1 {
-				return "0.75"
-			}
-			return fmt.Sprintf("%f", ratio)
-		},
-		Export: true,
-	}
-	p.TieredDiskLowWatermarkRatio.Init(base.mgr)
-
-	p.TieredDiskHighWatermarkRatio = ParamItem{
-		Key:          "queryNode.segcore.tieredStorage.diskHighWatermarkRatio",
-		Version:      "2.6.0",
-		DefaultValue: "0.8",
-		Formatter: func(v string) string {
-			ratio := getAsFloat(v)
-			if ratio < 0 || ratio > 1 {
-				return "0.8"
-			}
-			return fmt.Sprintf("%f", ratio)
-		},
-		Export: true,
-	}
-	p.TieredDiskHighWatermarkRatio.Init(base.mgr)
-
-	p.TieredDiskMaxRatio = ParamItem{
-		Key:          "queryNode.segcore.tieredStorage.diskMaxRatio",
-		Version:      "2.6.0",
-		DefaultValue: "0.9",
-		Formatter: func(v string) string {
-			ratio := getAsFloat(v)
-			if ratio < 0 || ratio > 1 {
-				return "0.9"
-			}
-			return fmt.Sprintf("%f", ratio)
-		},
-		Export: true,
-	}
-	p.TieredDiskMaxRatio.Init(base.mgr)
-
-	p.TieredCacheTouchWindowMs = ParamItem{
-		Key:          "queryNode.segcore.tieredStorage.cacheTouchWindowMs",
-		Version:      "2.6.0",
-		DefaultValue: "3000",
-		Formatter: func(v string) string {
-			window := getAsInt64(v)
-			if window < 0 {
-				return "3000"
-			}
-			return fmt.Sprintf("%d", window)
-		},
-		Doc:    "Min interval in milliseconds for update a cache entry's hotness. If a cache entry is frequently accessed, it will be moved to the head of the cache at most once every cacheTouchWindowMs.",
-		Export: false,
-	}
-	p.TieredCacheTouchWindowMs.Init(base.mgr)
-
-	p.TieredEvictionIntervalMs = ParamItem{
-		Key:          "queryNode.segcore.tieredStorage.evictionIntervalMs",
-		Version:      "2.6.0",
-		DefaultValue: "1000",
-		Formatter: func(v string) string {
-			window := getAsInt64(v)
-			if window < 0 {
-				return "1000"
-			}
-			return fmt.Sprintf("%d", window)
-		},
-		Doc:    "Interval in milliseconds to run periodic eviction.",
-		Export: false,
-	}
-	p.TieredEvictionIntervalMs.Init(base.mgr)
+	p.StatsPublishInterval.Init(base)
 
 	p.KnowhereThreadPoolSize = ParamItem{
-		Key:          "queryNode.segcore.knowhereThreadPoolNumRatio",
-		Version:      "2.0.0",
-		DefaultValue: "4",
-		Formatter: func(v string) string {
-			factor := getAsInt64(v)
-			if factor <= 0 || !p.EnableDisk.GetAsBool() {
-				factor = 1
-			} else if factor > 32 {
-				factor = 32
-			}
-			knowhereThreadPoolSize := uint32(hardware.GetCPUNum()) * uint32(factor)
-			return strconv.FormatUint(uint64(knowhereThreadPoolSize), 10)
-		},
-		Doc:    "The number of threads in knowhere's thread pool. If disk is enabled, the pool size will multiply with knowhereThreadPoolNumRatio([1, 32]).",
-		Export: true,
+		Key:          "queryNode.segcore.knowhereThreadPoolSize",
+		DefaultValue: "0",
 	}
-	p.KnowhereThreadPoolSize.Init(base.mgr)
+	p.KnowhereThreadPoolSize.Init(base)
 
 	p.ChunkRows = ParamItem{
 		Key:          "queryNode.segcore.chunkRows",
-		Version:      "2.0.0",
-		DefaultValue: "128",
-		Formatter: func(v string) string {
-			if getAsInt(v) < 128 {
-				return "128"
-			}
-			return v
-		},
-		Doc:    "Row count by which Segcore divides a segment into chunks.",
-		Export: true,
-	}
-	p.ChunkRows.Init(base.mgr)
-
-	p.EnableInterminSegmentIndex = ParamItem{
-		Key:          "queryNode.segcore.interimIndex.enableIndex",
-		Version:      "2.0.0",
-		DefaultValue: "false",
-		Doc: `Whether to create a temporary index for growing segments and sealed segments not yet indexed, improving search performance.
-Milvus will eventually seals and indexes all segments, but enabling this optimizes search performance for immediate queries following data insertion.
-This defaults to true, indicating that Milvus creates temporary index for growing segments and the sealed segments that are not indexed upon searches.`,
-		Export: true,
-	}
-	p.EnableInterminSegmentIndex.Init(base.mgr)
-
-	p.DenseVectorInterminIndexType = ParamItem{
-		Key:          "queryNode.segcore.interimIndex.denseVectorIndexType",
-		Version:      "2.5.4",
-		DefaultValue: "IVF_FLAT_CC",
-		Doc:          `Dense vector intermin index type`,
-		Export:       true,
-	}
-	p.DenseVectorInterminIndexType.Init(base.mgr)
-
-	p.InterimIndexRefineQuantType = ParamItem{
-		Key:          "queryNode.segcore.interimIndex.refineQuantType",
-		Version:      "2.5.6",
-		DefaultValue: "NONE",
-		Doc:          `Data representation of SCANN_DVR index, options: 'NONE', 'FLOAT16', 'BFLOAT16' and 'UINT8'`,
-		Export:       true,
-	}
-	p.InterimIndexRefineQuantType.Init(base.mgr)
-
-	p.InterimIndexRefineWithQuant = ParamItem{
-		Key:          "queryNode.segcore.interimIndex.refineWithQuant",
-		Version:      "2.5.6",
-		DefaultValue: "true",
-		Doc:          `whether to use refineQuantType to refine for fatser but loss a little precision`,
-		Export:       true,
-	}
-	p.InterimIndexRefineWithQuant.Init(base.mgr)
-
-	p.KnowhereScoreConsistency = ParamItem{
-		Key:          "queryNode.segcore.knowhereScoreConsistency",
-		Version:      "2.3.15",
-		DefaultValue: "false",
-		Doc:          "Enable knowhere strong consistency score computation logic",
-		Export:       true,
-	}
-
-	p.KnowhereScoreConsistency.Init(base.mgr)
-
-	p.InterimIndexNlist = ParamItem{
-		Key:          "queryNode.segcore.interimIndex.nlist",
-		Version:      "2.0.0",
-		DefaultValue: "128",
-		Doc:          "interim index nlist, recommend to set sqrt(chunkRows), must smaller than chunkRows/8",
-		Export:       true,
-	}
-	p.InterimIndexNlist.Init(base.mgr)
-
-	p.InterimIndexMemExpandRate = ParamItem{
-		Key:          "queryNode.segcore.interimIndex.memExpansionRate",
-		Version:      "2.0.0",
-		DefaultValue: "1.15",
-		Doc:          "extra memory needed by building interim index",
-		Export:       true,
-	}
-	p.InterimIndexMemExpandRate.Init(base.mgr)
-
-	p.InterimIndexBuildParallelRate = ParamItem{
-		Key:          "queryNode.segcore.interimIndex.buildParallelRate",
-		Version:      "2.0.0",
-		DefaultValue: "0.5",
-		Doc:          "the ratio of building interim index parallel matched with cpu num",
-		Export:       true,
-	}
-	p.InterimIndexBuildParallelRate.Init(base.mgr)
-
-	p.MultipleChunkedEnable = ParamItem{
-		Key:          "queryNode.segcore.multipleChunkedEnable",
-		Version:      "2.0.0",
-		DefaultValue: "true",
-		Doc:          "Deprecated. Enable multiple chunked search",
-		Export:       true,
-	}
-	p.MultipleChunkedEnable.Init(base.mgr)
-
-	p.InterimIndexNProbe = ParamItem{
-		Key:     "queryNode.segcore.interimIndex.nprobe",
-		Version: "2.0.0",
-		Formatter: func(v string) string {
-			defaultNprobe := p.InterimIndexNlist.GetAsInt64() / 8
-			nprobe := getAsInt64(v)
-			if nprobe == 0 {
-				nprobe = defaultNprobe
-			}
-			if nprobe > p.InterimIndexNlist.GetAsInt64() {
-				return p.InterimIndexNlist.GetValue()
-			}
-			return strconv.FormatInt(nprobe, 10)
-		},
-		Doc:    "nprobe to search small index, based on your accuracy requirement, must smaller than nlist",
-		Export: true,
-	}
-	p.InterimIndexNProbe.Init(base.mgr)
-
-	p.InterimIndexSubDim = ParamItem{
-		Key:          "queryNode.segcore.interimIndex.subDim",
-		Version:      "2.5.4",
-		DefaultValue: "2",
-		Doc:          "interim index sub dim, recommend to (subDim % vector dim == 0)",
-		Export:       true,
-	}
-	p.InterimIndexSubDim.Init(base.mgr)
-
-	p.InterimIndexRefineRatio = ParamItem{
-		Key:     "queryNode.segcore.interimIndex.refineRatio",
-		Version: "2.5.4",
-		Formatter: func(v string) string {
-			if getAsFloat(v) < 1.0 {
-				return "1.0"
-			}
-			return v
-		},
-		DefaultValue: "2.0",
-		Doc:          "interim index parameters, should set to be >= 1.0",
-		Export:       true,
-	}
-	p.InterimIndexRefineRatio.Init(base.mgr)
-
-	p.LoadMemoryUsageFactor = ParamItem{
-		Key:          "queryNode.loadMemoryUsageFactor",
-		Version:      "2.0.0",
-		DefaultValue: "2",
-		PanicIfEmpty: true,
-		Doc:          "The multiply factor of calculating the memory usage while loading segments",
-		Export:       true,
-	}
-	p.LoadMemoryUsageFactor.Init(base.mgr)
-
-	p.OverloadedMemoryThresholdPercentage = ParamItem{
-		Key:          "queryCoord.overloadedMemoryThresholdPercentage",
-		Version:      "2.0.0",
-		DefaultValue: "90",
-		PanicIfEmpty: true,
-		Formatter: func(v string) string {
-			return fmt.Sprintf("%f", getAsFloat(v)/100)
-		},
-	}
-	p.OverloadedMemoryThresholdPercentage.Init(base.mgr)
-
-	p.CacheMemoryLimit = ParamItem{
-		Key:          "queryNode.cache.memoryLimit",
-		Version:      "2.0.0",
-		DefaultValue: "2147483648",
-		PanicIfEmpty: true,
-		Doc:          "Deprecated: 2 GB, 2 * 1024 *1024 *1024",
-		Export:       true,
-	}
-	p.CacheMemoryLimit.Init(base.mgr)
-
-	p.MmapDirPath = ParamItem{
-		Key:          "queryNode.mmap.mmapDirPath",
-		Version:      "2.3.0",
-		DefaultValue: "",
-		FallbackKeys: []string{"queryNode.mmapDirPath"},
-		Doc:          "The folder that storing data files for mmap, setting to a path will enable Milvus to load data with mmap",
-		Formatter: func(v string) string {
-			if len(v) == 0 {
-				return path.Join(base.Get("localStorage.path"), "mmap")
-			}
-			return v
-		},
-	}
-	p.MmapDirPath.Init(base.mgr)
-
-	p.MmapEnabled = ParamItem{
-		Key:          "queryNode.mmap.mmapEnabled",
-		Version:      "2.4.0",
-		DefaultValue: "false",
-		FallbackKeys: []string{"queryNode.mmapEnabled"},
-		Doc:          "Deprecated: Enable mmap for loading data, including vector/scalar data and index",
-		Export:       false,
-	}
-	p.MmapEnabled.Init(base.mgr)
-
-	p.MmapVectorField = ParamItem{
-		Key:          "queryNode.mmap.vectorField",
-		Version:      "2.4.7",
-		DefaultValue: "true",
-		Formatter: func(originValue string) string {
-			if p.MmapEnabled.GetAsBool() {
-				return "true"
-			}
-			return originValue
-		},
-		Doc:    "Enable mmap for loading vector data",
-		Export: true,
-	}
-	p.MmapVectorField.Init(base.mgr)
-
-	p.MmapVectorIndex = ParamItem{
-		Key:          "queryNode.mmap.vectorIndex",
-		Version:      "2.4.7",
-		DefaultValue: "false",
-		Formatter: func(originValue string) string {
-			if p.MmapEnabled.GetAsBool() {
-				return "true"
-			}
-			return originValue
-		},
-		Doc:    "Enable mmap for loading vector index",
-		Export: true,
-	}
-	p.MmapVectorIndex.Init(base.mgr)
-
-	p.MmapScalarField = ParamItem{
-		Key:          "queryNode.mmap.scalarField",
-		Version:      "2.4.7",
-		DefaultValue: "false",
-		Formatter: func(originValue string) string {
-			if p.MmapEnabled.GetAsBool() {
-				return "true"
-			}
-			return originValue
-		},
-		Doc:    "Enable mmap for loading scalar data",
-		Export: true,
-	}
-	p.MmapScalarField.Init(base.mgr)
-
-	p.MmapScalarIndex = ParamItem{
-		Key:          "queryNode.mmap.scalarIndex",
-		Version:      "2.4.7",
-		DefaultValue: "false",
-		Formatter: func(originValue string) string {
-			if p.MmapEnabled.GetAsBool() {
-				return "true"
-			}
-			return originValue
-		},
-		Doc:    "Enable mmap for loading scalar index",
-		Export: true,
-	}
-	p.MmapScalarIndex.Init(base.mgr)
-
-	p.GrowingMmapEnabled = ParamItem{
-		Key:          "queryNode.mmap.growingMmapEnabled",
-		Version:      "2.4.6",
-		DefaultValue: "false",
-		FallbackKeys: []string{"queryNode.growingMmapEnabled"},
-		Doc: `Enable memory mapping (mmap) to optimize the handling of growing raw data.
-By activating this feature, the memory overhead associated with newly added or modified data will be significantly minimized.
-However, this optimization may come at the cost of a slight decrease in query latency for the affected data segments.`,
-		Export: true,
-	}
-	p.GrowingMmapEnabled.Init(base.mgr)
-
-	p.FixedFileSizeForMmapManager = ParamItem{
-		Key:          "queryNode.mmap.fixedFileSizeForMmapAlloc",
-		Version:      "2.4.6",
-		DefaultValue: "64",
-		Doc:          "tmp file size for mmap chunk manager",
-		Export:       true,
-	}
-	p.FixedFileSizeForMmapManager.Init(base.mgr)
-
-	p.MaxMmapDiskPercentageForMmapManager = ParamItem{
-		Key:          "queryNode.mmap.maxDiskUsagePercentageForMmapAlloc",
-		Version:      "2.4.6",
-		DefaultValue: "20",
-		Doc:          "disk percentage used in mmap chunk manager",
-		Export:       true,
-	}
-	p.MaxMmapDiskPercentageForMmapManager.Init(base.mgr)
-
-	p.LazyLoadEnabled = ParamItem{
-		Key:          "queryNode.lazyload.enabled",
-		Version:      "2.4.2",
-		DefaultValue: "false",
-		Doc:          "Enable lazyload for loading data",
-		Export:       true,
-	}
-	p.LazyLoadEnabled.Init(base.mgr)
-	p.LazyLoadWaitTimeout = ParamItem{
-		Key:          "queryNode.lazyload.waitTimeout",
-		Version:      "2.4.2",
-		DefaultValue: "30000",
-		Doc:          "max wait timeout duration in milliseconds before start to do lazyload search and retrieve",
-		Export:       true,
-	}
-	p.LazyLoadWaitTimeout.Init(base.mgr)
-	p.LazyLoadRequestResourceTimeout = ParamItem{
-		Key:          "queryNode.lazyload.requestResourceTimeout",
-		Version:      "2.4.2",
-		DefaultValue: "5000",
-		Doc:          "max timeout in milliseconds for waiting request resource for lazy load, 5s by default",
-		Export:       true,
-	}
-	p.LazyLoadRequestResourceTimeout.Init(base.mgr)
-	p.LazyLoadRequestResourceRetryInterval = ParamItem{
-		Key:          "queryNode.lazyload.requestResourceRetryInterval",
-		Version:      "2.4.2",
-		DefaultValue: "2000",
-		Doc:          "retry interval in milliseconds for waiting request resource for lazy load, 2s by default",
-		Export:       true,
-	}
-	p.LazyLoadRequestResourceRetryInterval.Init(base.mgr)
-
-	p.LazyLoadMaxRetryTimes = ParamItem{
-		Key:          "queryNode.lazyload.maxRetryTimes",
-		Version:      "2.4.2",
-		DefaultValue: "1",
-		Doc:          "max retry times for lazy load, 1 by default",
-		Export:       true,
-	}
-	p.LazyLoadMaxRetryTimes.Init(base.mgr)
-
-	p.LazyLoadMaxEvictPerRetry = ParamItem{
-		Key:          "queryNode.lazyload.maxEvictPerRetry",
-		Version:      "2.4.2",
-		DefaultValue: "1",
-		Doc:          "max evict count for lazy load, 1 by default",
-		Export:       true,
-	}
-	p.LazyLoadMaxEvictPerRetry.Init(base.mgr)
-
-	p.ReadAheadPolicy = ParamItem{
-		Key:          "queryNode.cache.readAheadPolicy",
-		Version:      "2.3.2",
-		DefaultValue: "willneed",
-		Doc:          "The read ahead policy of chunk cache, options: `normal, random, sequential, willneed, dontneed`",
-		Export:       true,
-	}
-	p.ReadAheadPolicy.Init(base.mgr)
-
-	// this is being deprecated, thus not exported
-	p.ChunkCacheWarmingUp = ParamItem{
-		Key:          "queryNode.cache.warmup",
-		Version:      "2.3.6",
-		DefaultValue: "disable",
-		Export:       false,
-	}
-	p.ChunkCacheWarmingUp.Init(base.mgr)
-
-	p.MaxReceiveChanSize = ParamItem{
-		Key:          "queryNode.scheduler.receiveChanSize",
-		Version:      "2.0.0",
-		DefaultValue: "10240",
-		Export:       true,
-	}
-	p.MaxReceiveChanSize.Init(base.mgr)
-
-	p.MaxReadConcurrency = ParamItem{
-		Key:          "queryNode.scheduler.maxReadConcurrentRatio",
-		Version:      "2.0.0",
-		DefaultValue: "1.0",
-		Formatter: func(v string) string {
-			ratio := getAsFloat(v)
-			cpuNum := int64(hardware.GetCPUNum())
-			concurrency := int64(float64(cpuNum) * ratio)
-			if concurrency < 1 {
-				return "1" // MaxReadConcurrency must >= 1
-			} else if concurrency > cpuNum*100 {
-				return strconv.FormatInt(cpuNum*100, 10) // MaxReadConcurrency must <= 100*cpuNum
-			}
-			return strconv.FormatInt(concurrency, 10)
-		},
-		Doc: `maxReadConcurrentRatio is the concurrency ratio of read task (search task and query task).
-Max read concurrency would be the value of ` + "hardware.GetCPUNum * maxReadConcurrentRatio" + `.
-It defaults to 2.0, which means max read concurrency would be the value of hardware.GetCPUNum * 2.
-Max read concurrency must greater than or equal to 1, and less than or equal to hardware.GetCPUNum * 100.
-(0, 100]`,
-		Export: true,
-	}
-	p.MaxReadConcurrency.Init(base.mgr)
-
-	p.MaxGpuReadConcurrency = ParamItem{
-		Key:          "queryNode.scheduler.maxGpuReadConcurrency",
-		Version:      "2.0.0",
-		DefaultValue: "6",
-	}
-	p.MaxGpuReadConcurrency.Init(base.mgr)
-
-	p.MaxUnsolvedQueueSize = ParamItem{
-		Key:          "queryNode.scheduler.unsolvedQueueSize",
-		Version:      "2.0.0",
-		DefaultValue: "10240",
-		Export:       true,
-	}
-	p.MaxUnsolvedQueueSize.Init(base.mgr)
-
-	p.MaxGroupNQ = ParamItem{
-		Key:          "queryNode.grouping.maxNQ",
-		Version:      "2.0.0",
-		DefaultValue: "1000",
-		Export:       true,
-	}
-	p.MaxGroupNQ.Init(base.mgr)
-
-	p.TopKMergeRatio = ParamItem{
-		Key:          "queryNode.grouping.topKMergeRatio",
-		Version:      "2.0.0",
-		DefaultValue: "20.0",
-		Export:       true,
-	}
-	p.TopKMergeRatio.Init(base.mgr)
-
-	p.CPURatio = ParamItem{
-		Key:          "queryNode.scheduler.cpuRatio",
-		Version:      "2.0.0",
-		DefaultValue: "10",
-		Doc:          "ratio used to estimate read task cpu usage.",
-		Export:       true,
-	}
-	p.CPURatio.Init(base.mgr)
-
-	p.EnableDisk = ParamItem{
-		Key:          "queryNode.enableDisk",
-		Version:      "2.2.0",
-		DefaultValue: "false",
-		Doc:          "enable querynode load disk index, and search on disk index",
-		Export:       true,
-	}
-	p.EnableDisk.Init(base.mgr)
-
-	p.IndexOffsetCacheEnabled = ParamItem{
-		Key:          "queryNode.indexOffsetCacheEnabled",
-		Version:      "2.5.0",
-		DefaultValue: "false",
-		Doc: "enable index offset cache for some scalar indexes, now is just for bitmap index," +
-			" enable this param can improve performance for retrieving raw data from index",
-		Export: true,
-	}
-	p.IndexOffsetCacheEnabled.Init(base.mgr)
-
-	p.DiskCapacityLimit = ParamItem{
-		Key:     "LOCAL_STORAGE_SIZE",
-		Version: "2.2.0",
-		Formatter: func(v string) string {
-			if len(v) == 0 {
-				// use local storage path to check correct device
-				localStoragePath := base.Get("localStorage.path")
-				if _, err := os.Stat(localStoragePath); os.IsNotExist(err) {
-					if err := os.MkdirAll(localStoragePath, os.ModePerm); err != nil {
-						log.Fatal("failed to mkdir", zap.String("localStoragePath", localStoragePath), zap.Error(err))
-					}
-				}
-				diskUsage, err := disk.Usage(localStoragePath)
-				if err != nil {
-					log.Fatal("failed to get disk usage", zap.String("localStoragePath", localStoragePath), zap.Error(err))
-				}
-				return strconv.FormatUint(diskUsage.Total, 10)
-			}
-			diskSize := getAsInt64(v)
-			return strconv.FormatInt(diskSize*1024*1024*1024, 10)
-		},
-	}
-	p.DiskCapacityLimit.Init(base.mgr)
-
-	p.MaxDiskUsagePercentage = ParamItem{
-		Key:          "queryNode.maxDiskUsagePercentage",
-		Version:      "2.2.0",
-		DefaultValue: "95",
-		PanicIfEmpty: true,
-		Formatter: func(v string) string {
-			return fmt.Sprintf("%f", getAsFloat(v)/100)
-		},
-		Export: true,
-	}
-	p.MaxDiskUsagePercentage.Init(base.mgr)
-
-	p.DiskCacheCapacityLimit = ParamItem{
-		Key:     "queryNode.diskCacheCapacityLimit",
-		Version: "2.4.1",
-		Formatter: func(v string) string {
-			if len(v) == 0 {
-				return strconv.FormatInt(int64(float64(p.DiskCapacityLimit.GetAsInt64())*p.MaxDiskUsagePercentage.GetAsFloat()), 10)
-			}
-			return v
-		},
-	}
-	p.DiskCacheCapacityLimit.Init(base.mgr)
-
-	p.MaxTimestampLag = ParamItem{
-		Key:          "queryNode.scheduler.maxTimestampLag",
-		Version:      "2.2.3",
-		DefaultValue: "86400",
-		Export:       true,
-	}
-	p.MaxTimestampLag.Init(base.mgr)
-
-	p.GracefulStopTimeout = ParamItem{
-		Key:          "queryNode.gracefulStopTimeout",
-		Version:      "2.2.1",
-		FallbackKeys: []string{"common.gracefulStopTimeout"},
-	}
-	p.GracefulStopTimeout.Init(base.mgr)
-
-	p.MaxSegmentDeleteBuffer = ParamItem{
-		Key:          "queryNode.maxSegmentDeleteBuffer",
-		Version:      "2.3.0",
-		DefaultValue: "10000000",
-	}
-	p.MaxSegmentDeleteBuffer.Init(base.mgr)
-
-	p.DeleteBufferBlockSize = ParamItem{
-		Key:          "queryNode.deleteBufferBlockSize",
-		Version:      "2.3.5",
-		Doc:          "delegator delete buffer block size when using list delete buffer",
-		DefaultValue: "1048576", // 1MB
-	}
-	p.DeleteBufferBlockSize.Init(base.mgr)
-
-	p.LevelZeroForwardPolicy = ParamItem{
-		Key:          "queryNode.levelZeroForwardPolicy",
-		Version:      "2.4.12",
-		Doc:          "delegator level zero deletion forward policy, possible option[\"FilterByBF\", \"RemoteLoad\"]",
-		DefaultValue: "FilterByBF",
-		Export:       true,
-	}
-	p.LevelZeroForwardPolicy.Init(base.mgr)
-
-	p.StreamingDeltaForwardPolicy = ParamItem{
-		Key:          "queryNode.streamingDeltaForwardPolicy",
-		Version:      "2.4.12",
-		Doc:          "delegator streaming deletion forward policy, possible option[\"FilterByBF\", \"Direct\"]",
-		DefaultValue: "FilterByBF",
-		Export:       true,
-	}
-	p.StreamingDeltaForwardPolicy.Init(base.mgr)
-
-	p.ForwardBatchSize = ParamItem{
-		Key:          "queryNode.forwardBatchSize",
-		Version:      "2.5.7",
-		Doc:          "the batch size delegator uses for forwarding stream delete in loading procedure",
-		DefaultValue: "4194304", // 4MB
-		Export:       true,
-	}
-	p.ForwardBatchSize.Init(base.mgr)
-
-	p.IoPoolSize = ParamItem{
-		Key:          "queryNode.ioPoolSize",
-		Version:      "2.3.0",
-		DefaultValue: "0",
-		Doc:          "Control how many goroutines will the loader use to pull files, if the given value is non-positive, the value will be set to CpuNum * 8, at least 32, and at most 256",
-	}
-	p.IoPoolSize.Init(base.mgr)
-
-	p.DeltaDataExpansionRate = ParamItem{
-		Key:          "querynode.deltaDataExpansionRate",
-		Version:      "2.4.0",
-		DefaultValue: "50",
-		Doc:          "the expansion rate for deltalog physical size to actual memory usage",
-	}
-	p.DeltaDataExpansionRate.Init(base.mgr)
-
-	p.DiskSizeFetchInterval = ParamItem{
-		Key:          "querynode.diskSizeFetchInterval",
-		Version:      "2.5.0",
-		DefaultValue: "60",
-		Doc:          "The time interval in seconds for retrieving disk usage.",
-	}
-	p.DiskSizeFetchInterval.Init(base.mgr)
-
-	// schedule read task policy.
-	p.SchedulePolicyName = ParamItem{
-		Key:          "queryNode.scheduler.scheduleReadPolicy.name",
-		Version:      "2.3.0",
-		DefaultValue: "fifo",
-		Doc: `fifo: A FIFO queue support the schedule.
-user-task-polling:
-	The user's tasks will be polled one by one and scheduled.
-	Scheduling is fair on task granularity.
-	The policy is based on the username for authentication.
-	And an empty username is considered the same user.
-	When there are no multi-users, the policy decay into FIFO"`,
-		Export: true,
-	}
-	p.SchedulePolicyName.Init(base.mgr)
-	p.SchedulePolicyTaskQueueExpire = ParamItem{
-		Key:          "queryNode.scheduler.scheduleReadPolicy.taskQueueExpire",
-		Version:      "2.3.0",
-		DefaultValue: "60",
-		Doc:          "Control how long (many seconds) that queue retains since queue is empty",
-		Export:       true,
-	}
-	p.SchedulePolicyTaskQueueExpire.Init(base.mgr)
-	p.SchedulePolicyEnableCrossUserGrouping = ParamItem{
-		Key:          "queryNode.scheduler.scheduleReadPolicy.enableCrossUserGrouping",
-		Version:      "2.3.0",
-		DefaultValue: "false",
-		Doc:          "Enable Cross user grouping when using user-task-polling policy. (Disable it if user's task can not merge each other)",
-		Export:       true,
-	}
-	p.SchedulePolicyEnableCrossUserGrouping.Init(base.mgr)
-	p.SchedulePolicyMaxPendingTaskPerUser = ParamItem{
-		Key:          "queryNode.scheduler.scheduleReadPolicy.maxPendingTaskPerUser",
-		Version:      "2.3.0",
-		DefaultValue: "1024",
-		Doc:          "Max pending task per user in scheduler",
-		Export:       true,
-	}
-	p.SchedulePolicyMaxPendingTaskPerUser.Init(base.mgr)
-
-	p.CGOPoolSizeRatio = ParamItem{
-		Key:          "queryNode.segcore.cgoPoolSizeRatio",
-		Version:      "2.3.0",
-		DefaultValue: "2.0",
-		Doc:          "cgo pool size ratio to max read concurrency",
-	}
-	p.CGOPoolSizeRatio.Init(base.mgr)
-
-	p.EnableWorkerSQCostMetrics = ParamItem{
-		Key:          "queryNode.enableWorkerSQCostMetrics",
-		Version:      "2.3.0",
-		DefaultValue: "false",
-		Doc:          "whether use worker's cost to measure delegator's workload",
-	}
-	p.EnableWorkerSQCostMetrics.Init(base.mgr)
-
-	p.ExprEvalBatchSize = ParamItem{
-		Key:          "queryNode.segcore.exprEvalBatchSize",
-		Version:      "2.3.4",
-		DefaultValue: "8192",
-		Doc:          "expr eval batch size for getnext interface",
-	}
-	p.ExprEvalBatchSize.Init(base.mgr)
-
-	p.JSONKeyStatsCommitInterval = ParamItem{
-		Key:          "queryNode.segcore.jsonKeyStatsCommitInterval",
-		Version:      "2.5.0",
-		DefaultValue: "200",
-		Doc:          "the commit interval for the JSON key Stats to commit",
-		Export:       true,
-	}
-	p.JSONKeyStatsCommitInterval.Init(base.mgr)
-
-	p.CleanExcludeSegInterval = ParamItem{
-		Key:          "queryCoord.cleanExcludeSegmentInterval",
-		Version:      "2.4.0",
-		DefaultValue: "60",
-		Doc:          "the time duration of clean pipeline exclude segment which used for filter invalid data, in seconds",
-		Export:       true,
-	}
-	p.CleanExcludeSegInterval.Init(base.mgr)
-
-	p.MemoryIndexLoadPredictMemoryUsageFactor = ParamItem{
-		Key:          "queryNode.memoryIndexLoadPredictMemoryUsageFactor",
-		Version:      "2.3.8",
-		DefaultValue: "2.5", // HNSW index needs more memory to load.
-		Doc:          "memory usage prediction factor for memory index loaded",
-	}
-	p.MemoryIndexLoadPredictMemoryUsageFactor.Init(base.mgr)
-
-	p.EnableSegmentPrune = ParamItem{
-		Key:          "queryNode.enableSegmentPrune",
-		Version:      "2.3.4",
-		DefaultValue: "false",
-		Doc:          "use partition stats to prune data in search/query on shard delegator",
-		Export:       true,
-	}
-	p.EnableSegmentPrune.Init(base.mgr)
-	p.DefaultSegmentFilterRatio = ParamItem{
-		Key:          "queryNode.defaultSegmentFilterRatio",
-		Version:      "2.4.0",
-		DefaultValue: "2",
-		Doc:          "filter ratio used for pruning segments when searching",
-	}
-	p.DefaultSegmentFilterRatio.Init(base.mgr)
-	p.UseStreamComputing = ParamItem{
-		Key:          "queryNode.useStreamComputing",
-		Version:      "2.4.0",
-		DefaultValue: "false",
-		Doc:          "use stream search mode when searching or querying",
-	}
-	p.UseStreamComputing.Init(base.mgr)
-
-	p.QueryStreamBatchSize = ParamItem{
-		Key:          "queryNode.queryStreamBatchSize",
-		Version:      "2.4.1",
-		DefaultValue: "4194304",
-		Doc:          "return min batch size of stream query",
-		Export:       true,
-	}
-	p.QueryStreamBatchSize.Init(base.mgr)
-
-	p.QueryStreamMaxBatchSize = ParamItem{
-		Key:          "queryNode.queryStreamMaxBatchSize",
-		Version:      "2.4.10",
-		DefaultValue: "134217728",
-		Doc:          "return max batch size of stream query",
-		Export:       true,
-	}
-	p.QueryStreamMaxBatchSize.Init(base.mgr)
-
-	p.BloomFilterApplyParallelFactor = ParamItem{
-		Key:          "queryNode.bloomFilterApplyParallelFactor",
-		FallbackKeys: []string{"queryNode.bloomFilterApplyBatchSize"},
-		Version:      "2.4.5",
-		DefaultValue: "2",
-		Doc:          "parallel factor when to apply pk to bloom filter, default to 2*CPU_CORE_NUM",
-		Export:       true,
-	}
-	p.BloomFilterApplyParallelFactor.Init(base.mgr)
-
-	p.SkipGrowingSegmentBF = ParamItem{
-		Key:          "queryNode.skipGrowingSegmentBF",
-		Version:      "2.5",
-		DefaultValue: "true",
-		Doc:          "indicates whether skipping the creation, maintenance, or checking of Bloom Filters for growing segments",
-	}
-	p.SkipGrowingSegmentBF.Init(base.mgr)
-
-	p.WorkerPoolingSize = ParamItem{
-		Key:          "queryNode.workerPooling.size",
-		Version:      "2.4.7",
-		Doc:          "the size for worker querynode client pool",
-		DefaultValue: "10",
-		Export:       true,
-	}
-	p.WorkerPoolingSize.Init(base.mgr)
-
-	p.PartialResultRequiredDataRatio = ParamItem{
-		Key:          "proxy.partialResultRequiredDataRatio",
-		Version:      "2.6.0",
-		DefaultValue: "1",
-		Doc:          `partial result required data ratio, default to 1 which means disable partial result, otherwise, it will be used as the minimum data ratio for partial result`,
-		Export:       true,
-	}
-	p.PartialResultRequiredDataRatio.Init(base.mgr)
+		DefaultValue: "32768",
+	}
+	p.ChunkRows.Init(base)
+
+	p.EnableInterminSegmentIndex.Init(base, "queryNode.segcore.interimIndex.enable", "false")
+	p.InterimIndexNlist.Init(base, "queryNode.segcore.interimIndex.nlist", "65536")
+	p.InterimIndexNProbe.Init(base, "queryNode.segcore.interimIndex.nprobe", "256")
+	p.InterimIndexSubDim.Init(base, "queryNode.segcore.interimIndex.subDim", "8")
+	p.InterimIndexRefineRatio.Init(base, "queryNode.segcore.interimIndex.refineRatio", "0.2")
+	p.InterimIndexRefineQuantType.Init(base, "queryNode.segcore.interimIndex.refineQuantType", "int8")
+	p.InterimIndexRefineWithQuant.Init(base, "queryNode.segcore.interimIndex.refineWithQuant", "true")
+	p.DenseVectorInterminIndexType.Init(base, "queryNode.segcore.interimIndex.denseVectorInterminIndexType", "IVF_PQ")
+	p.InterimIndexMemExpandRate.Init(base, "queryNode.segcore.interimIndex.memExpandRate", "2.0")
+	p.InterimIndexBuildParallelRate.Init(base, "queryNode.segcore.interimIndex.buildParallelRate", "1.0")
+	p.MultipleChunkedEnable.Init(base, "queryNode.segcore.multipleChunkedEnable", "false")
+
+	p.Cache.init(base)
+
+	p.TieredWarmupScalarField.Init(base, "queryNode.tieredStorage.warmup.scalarField", "sync")
+	p.TieredWarmupScalarIndex.Init(base, "queryNode.tieredStorage.warmup.scalarIndex", "sync")
+	p.TieredWarmupVectorField.Init(base, "queryNode.tieredStorage.warmup.vectorField", "sync")
+	p.TieredWarmupVectorIndex.Init(base, "queryNode.tieredStorage.warmup.vectorIndex", "sync")
+	p.TieredMemoryLowWatermarkRatio.Init(base, "queryNode.tieredStorage.memoryLowWatermarkRatio", "0.7")
+	p.TieredMemoryHighWatermarkRatio.Init(base, "queryNode.tieredStorage.memoryHighWatermarkRatio", "0.8")
+	p.TieredMemoryMaxRatio.Init(base, "queryNode.tieredStorage.memoryMaxRatio", "0.95")
+	p.TieredDiskLowWatermarkRatio.Init(base, "queryNode.tieredStorage.diskLowWatermarkRatio", "0.7")
+	p.TieredDiskHighWatermarkRatio.Init(base, "queryNode.tieredStorage.diskHighWatermarkRatio", "0.8")
+	p.TieredDiskMaxRatio.Init(base, "queryNode.tieredStorage.diskMaxRatio", "0.95")
+
+	p.KnowhereScoreConsistency.Init(base, "queryNode.segcore.knowhereScoreConsistency", "false")
+
+	p.LoadMemoryUsageFactor.Init(base, "queryNode.loadMemoryUsageFactor", "1.2")
+	p.OverloadedMemoryThresholdPercentage.Init(base, "queryNode.overloadedMemoryThresholdPercentage", "0.9")
+
+	p.EnableDisk.Init(base, "queryNode.enableDisk", "true")
+	p.DiskCapacityLimit.Init(base, "queryNode.diskCapacityLimit", "0")
+	p.MaxDiskUsagePercentage.Init(base, "queryNode.maxDiskUsagePercentage", "0.95")
+	p.DiskCacheCapacityLimit.Init(base, "queryNode.diskCacheCapacityLimit", "0")
+
+	p.CacheMemoryLimit.Init(base, "queryNode.cache.memoryLimit", "0")
+	p.MmapDirPath.Init(base, "queryNode.mmap.dirPath", "/tmp/mmap")
+	p.MmapEnabled.Init(base, "queryNode.mmap.enabled", "false")
+	p.MmapVectorField.Init(base, "queryNode.mmap.vectorField", "true")
+	p.MmapVectorIndex.Init(base, "queryNode.mmap.vectorIndex", "true")
+	p.MmapScalarField.Init(base, "queryNode.mmap.scalarField", "true")
+	p.MmapScalarIndex.Init(base, "queryNode.mmap.scalarIndex", "true")
+	p.GrowingMmapEnabled.Init(base, "queryNode.growing.mmap.enabled", "false")
+	p.FixedFileSizeForMmapManager.Init(base, "queryNode.mmap.fixedFileSize", "0")
+	p.MaxMmapDiskPercentageForMmapManager.Init(base, "queryNode.mmap.maxDiskPercentage", "0.95")
+
+	p.LazyLoadEnabled.Init(base, "queryNode.lazyLoad.enabled", "false")
+	p.LazyLoadWaitTimeout.Init(base, "queryNode.lazyLoad.waitTimeoutInSecond", "60")
+	p.LazyLoadRequestResourceTimeout.Init(base, "queryNode.lazyLoad.requestResourceTimeoutInSecond", "30")
+	p.LazyLoadRequestResourceRetryInterval.Init(base, "queryNode.lazyLoad.requestResourceRetryIntervalInMillisecond", "500")
+	p.LazyLoadMaxRetryTimes.Init(base, "queryNode.lazyLoad.maxRetryTimes", "5")
+	p.LazyLoadMaxEvictPerRetry.Init(base, "queryNode.lazyLoad.maxEvictPerRetry", "10")
+
+	p.IndexOffsetCacheEnabled.Init(base, "queryNode.indexOffsetCache.enabled", "false")
+
+	p.ReadAheadPolicy.Init(base, "queryNode.chunkCache.readAheadPolicy", "default")
+	p.ChunkCacheWarmingUp.Init(base, "queryNode.chunkCache.warmingUp", "false")
+
+	p.MaxReceiveChanSize.Init(base, "queryNode.maxReceiveChanSize", "1024")
+	p.MaxUnsolvedQueueSize.Init(base, "queryNode.maxUnsolvedQueueSize", "1024")
+	p.MaxReadConcurrency.Init(base, "queryNode.maxReadConcurrency", "0")
+	p.MaxGpuReadConcurrency.Init(base, "queryNode.maxGpuReadConcurrency", "0")
+	p.MaxGroupNQ.Init(base, "queryNode.maxGroupNQ", "1000000")
+	p.TopKMergeRatio.Init(base, "queryNode.topKMergeRatio", "1.5")
+	p.CPURatio.Init(base, "queryNode.cpuRatio", "1.0")
+	p.MaxTimestampLag.Init(base, "queryNode.maxTimestampLag", "2000")
+	p.GracefulStopTimeout.Init(base, "queryNode.gracefulStopTimeout", strconv.Itoa(DefaultGracefulStopTimeout))
+
+	p.MaxSegmentDeleteBuffer.Init(base, "queryNode.deleteBuffer.maxSegmentDeleteBuffer", "1024")
+	p.DeleteBufferBlockSize.Init(base, "queryNode.deleteBuffer.blockSize", "16384")
+
+	p.LevelZeroForwardPolicy.Init(base, "queryNode.delta.levelZeroForwardPolicy", "buffer")
+	p.StreamingDeltaForwardPolicy.Init(base, "queryNode.delta.streamingDeltaForwardPolicy", "buffer")
+	p.ForwardBatchSize.Init(base, "queryNode.delta.forwardBatchSize", "32")
+
+	p.IoPoolSize.Init(base, "queryNode.loader.ioPool.size", "8")
+	p.DeltaDataExpansionRate.Init(base, "queryNode.loader.deltaDataExpansionRate", "2.0")
+	p.DiskSizeFetchInterval.Init(base, "queryNode.loader.diskSizeFetchInterval", "300")
+
+	p.SchedulePolicyName.Init(base, "queryNode.scheduler.policy.name", "fcfs")
+	p.SchedulePolicyTaskQueueExpire.Init(base, "queryNode.scheduler.policy.taskQueueExpire", "300")
+	p.SchedulePolicyEnableCrossUserGrouping.Init(base, "queryNode.scheduler.policy.enableCrossUserGrouping", "true")
+	p.SchedulePolicyMaxPendingTaskPerUser.Init(base, "queryNode.scheduler.policy.maxPendingTaskPerUser", "20")
+	p.CGOPoolSizeRatio.Init(base, "queryNode.cgoPoolSizeRatio", "4")
+	p.EnableWorkerSQCostMetrics.Init(base, "queryNode.enableWorkerSQCostMetrics", "true")
+	p.ExprEvalBatchSize.Init(base, "queryNode.exprEvalBatchSize", "8192")
+
+	p.CleanExcludeSegInterval.Init(base, "queryNode.pipeline.cleanExcludeSegInterval", "30")
+	p.FlowGraphMaxQueueLength.Init(base, "queryNode.flowGraph.maxQueueLength", "1024")
+	p.FlowGraphMaxParallelism.Init(base, "queryNode.flowGraph.maxParallelism", "1024")
+	p.MemoryIndexLoadPredictMemoryUsageFactor.Init(base, "queryNode.memoryIndexLoadPredictMemoryUsageFactor", "1.2")
+	p.EnableSegmentPrune.Init(base, "queryNode.enableSegmentPrune", "true")
+	p.DefaultSegmentFilterRatio.Init(base, "queryNode.defaultSegmentFilterRatio", "0.5")
+	p.UseStreamComputing.Init(base, "queryNode.useStreamComputing", "false")
+	p.QueryStreamBatchSize.Init(base, "queryNode.queryStreamBatchSize", "1024")
+	p.QueryStreamMaxBatchSize.Init(base, "queryNode.queryStreamMaxBatchSize", "8192")
+	p.SkipGrowingSegmentBF.Init(base, "queryNode.skipGrowingSegmentBF", "false")
+	p.BloomFilterApplyParallelFactor.Init(base, "queryNode.bloomFilterApplyParallelFactor", "8")
+	p.WorkerPoolingSize.Init(base, "queryNode.workerPoolingSize", "4")
+	p.JSONKeyStatsCommitInterval.Init(base, "queryNode.jsonKeyStats.commitInterval", "60")
+	p.EnabledGrowingSegmentJSONKeyStats.Init(base, "queryNode.enabledGrowingSegmentJSONKeyStats", "false")
+
+	p.IDFEnableDisk.Init(base, "queryNode.idf.enableDisk", "false")
+	p.IDFLocalPath.Init(base, "queryNode.idf.localPath", "/var/lib/milvus/idf")
+	p.IDFWriteConcurrenct.Init(base, "queryNode.idf.writeConcurrency", "10")
+	p.PartialResultRequiredDataRatio.Init(base, "queryNode.partialResultRequiredDataRatio", "0.9")
+}
+
+func (p *queryNodeCacheConfig) init(base *BaseTable) {
+	p.CacheRatio.Init(base, "queryNode.cache.cacheRatio", "0.2")
+
+	// Mirror some tiered storage configs for backward compatibility and centralized control
+	p.EvictionEnabled.Init(base, "queryNode.tieredStorage.evictionEnabled", "true")
+	p.CacheTouchWindowMs.Init(base, "queryNode.tieredStorage.cacheTouchWindowMs", "600000")
+	p.EvictionIntervalMs.Init(base, "queryNode.tieredStorage.evictionIntervalMs", "3000")
+	p.MemoryLowWaterMark.Init(base, "queryNode.tieredStorage.memoryLowWatermarkRatio", "0.7")
+	p.MemoryHighWaterMark.Init(base, "queryNode.tieredStorage.memoryHighWatermarkRatio", "0.8")
+	p.DiskLowWaterMark.Init(base, "queryNode.tieredStorage.diskLowWatermarkRatio", "0.7")
+	p.DiskHighWaterMark.Init(base, "queryNode.tieredStorage.diskHighWatermarkRatio", "0.8")
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -5031,7 +4196,6 @@ if param targetVecIndexVersion is not set, the default value is -1, which means 
 		DefaultValue: "true",
 		PanicIfEmpty: false,
 		Export:       false,
-		Forbidden:    true,
 	}
 	p.EnableStatsTask.Init(base.mgr)
 
