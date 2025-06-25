@@ -1,0 +1,56 @@
+# Example configuration for Caching Layer Load Guard
+# This file demonstrates the new load guard configuration parameters introduced in Milvus 2.6.0
+
+queryNode:
+  # Load guard configuration for caching layer resource management
+  loadGuard:
+    # Cache ratio: For evictable data of size X, reserve at least X * cacheRatio for hot/cold swapping
+    # Range: 0.0 - 1.0
+    # Default: 0.2 (for X bytes of evictable data, reserve at least 0.2*X bytes for caching)
+    # - 0.0: No reserved space, but can still use available memory/disk for caching
+    # - 1.0: Reserve space equal to evictable data size (conservative approach)
+    cacheRatio: 0.2
+    
+    # Low watermark: eviction target threshold
+    # Range: 0.0 - 1.0
+    # Default: 0.7 (70% of available resources)
+    # When eviction is triggered, resources will be freed until usage drops below this level
+    lowWatermark: 0.7
+    
+    # High watermark: eviction trigger threshold  
+    # Range: 0.0 - 1.0
+    # Default: 0.8 (80% of available resources)
+    # Eviction is triggered when resource usage exceeds this threshold
+    highWatermark: 0.8
+    
+    # Eviction interval: how often to check for eviction (in milliseconds)
+    # Default: 3000 (3 seconds)
+    # Lower values provide more responsive eviction but higher CPU overhead
+    evictionIntervalMs: 3000
+
+# Example configurations for different scenarios:
+
+# Scenario 1: High-memory system with lots of hot data
+# queryNode:
+#   loadGuard:
+#     cacheRatio: 0.5        # For X bytes of evictable data, reserve 0.5*X for swapping
+#     lowWatermark: 0.6      # More aggressive eviction target
+#     highWatermark: 0.8     # Standard eviction trigger
+#     evictionIntervalMs: 5000  # Less frequent checks
+
+# Scenario 2: Memory-constrained system
+# queryNode:
+#   loadGuard:
+#     cacheRatio: 0.1        # For X bytes of evictable data, reserve only 0.1*X for swapping
+#     lowWatermark: 0.8      # Conservative eviction target
+#     highWatermark: 0.9     # Late eviction trigger
+#     evictionIntervalMs: 1000  # Frequent checks for tight control
+
+# Scenario 3: Disable eviction (traditional behavior)
+# queryNode:
+#   loadGuard:
+#     cacheRatio: 1.0        # When eviction disabled, all data must fit in memory
+#     lowWatermark: 0.7      # Not used when eviction disabled
+#     highWatermark: 0.8     # Not used when eviction disabled
+#     evictionIntervalMs: 3000  # Not used when eviction disabled
+# Additionally set: tieredStorage.evictionEnabled: false

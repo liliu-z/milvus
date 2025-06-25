@@ -32,6 +32,7 @@ import "C"
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -486,7 +487,12 @@ func (node *QueryNode) Init() error {
 		node.subscribingChannels = typeutil.NewConcurrentSet[string]()
 		node.unsubscribingChannels = typeutil.NewConcurrentSet[string]()
 		node.manager = segments.NewManager()
-		node.loader = segments.NewLoader(node.ctx, node.manager, node.chunkManager)
+		loader, err := segments.CreateSegmentLoader(node.ctx, node.manager, node.chunkManager)
+		if err != nil {
+			log.Error("failed to create segment loader", zap.Error(err))
+			return errors.Wrap(err, "failed to create segment loader")
+		}
+		node.loader = loader
 		node.manager.SetLoader(node.loader)
 		if streamingutil.IsStreamingServiceEnabled() {
 			node.dispClient = msgdispatcher.NewClientWithIncludeSkipWhenSplit(streaming.NewDelegatorMsgstreamFactory(), typeutil.QueryNodeRole, node.GetNodeID())
@@ -627,6 +633,15 @@ func (node *QueryNode) Stop() error {
 		}
 		if node.manager != nil {
 			node.manager.Segment.Clear(context.Background())
+		}
+
+		// Clean up loader resources
+		if node.loader != nil {
+			if closer, ok := node.loader.(io.Closer); ok {
+				if err := closer.Close(); err != nil {
+					log.Warn("failed to close segment loader", zap.Error(err))
+				}
+			}
 		}
 
 		node.CloseSegcore()
