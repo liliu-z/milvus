@@ -2,7 +2,6 @@ package cgo
 
 import (
 	"math"
-	"runtime"
 	"time"
 
 	"github.com/milvus-io/milvus/pkg/v2/metrics"
@@ -42,15 +41,11 @@ func (c *cgoCaller) call(name string, work func()) {
 	queueTime := time.Since(start)
 	metrics.CGOQueueDuration.WithLabelValues(c.nodeID).Observe(queueTime.Seconds())
 
-	runtime.LockOSThread()
-	defer func() {
-		runtime.UnlockOSThread()
-		<-c.ch
-
-		metrics.RunningCgoCallTotal.WithLabelValues(c.nodeID).Dec()
-		total := time.Since(start) - queueTime
-		metrics.CGODuration.WithLabelValues(c.nodeID, name).Observe(total.Seconds())
-	}()
 	metrics.RunningCgoCallTotal.WithLabelValues(c.nodeID).Inc()
 	work()
+	<-c.ch
+
+	metrics.RunningCgoCallTotal.WithLabelValues(c.nodeID).Dec()
+	total := time.Since(start) - queueTime
+	metrics.CGODuration.WithLabelValues(c.nodeID, name).Observe(total.Seconds())
 }
