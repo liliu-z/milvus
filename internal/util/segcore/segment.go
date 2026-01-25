@@ -141,6 +141,7 @@ func (s *cSegmentImpl) Search(ctx context.Context, searchReq *SearchRequest) (*S
 			))
 		},
 		cgo.WithName("search"),
+		cgo.WithSkipManager(),
 	)
 	defer future.Release()
 	result, err := future.BlockAndLeakyGet()

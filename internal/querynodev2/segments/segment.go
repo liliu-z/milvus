@@ -603,31 +603,15 @@ func (s *LocalSegment) ResetIndexesLazyLoad(lazyState bool) {
 }
 
 func (s *LocalSegment) Search(ctx context.Context, searchReq *segcore.SearchRequest) (*segcore.SearchResult, error) {
-	log := log.Ctx(ctx).WithLazy(
-		zap.Uint64("mvcc", searchReq.MVCC()),
-		zap.Int64("collectionID", s.Collection()),
-		zap.Int64("segmentID", s.ID()),
-		zap.String("segmentType", s.segmentType.String()),
-	)
-
 	if !s.ptrLock.PinIf(state.IsNotReleased) {
-		// TODO: check if the segment is readable but not released. too many related logic need to be refactor.
 		return nil, merr.WrapErrSegmentNotLoaded(s.ID(), "segment released")
 	}
 	defer s.ptrLock.Unpin()
 
-	hasIndex := s.ExistIndex(searchReq.SearchFieldID())
-	log = log.With(zap.Bool("withIndex", hasIndex))
-	log.Debug("search segment...")
-
-	tr := timerecord.NewTimeRecorder("cgoSearch")
 	result, err := s.csegment.Search(ctx, searchReq)
 	if err != nil {
-		log.Warn("Search failed")
 		return nil, err
 	}
-	metrics.QueryNodeSQSegmentLatencyInCore.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()), metrics.SearchLabel).Observe(float64(tr.ElapseSpan().Milliseconds()))
-	log.Debug("search segment done")
 	return result, nil
 }
 

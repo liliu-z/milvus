@@ -18,101 +18,58 @@ package segments
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
-	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/milvus-io/milvus-proto/go-api/v2/commonpb"
-	"github.com/milvus-io/milvus/internal/querynodev2/segments/metricsutil"
 	"github.com/milvus-io/milvus/pkg/v2/log"
-	"github.com/milvus-io/milvus/pkg/v2/metrics"
-	"github.com/milvus-io/milvus/pkg/v2/util/paramtable"
-	"github.com/milvus-io/milvus/pkg/v2/util/timerecord"
 )
 
 // searchOnSegments performs search on listed segments
 // all segment ids are validated before calling this function
 func searchSegments(ctx context.Context, mgr *Manager, segments []Segment, segType SegmentType, searchReq *SearchRequest) ([]*SearchResult, error) {
-	searchLabel := metrics.SealedSegmentLabel
-	if segType == commonpb.SegmentState_Growing {
-		searchLabel = metrics.GrowingSegmentLabel
+	if len(segments) == 0 {
+		return nil, nil
 	}
 
-	resultCh := make(chan *SearchResult, len(segments))
-	searcher := func(ctx context.Context, s Segment) error {
-		// record search time
-		tr := timerecord.NewTimeRecorder("searchOnSegments")
-		searchResult, err := s.Search(ctx, searchReq)
-		if err != nil {
-			return err
-		}
-		resultCh <- searchResult
-		// update metrics
-		elapsed := tr.ElapseSpan().Milliseconds()
-		metrics.QueryNodeSQSegmentLatency.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()),
-			metrics.SearchLabel, searchLabel).Observe(float64(elapsed))
-		metrics.QueryNodeSegmentSearchLatencyPerVector.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()),
-			metrics.SearchLabel, searchLabel).Observe(float64(elapsed) / float64(searchReq.GetNumOfQuery()))
-		return nil
-	}
-
-	// calling segment search in goroutines
-	errGroup, ctx := errgroup.WithContext(ctx)
-	segmentsWithoutIndex := make([]int64, 0)
-	for _, segment := range segments {
+	// Use slice + mutex instead of channel to collect results (fewer allocations)
+	results := make([]*SearchResult, len(segments))
+	var g errgroup.Group
+	for i, segment := range segments {
+		idx := i
 		seg := segment
-		if !seg.ExistIndex(searchReq.SearchFieldID()) {
-			segmentsWithoutIndex = append(segmentsWithoutIndex, seg.ID())
-		}
-		errGroup.Go(func() error {
-			if ctx.Err() != nil {
-				return ctx.Err()
-			}
-
-			var err error
-			accessRecord := metricsutil.NewSearchSegmentAccessRecord(getSegmentMetricLabel(seg))
-			defer func() {
-				accessRecord.Finish(err)
-			}()
-
+		g.Go(func() error {
 			if seg.IsLazyLoad() {
 				ctx, cancel := withLazyLoadTimeoutContext(ctx)
 				defer cancel()
-
-				var missing bool
-				missing, err = mgr.DiskCache.Do(ctx, seg.ID(), searcher)
-				if missing {
-					accessRecord.CacheMissing()
+				searcher := func(ctx context.Context, s Segment) error {
+					searchResult, err := s.Search(ctx, searchReq)
+					if err != nil {
+						return err
+					}
+					results[idx] = searchResult
+					return nil
 				}
+				_, err := mgr.DiskCache.Do(ctx, seg.ID(), searcher)
 				if err != nil {
 					log.Warn("failed to do search for disk cache", zap.Int64("segID", seg.ID()), zap.Error(err))
 				}
 				return err
 			}
-			return searcher(ctx, seg)
+			searchResult, err := seg.Search(ctx, searchReq)
+			if err != nil {
+				return err
+			}
+			results[idx] = searchResult
+			return nil
 		})
 	}
-	err := errGroup.Wait()
-	close(resultCh)
-
-	searchResults := make([]*SearchResult, 0, len(segments))
-	for result := range resultCh {
-		searchResults = append(searchResults, result)
-	}
-
-	if err != nil {
-		DeleteSearchResults(searchResults)
+	if err := g.Wait(); err != nil {
+		DeleteSearchResults(results)
 		return nil, err
 	}
-
-	if len(segmentsWithoutIndex) > 0 {
-		log.Ctx(ctx).Debug("search growing/sealed segments without indexes", zap.Int64s("segmentIDs", segmentsWithoutIndex))
-	}
-
-	return searchResults, nil
+	return results, nil
 }
 
 // searchSegmentsStreamly performs search on listed segments in a stream mode instead of a batch mode
@@ -123,15 +80,10 @@ func searchSegmentsStreamly(ctx context.Context,
 	searchReq *SearchRequest,
 	streamReduce func(result *SearchResult) error,
 ) error {
-	searchLabel := metrics.SealedSegmentLabel
-	searchResultsToClear := make([]*SearchResult, 0)
+	searchResultsToClear := make([]*SearchResult, 0, len(segments))
 	var reduceMutex sync.Mutex
-	var sumReduceDuration atomic.Duration
 	searcher := func(ctx context.Context, seg Segment) error {
-		// record search time
-		tr := timerecord.NewTimeRecorder("searchOnSegments")
 		searchResult, searchErr := seg.Search(ctx, searchReq)
-		searchDuration := tr.RecordSpan().Milliseconds()
 		if searchErr != nil {
 			return searchErr
 		}
@@ -139,64 +91,28 @@ func searchSegmentsStreamly(ctx context.Context,
 		searchResultsToClear = append(searchResultsToClear, searchResult)
 		reducedErr := streamReduce(searchResult)
 		reduceMutex.Unlock()
-		reduceDuration := tr.RecordSpan()
-		if reducedErr != nil {
-			return reducedErr
-		}
-		sumReduceDuration.Add(reduceDuration)
-		// update metrics
-		metrics.QueryNodeSQSegmentLatency.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()),
-			metrics.SearchLabel, searchLabel).Observe(float64(searchDuration))
-		metrics.QueryNodeSegmentSearchLatencyPerVector.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()),
-			metrics.SearchLabel, searchLabel).Observe(float64(searchDuration) / float64(searchReq.GetNumOfQuery()))
-		return nil
+		return reducedErr
 	}
 
-	// calling segment search in goroutines
-	errGroup, ctx := errgroup.WithContext(ctx)
-	log := log.Ctx(ctx)
+	var g errgroup.Group
 	for _, segment := range segments {
 		seg := segment
-		errGroup.Go(func() error {
-			if ctx.Err() != nil {
-				return ctx.Err()
-			}
-
-			var err error
-			accessRecord := metricsutil.NewSearchSegmentAccessRecord(getSegmentMetricLabel(seg))
-			defer func() {
-				accessRecord.Finish(err)
-			}()
+		g.Go(func() error {
 			if seg.IsLazyLoad() {
-				log.Debug("before doing stream search in DiskCache", zap.Int64("segID", seg.ID()))
 				ctx, cancel := withLazyLoadTimeoutContext(ctx)
 				defer cancel()
-
-				var missing bool
-				missing, err = mgr.DiskCache.Do(ctx, seg.ID(), searcher)
-				if missing {
-					accessRecord.CacheMissing()
-				}
+				_, err := mgr.DiskCache.Do(ctx, seg.ID(), searcher)
 				if err != nil {
 					log.Warn("failed to do search for disk cache", zap.Int64("segID", seg.ID()), zap.Error(err))
 				}
-				log.Debug("after doing stream search in DiskCache", zap.Int64("segID", seg.ID()), zap.Error(err))
 				return err
 			}
 			return searcher(ctx, seg)
 		})
 	}
-	err := errGroup.Wait()
+	err := g.Wait()
 	DeleteSearchResults(searchResultsToClear)
-	if err != nil {
-		return err
-	}
-	metrics.QueryNodeReduceLatency.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()),
-		metrics.SearchLabel,
-		metrics.ReduceSegments,
-		metrics.StreamReduce).Observe(float64(sumReduceDuration.Load().Milliseconds()))
-	log.Debug("stream reduce sum duration:", zap.Duration("duration", sumReduceDuration.Load()))
-	return nil
+	return err
 }
 
 // search will search on the historical segments the target segments in historical.

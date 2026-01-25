@@ -67,17 +67,12 @@ func (s *scheduler) Add(task Task) (err error) {
 
 	errCh := make(chan error, 1)
 
-	// TODO: add operation should be fast, is UnsolveLen metric unnesscery?
-	metrics.QueryNodeReadTaskUnsolveLen.WithLabelValues(fmt.Sprint(paramtable.GetNodeID())).Inc()
-
 	// start a new in queue span and send task to add chan
 	s.receiveChan <- addTaskReq{
 		task: task,
 		err:  errCh,
 	}
 	err = <-errCh
-
-	metrics.QueryNodeReadTaskUnsolveLen.WithLabelValues(fmt.Sprint(paramtable.GetNodeID())).Dec()
 	return
 }
 
@@ -236,15 +231,7 @@ func (s *scheduler) exec() {
 		}
 
 		s.getPool(t).Submit(func() (any, error) {
-			// Update concurrency metric and notify task done.
-			metrics.QueryNodeReadTaskConcurrency.WithLabelValues(fmt.Sprint(paramtable.GetNodeID())).Inc()
-			collector.Counter.Inc(metricsinfo.ExecuteQueueType)
-
 			err := t.Execute()
-
-			// Update all metric after task finished.
-			metrics.QueryNodeReadTaskConcurrency.WithLabelValues(fmt.Sprint(paramtable.GetNodeID())).Dec()
-			collector.Counter.Dec(metricsinfo.ExecuteQueueType)
 
 			// Notify task done.
 			t.Done(err)

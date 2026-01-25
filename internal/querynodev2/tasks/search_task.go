@@ -7,12 +7,9 @@ import "C"
 import (
 	"bytes"
 	"context"
-	"fmt"
-	"strconv"
+	"time"
 
 	"github.com/samber/lo"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 
@@ -21,14 +18,11 @@ import (
 	"github.com/milvus-io/milvus/internal/util/searchutil/scheduler"
 	"github.com/milvus-io/milvus/internal/util/segcore"
 	"github.com/milvus-io/milvus/pkg/v2/log"
-	"github.com/milvus-io/milvus/pkg/v2/metrics"
 	"github.com/milvus-io/milvus/pkg/v2/proto/internalpb"
 	"github.com/milvus-io/milvus/pkg/v2/proto/querypb"
 	"github.com/milvus-io/milvus/pkg/v2/util/funcutil"
 	"github.com/milvus-io/milvus/pkg/v2/util/merr"
 	"github.com/milvus-io/milvus/pkg/v2/util/paramtable"
-	"github.com/milvus-io/milvus/pkg/v2/util/timerecord"
-	"github.com/milvus-io/milvus/pkg/v2/util/typeutil"
 )
 
 var (
@@ -52,9 +46,6 @@ type SearchTask struct {
 	others           []*SearchTask
 	notifier         chan error
 	serverID         int64
-
-	tr           *timerecord.TimeRecorder
-	scheduleSpan trace.Span
 }
 
 func NewSearchTask(ctx context.Context,
@@ -63,7 +54,6 @@ func NewSearchTask(ctx context.Context,
 	req *querypb.SearchRequest,
 	serverID int64,
 ) *SearchTask {
-	ctx, span := otel.Tracer(typeutil.QueryNodeRole).Start(ctx, "schedule")
 	return &SearchTask{
 		ctx:              ctx,
 		collection:       collection,
@@ -77,8 +67,6 @@ func NewSearchTask(ctx context.Context,
 		originTopks:      []int64{req.GetReq().GetTopk()},
 		originNqs:        []int64{req.GetReq().GetNq()},
 		notifier:         make(chan error, 1),
-		tr:               timerecord.NewTimeRecorderWithTrace(ctx, "searchTask"),
-		scheduleSpan:     span,
 		serverID:         serverID,
 	}
 }
@@ -98,35 +86,6 @@ func (t *SearchTask) IsGpuIndex() bool {
 }
 
 func (t *SearchTask) PreExecute() error {
-	// Update task wait time metric before execute
-	nodeID := strconv.FormatInt(t.GetNodeID(), 10)
-	inQueueDuration := t.tr.ElapseSpan()
-	inQueueDurationMS := inQueueDuration.Seconds() * 1000
-
-	// Update in queue metric for prometheus.
-	metrics.QueryNodeSQLatencyInQueue.WithLabelValues(
-		nodeID,
-		metrics.SearchLabel,
-		t.collection.GetDBName(),
-		t.collection.GetResourceGroup(),
-		// TODO: resource group and db name may be removed at runtime,
-		// should be refactor into metricsutil.observer in the future.
-	).Observe(inQueueDurationMS)
-
-	username := t.Username()
-	metrics.QueryNodeSQPerUserLatencyInQueue.WithLabelValues(
-		nodeID,
-		metrics.SearchLabel,
-		username).
-		Observe(inQueueDurationMS)
-
-	// Execute merged task's PreExecute.
-	for _, subTask := range t.others {
-		err := subTask.PreExecute()
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
@@ -136,10 +95,7 @@ func (t *SearchTask) Execute() error {
 		zap.String("shard", t.req.GetDmlChannels()[0]),
 	)
 
-	if t.scheduleSpan != nil {
-		t.scheduleSpan.End()
-	}
-	tr := timerecord.NewTimeRecorderWithTrace(t.ctx, "SearchTask")
+	startTime := time.Now()
 
 	req := t.req
 	err := t.combinePlaceHolderGroups()
@@ -204,7 +160,7 @@ func (t *SearchTask) Execute() error {
 				SlicedOffset:   1,
 				SlicedNumCount: 1,
 				CostAggregation: &internalpb.CostAggregation{
-					ServiceTime: tr.ElapseSpan().Milliseconds(),
+					ServiceTime: time.Since(startTime).Milliseconds(),
 				},
 			}
 		}
@@ -215,7 +171,6 @@ func (t *SearchTask) Execute() error {
 		return acc + segments.GetSegmentRelatedDataSize(seg)
 	}, 0)
 
-	tr.RecordSpan()
 	blobs, err := segcore.ReduceSearchResultsAndFillData(
 		t.ctx,
 		searchReq.Plan(),
@@ -229,12 +184,6 @@ func (t *SearchTask) Execute() error {
 		return err
 	}
 	defer segcore.DeleteSearchResultDataBlobs(blobs)
-	metrics.QueryNodeReduceLatency.WithLabelValues(
-		fmt.Sprint(t.GetNodeID()),
-		metrics.SearchLabel,
-		metrics.ReduceSegments,
-		metrics.BatchReduce).
-		Observe(float64(tr.RecordSpan().Milliseconds()))
 	for i := range t.originNqs {
 		blob, cost, err := segcore.GetSearchResultDataBlob(t.ctx, blobs, i)
 		if err != nil {
@@ -264,7 +213,7 @@ func (t *SearchTask) Execute() error {
 			SlicedOffset:   1,
 			SlicedNumCount: 1,
 			CostAggregation: &internalpb.CostAggregation{
-				ServiceTime:          tr.ElapseSpan().Milliseconds(),
+				ServiceTime:          time.Since(startTime).Milliseconds(),
 				TotalRelatedDataSize: relatedDataSize,
 			},
 			ScannedRemoteBytes: cost.ScannedRemoteBytes,
@@ -316,11 +265,6 @@ func (t *SearchTask) Merge(other *SearchTask) bool {
 }
 
 func (t *SearchTask) Done(err error) {
-	if !t.merged {
-		metrics.QueryNodeSearchGroupSize.WithLabelValues(fmt.Sprint(t.GetNodeID())).Observe(float64(t.groupSize))
-		metrics.QueryNodeSearchGroupNQ.WithLabelValues(fmt.Sprint(t.GetNodeID())).Observe(float64(t.nq))
-		metrics.QueryNodeSearchGroupTopK.WithLabelValues(fmt.Sprint(t.GetNodeID())).Observe(float64(t.topk))
-	}
 	t.notifier <- err
 	for _, other := range t.others {
 		other.Done(err)
@@ -399,7 +343,6 @@ func NewStreamingSearchTask(ctx context.Context,
 	req *querypb.SearchRequest,
 	serverID int64,
 ) *StreamingSearchTask {
-	ctx, span := otel.Tracer(typeutil.QueryNodeRole).Start(ctx, "schedule")
 	return &StreamingSearchTask{
 		SearchTask: SearchTask{
 			ctx:              ctx,
@@ -414,8 +357,6 @@ func NewStreamingSearchTask(ctx context.Context,
 			originTopks:      []int64{req.GetReq().GetTopk()},
 			originNqs:        []int64{req.GetReq().GetNq()},
 			notifier:         make(chan error, 1),
-			tr:               timerecord.NewTimeRecorderWithTrace(ctx, "searchTask"),
-			scheduleSpan:     span,
 			serverID:         serverID,
 		},
 	}
@@ -430,11 +371,7 @@ func (t *StreamingSearchTask) Execute() error {
 		zap.Int64("collectionID", t.collection.ID()),
 		zap.String("shard", t.req.GetDmlChannels()[0]),
 	)
-	// 0. prepare search req
-	if t.scheduleSpan != nil {
-		t.scheduleSpan.End()
-	}
-	tr := timerecord.NewTimeRecorderWithTrace(t.ctx, "SearchTask")
+	startTime := time.Now()
 	req := t.req
 	t.combinePlaceHolderGroups()
 	searchReq, err := segcore.NewSearchRequest(t.collection.GetCCollection(), req, t.placeholderGroup)
@@ -488,10 +425,9 @@ func (t *StreamingSearchTask) Execute() error {
 		if err != nil {
 			return err
 		}
-		if t.maybeReturnForEmptyResults(results, metricType, tr) {
+		if t.maybeReturnForEmptyResults(results, metricType, startTime) {
 			return nil
 		}
-		tr.RecordSpan()
 		t.resultBlobs, err = segcore.ReduceSearchResultsAndFillData(
 			t.ctx,
 			searchReq.Plan(),
@@ -505,12 +441,6 @@ func (t *StreamingSearchTask) Execute() error {
 			return err
 		}
 		defer segcore.DeleteSearchResultDataBlobs(t.resultBlobs)
-		metrics.QueryNodeReduceLatency.WithLabelValues(
-			fmt.Sprint(t.GetNodeID()),
-			metrics.SearchLabel,
-			metrics.ReduceSegments,
-			metrics.BatchReduce).
-			Observe(float64(tr.RecordSpan().Milliseconds()))
 		relatedDataSize = lo.Reduce(pinnedSegments, func(acc int64, seg segments.Segment, _ int) int64 {
 			return acc + segments.GetSegmentRelatedDataSize(seg)
 		}, 0)
@@ -546,7 +476,7 @@ func (t *StreamingSearchTask) Execute() error {
 			SlicedOffset:   1,
 			SlicedNumCount: 1,
 			CostAggregation: &internalpb.CostAggregation{
-				ServiceTime:          tr.ElapseSpan().Milliseconds(),
+				ServiceTime:          time.Since(startTime).Milliseconds(),
 				TotalRelatedDataSize: relatedDataSize,
 			},
 			ScannedRemoteBytes: cost.ScannedRemoteBytes,
@@ -558,7 +488,7 @@ func (t *StreamingSearchTask) Execute() error {
 }
 
 func (t *StreamingSearchTask) maybeReturnForEmptyResults(results []*segments.SearchResult,
-	metricType string, tr *timerecord.TimeRecorder,
+	metricType string, startTime time.Time,
 ) bool {
 	if len(results) == 0 {
 		for i := range t.originNqs {
@@ -580,7 +510,7 @@ func (t *StreamingSearchTask) maybeReturnForEmptyResults(results []*segments.Sea
 				SlicedOffset:   1,
 				SlicedNumCount: 1,
 				CostAggregation: &internalpb.CostAggregation{
-					ServiceTime: tr.ElapseSpan().Milliseconds(),
+					ServiceTime: time.Since(startTime).Milliseconds(),
 				},
 				ScannedRemoteBytes: 0,
 				ScannedTotalBytes:  0,

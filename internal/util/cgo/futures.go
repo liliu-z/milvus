@@ -90,7 +90,10 @@ func Async(ctx context.Context, f CGOAsyncFunction, opts ...Opt) Future {
 		cFuturePtr = (*C.CFuture)(f())
 	})
 
-	ctx, cancel := context.WithCancel(ctx)
+	var cancel context.CancelFunc
+	if !options.skipManager {
+		ctx, cancel = context.WithCancel(ctx)
+	}
 	future := &futureImpl{
 		closure:   f,
 		ctx:       ctx,
@@ -100,8 +103,10 @@ func Async(ctx context.Context, f CGOAsyncFunction, opts ...Opt) Future {
 		state:     newFutureState(),
 	}
 
-	// register the future to do timeout notification.
-	futureManager.Register(future)
+	if !options.skipManager {
+		// register the future to do timeout notification.
+		futureManager.Register(future)
+	}
 	return future
 }
 
@@ -136,7 +141,7 @@ func (f *futureImpl) BlockAndLeakyGet() (unsafe.Pointer, error) {
 
 	var ptr unsafe.Pointer
 	var status C.CStatus
-	getCGOCaller().call("future_leak_and_get", func() {
+	getCGOCaller().callLight(func() {
 		status = C.future_leak_and_get(f.future, &ptr)
 	})
 	err := ConsumeCStatusIntoError(&status)
@@ -160,7 +165,7 @@ func (f *futureImpl) Release() {
 	defer guard.Unlock()
 
 	// release the future.
-	getCGOCaller().call("future_destroy", func() {
+	getCGOCaller().callLight(func() {
 		C.future_destroy(f.future)
 	})
 }
@@ -175,7 +180,7 @@ func (f *futureImpl) cancel(err error) {
 	defer guard.Unlock()
 
 	if errors.IsAny(err, context.DeadlineExceeded, context.Canceled) {
-		getCGOCaller().call("future_cancel", func() {
+		getCGOCaller().callLight(func() {
 			C.future_cancel(f.future)
 		})
 		return
@@ -192,7 +197,7 @@ func (f *futureImpl) blockUntilReady() {
 
 	mu := &sync.Mutex{}
 	mu.Lock()
-	getCGOCaller().call("future_go_register_ready_callback", func() {
+	getCGOCaller().callLight(func() {
 		C.future_go_register_ready_callback(f.future, (*C.CLockedGoMutex)(unsafe.Pointer(mu)))
 	})
 	mu.Lock()
@@ -200,5 +205,7 @@ func (f *futureImpl) blockUntilReady() {
 	// mark the future as ready at go side to avoid more cgo calls.
 	f.state.IntoReady()
 	// notify the future manager that the future is ready.
-	f.ctxCancel()
+	if f.ctxCancel != nil {
+		f.ctxCancel()
+	}
 }

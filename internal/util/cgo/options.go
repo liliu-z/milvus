@@ -7,7 +7,8 @@ func getDefaultOpt() *options {
 }
 
 type options struct {
-	name string
+	name        string
+	skipManager bool
 }
 
 // Opt is the option type for future.
@@ -18,5 +19,13 @@ type Opt func(*options)
 func WithName(name string) Opt {
 	return func(o *options) {
 		o.name = name
+	}
+}
+
+// WithSkipManager skips futureManager registration and context.WithCancel.
+// Use when the caller guarantees the context won't be canceled before the future completes.
+func WithSkipManager() Opt {
+	return func(o *options) {
+		o.skipManager = true
 	}
 }
