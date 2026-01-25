@@ -56,7 +56,7 @@ func RateLimitInterceptor(limiter types.Limiter) grpc.UnaryServerInterceptor {
 			}
 		}
 		err = limiter.Check(dbID, collectionIDToPartIDs, rt, n)
-		nodeID := strconv.FormatInt(paramtable.GetNodeID(), 10)
+		nodeID := paramtable.GetStringNodeID()
 		metrics.ProxyRateLimitReqCount.WithLabelValues(nodeID, rt.String(), metrics.TotalLabel).Inc()
 		if err != nil {
 			metrics.ProxyRateLimitReqCount.WithLabelValues(nodeID, rt.String(), metrics.FailLabel).Inc()

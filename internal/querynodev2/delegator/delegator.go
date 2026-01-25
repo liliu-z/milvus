@@ -245,7 +245,7 @@ func (sd *shardDelegator) SyncPartitionStats(ctx context.Context, partVersions m
 func (sd *shardDelegator) GetPartitionStatsVersions(ctx context.Context) map[int64]int64 {
 	sd.partitionStatsMut.RLock()
 	defer sd.partitionStatsMut.RUnlock()
-	partStatMap := make(map[int64]int64)
+	partStatMap := make(map[int64]int64, len(sd.partitionStats)) // pre-allocate
 	for partID, partStats := range sd.partitionStats {
 		partStatMap[partID] = partStats.GetVersion()
 	}
@@ -429,7 +429,7 @@ func (sd *shardDelegator) Search(ctx context.Context, req *querypb.SearchRequest
 	}
 
 	metrics.QueryNodeSQLatencyWaitTSafe.WithLabelValues(
-		fmt.Sprint(paramtable.GetNodeID()), metrics.SearchLabel).
+		paramtable.GetStringNodeID(), metrics.SearchLabel).
 		Observe(float64(waitTr.ElapseSpan().Milliseconds()))
 
 	sealed, growing, sealedRowCount, version, err := sd.distribution.PinReadableSegments(partialResultRequiredDataRatio, req.GetReq().GetPartitionIDs()...)
@@ -548,7 +548,7 @@ func (sd *shardDelegator) QueryStream(ctx context.Context, req *querypb.QueryReq
 		req.Req.MvccTimestamp = tSafe
 	}
 	metrics.QueryNodeSQLatencyWaitTSafe.WithLabelValues(
-		fmt.Sprint(paramtable.GetNodeID()), metrics.QueryLabel).
+		paramtable.GetStringNodeID(), metrics.QueryLabel).
 		Observe(float64(waitTr.ElapseSpan().Milliseconds()))
 
 	sealed, growing, sealedRowCount, version, err := sd.distribution.PinReadableSegments(float64(1.0), req.GetReq().GetPartitionIDs()...)
@@ -634,7 +634,7 @@ func (sd *shardDelegator) Query(ctx context.Context, req *querypb.QueryRequest) 
 	}
 
 	metrics.QueryNodeSQLatencyWaitTSafe.WithLabelValues(
-		fmt.Sprint(paramtable.GetNodeID()), metrics.QueryLabel).
+		paramtable.GetStringNodeID(), metrics.QueryLabel).
 		Observe(float64(waitTr.ElapseSpan().Milliseconds()))
 
 	sealed, growing, sealedRowCount, version, err := sd.distribution.PinReadableSegments(partialResultRequiredDataRatio, req.GetReq().GetPartitionIDs()...)
@@ -1173,8 +1173,8 @@ func (sd *shardDelegator) Close() {
 	sd.deleteBuffer.Clear()
 	log.Info("unregister all l0 segments", zap.Duration("cost", time.Since(start)))
 
-	metrics.QueryNodeDeleteBufferSize.DeleteLabelValues(fmt.Sprint(paramtable.GetNodeID()), sd.vchannelName)
-	metrics.QueryNodeDeleteBufferRowNum.DeleteLabelValues(fmt.Sprint(paramtable.GetNodeID()), sd.vchannelName)
+	metrics.QueryNodeDeleteBufferSize.DeleteLabelValues(paramtable.GetStringNodeID(), sd.vchannelName)
+	metrics.QueryNodeDeleteBufferRowNum.DeleteLabelValues(paramtable.GetStringNodeID(), sd.vchannelName)
 }
 
 // As partition stats is an optimization for search/query which is not mandatory for milvus instance,
@@ -1260,7 +1260,7 @@ func NewShardDelegator(ctx context.Context, collectionID UniqueID, replicaID Uni
 		lifetime:       lifetime.NewLifetime(lifetime.Initializing),
 		distribution:   NewDistribution(channel, queryView),
 		deleteBuffer: deletebuffer.NewListDeleteBuffer[*deletebuffer.Item](startTs, sizePerBlock,
-			[]string{fmt.Sprint(paramtable.GetNodeID()), channel}),
+			[]string{paramtable.GetStringNodeID(), channel}),
 		pkOracle:                   pkoracle.NewPkOracle(),
 		latestTsafe:                atomic.NewUint64(startTs),
 		loader:                     loader,

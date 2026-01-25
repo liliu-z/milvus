@@ -93,7 +93,7 @@ func retrieveOnSegments(ctx context.Context, mgr *Manager, segments []Segment, s
 			result,
 			s,
 		}
-		metrics.QueryNodeSQSegmentLatency.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()),
+		metrics.QueryNodeSQSegmentLatency.WithLabelValues(paramtable.GetStringNodeID(),
 			metrics.QueryLabel, label).Observe(float64(tr.ElapseSpan().Milliseconds()))
 		return nil
 	}
@@ -156,7 +156,7 @@ func retrieveOnSegmentsWithStream(ctx context.Context, mgr *Manager, segments []
 			}
 
 			errs[i] = nil
-			metrics.QueryNodeSQSegmentLatency.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()),
+			metrics.QueryNodeSQSegmentLatency.WithLabelValues(paramtable.GetStringNodeID(),
 				metrics.QueryLabel, label).Observe(float64(tr.ElapseSpan().Milliseconds()))
 		}(segment, i)
 	}
@@ -173,7 +173,7 @@ func Retrieve(ctx context.Context, manager *Manager, plan *RetrievePlan, req *qu
 	var err error
 	var SegType commonpb.SegmentState
 	var retrieveSegments []Segment
-	var segFilters []SegmentFilter = make([]SegmentFilter, 0)
+	var segFilters = make([]SegmentFilter, 0, 3) // pre-allocate for typical 2-3 filters
 
 	segIDs := req.GetSegmentIDs()
 	collID := req.Req.GetCollectionID()

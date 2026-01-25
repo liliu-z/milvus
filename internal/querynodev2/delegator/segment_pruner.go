@@ -66,7 +66,7 @@ func PruneSegments(ctx context.Context,
 		partitionIDs = queryReq.GetPartitionIDs()
 	}
 
-	filteredSegments := make(map[UniqueID]struct{}, 0)
+	filteredSegments := make(map[UniqueID]struct{})
 	pruneType := "scalar"
 	// currently we only prune based on one column
 	if typeutil.IsVectorType(clusteringKeyField.GetDataType()) {
@@ -170,14 +170,14 @@ func PruneSegments(ctx context.Context,
 			bias = float64(maxSegmentCount) / float64(minSegmentCount)
 		}
 		metrics.QueryNodeSegmentPruneBias.
-			WithLabelValues(fmt.Sprint(paramtable.GetNodeID()),
+			WithLabelValues(paramtable.GetStringNodeID(),
 				fmt.Sprint(collectionID),
 				pruneType,
 			).Set(bias)
 
 		filterRatio := float32(realFilteredSegments) / float32(totalSegNum)
 		metrics.QueryNodeSegmentPruneRatio.
-			WithLabelValues(fmt.Sprint(paramtable.GetNodeID()),
+			WithLabelValues(paramtable.GetStringNodeID(),
 				fmt.Sprint(collectionID),
 				pruneType,
 			).Set(float64(filterRatio))
@@ -190,7 +190,7 @@ func PruneSegments(ctx context.Context,
 	}
 
 	metrics.QueryNodeSegmentPruneLatency.WithLabelValues(
-		fmt.Sprint(paramtable.GetNodeID()),
+		paramtable.GetStringNodeID(),
 		fmt.Sprint(collectionID),
 		pruneType).
 		Observe(float64(tr.ElapseSpan().Milliseconds()))
@@ -213,9 +213,9 @@ func FilterSegmentsByVector(partitionStats *storage.PartitionStatsSnapshot,
 	filterRatio float64,
 ) {
 	// 1. calculate vectors' distances
-	neededSegments := make(map[UniqueID]struct{})
+	neededSegments := make(map[UniqueID]struct{}, len(partitionStats.SegmentStats))
 	for _, vecBytes := range vectorBytes {
-		segmentsToSearch := make([]segmentDisStruct, 0)
+		segmentsToSearch := make([]segmentDisStruct, 0, len(partitionStats.SegmentStats))
 		for segId, segStats := range partitionStats.SegmentStats {
 			// here, we do not skip needed segments required by former query vector
 			// meaning that repeated calculation will be carried and the larger the nq is

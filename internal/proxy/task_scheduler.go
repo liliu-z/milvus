@@ -20,7 +20,6 @@ import (
 	"container/list"
 	"context"
 	"math"
-	"strconv"
 	"sync"
 	"time"
 
@@ -57,10 +56,11 @@ var _ taskQueue = (*baseTaskQueue)(nil)
 
 // baseTaskQueue implements taskQueue.
 type baseTaskQueue struct {
-	unissuedTasks *list.List
-	activeTasks   map[UniqueID]task
-	utLock        sync.RWMutex
-	atLock        sync.RWMutex
+	unissuedTasks      *list.List
+	unissuedTasksIndex map[UniqueID]task // O(1) lookup index for unissued tasks
+	activeTasks        map[UniqueID]task
+	utLock             sync.RWMutex
+	atLock             sync.RWMutex
 
 	// maxTaskNum should keep still
 	maxTaskNum    int64
@@ -93,6 +93,7 @@ func (queue *baseTaskQueue) addUnissuedTask(t task) error {
 		return merr.WrapErrTooManyRequests(int32(queue.getMaxTaskNum()))
 	}
 	queue.unissuedTasks.PushBack(t)
+	queue.unissuedTasksIndex[t.ID()] = t // maintain index
 	queue.utBufChan <- 1
 	return nil
 }
@@ -119,7 +120,9 @@ func (queue *baseTaskQueue) PopUnissuedTask() task {
 	ft := queue.unissuedTasks.Front()
 	queue.unissuedTasks.Remove(ft)
 
-	return ft.Value.(task)
+	t := ft.Value.(task)
+	delete(queue.unissuedTasksIndex, t.ID()) // maintain index
+	return t
 }
 
 func (queue *baseTaskQueue) AddActiveTask(t task) {
@@ -149,24 +152,19 @@ func (queue *baseTaskQueue) PopActiveTask(taskID UniqueID) task {
 }
 
 func (queue *baseTaskQueue) getTaskByReqID(reqID UniqueID) task {
+	// Use O(1) map lookup for unissued tasks instead of O(n) list traversal
 	queue.utLock.RLock()
-	for e := queue.unissuedTasks.Front(); e != nil; e = e.Next() {
-		if e.Value.(task).ID() == reqID {
-			queue.utLock.RUnlock()
-			return e.Value.(task)
-		}
+	if t, ok := queue.unissuedTasksIndex[reqID]; ok {
+		queue.utLock.RUnlock()
+		return t
 	}
 	queue.utLock.RUnlock()
 
+	// Use direct map lookup for active tasks - O(1)
 	queue.atLock.RLock()
-	for tID, t := range queue.activeTasks {
-		if tID == reqID {
-			queue.atLock.RUnlock()
-			return t
-		}
-	}
+	t := queue.activeTasks[reqID]
 	queue.atLock.RUnlock()
-	return nil
+	return t
 }
 
 func (queue *baseTaskQueue) Enqueue(t task) error {
@@ -214,13 +212,14 @@ func (queue *baseTaskQueue) getMaxTaskNum() int64 {
 
 func newBaseTaskQueue(tsoAllocatorIns tsoAllocator) *baseTaskQueue {
 	return &baseTaskQueue{
-		unissuedTasks:   list.New(),
-		activeTasks:     make(map[UniqueID]task),
-		utLock:          sync.RWMutex{},
-		atLock:          sync.RWMutex{},
-		maxTaskNum:      Params.ProxyCfg.MaxTaskNum.GetAsInt64(),
-		utBufChan:       make(chan int, Params.ProxyCfg.MaxTaskNum.GetAsInt()),
-		tsoAllocatorIns: tsoAllocatorIns,
+		unissuedTasks:      list.New(),
+		unissuedTasksIndex: make(map[UniqueID]task),
+		activeTasks:        make(map[UniqueID]task),
+		utLock:             sync.RWMutex{},
+		atLock:             sync.RWMutex{},
+		maxTaskNum:         Params.ProxyCfg.MaxTaskNum.GetAsInt64(),
+		utBufChan:          make(chan int, Params.ProxyCfg.MaxTaskNum.GetAsInt()),
+		tsoAllocatorIns:    tsoAllocatorIns,
 	}
 }
 
@@ -238,8 +237,8 @@ func (queue *ddTaskQueue) updateMetrics() {
 	activateTaskNum := len(queue.activeTasks)
 	queue.atLock.RUnlock()
 
-	metrics.ProxyQueueTaskNum.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), "ddl", metrics.UnissuedIndexTaskLabel).Set(float64(unissuedTasksNum))
-	metrics.ProxyQueueTaskNum.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), "ddl", metrics.InProgressIndexTaskLabel).Set(float64(activateTaskNum))
+	metrics.ProxyQueueTaskNum.WithLabelValues(paramtable.GetStringNodeID(), "ddl", metrics.UnissuedIndexTaskLabel).Set(float64(unissuedTasksNum))
+	metrics.ProxyQueueTaskNum.WithLabelValues(paramtable.GetStringNodeID(), "ddl", metrics.InProgressIndexTaskLabel).Set(float64(activateTaskNum))
 }
 
 type pChanStatInfo struct {
@@ -263,8 +262,8 @@ func (queue *dmTaskQueue) updateMetrics() {
 	activateTaskNum := len(queue.activeTasks)
 	queue.atLock.RUnlock()
 
-	metrics.ProxyQueueTaskNum.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), "dml", metrics.UnissuedIndexTaskLabel).Set(float64(unissuedTasksNum))
-	metrics.ProxyQueueTaskNum.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), "dml", metrics.InProgressIndexTaskLabel).Set(float64(activateTaskNum))
+	metrics.ProxyQueueTaskNum.WithLabelValues(paramtable.GetStringNodeID(), "dml", metrics.UnissuedIndexTaskLabel).Set(float64(unissuedTasksNum))
+	metrics.ProxyQueueTaskNum.WithLabelValues(paramtable.GetStringNodeID(), "dml", metrics.InProgressIndexTaskLabel).Set(float64(activateTaskNum))
 }
 
 func (queue *dmTaskQueue) Enqueue(t task) error {
@@ -315,7 +314,7 @@ func (queue *dmTaskQueue) PopActiveTask(taskID UniqueID) task {
 
 func (queue *dmTaskQueue) commitPChanStats(dmt dmlTask, pChannels []pChan) {
 	// 1. prepare new stat for all pChannels
-	newStats := make(map[pChan]pChanStatistics)
+	newStats := make(map[pChan]pChanStatistics, len(pChannels))
 	beginTs := dmt.BeginTs()
 	endTs := dmt.EndTs()
 	for _, channel := range pChannels {
@@ -395,8 +394,8 @@ func (queue *dqTaskQueue) updateMetrics() {
 	activateTaskNum := len(queue.activeTasks)
 	queue.atLock.RUnlock()
 
-	metrics.ProxyQueueTaskNum.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), "dql", metrics.UnissuedIndexTaskLabel).Set(float64(unissuedTasksNum))
-	metrics.ProxyQueueTaskNum.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), "dql", metrics.InProgressIndexTaskLabel).Set(float64(activateTaskNum))
+	metrics.ProxyQueueTaskNum.WithLabelValues(paramtable.GetStringNodeID(), "dql", metrics.UnissuedIndexTaskLabel).Set(float64(unissuedTasksNum))
+	metrics.ProxyQueueTaskNum.WithLabelValues(paramtable.GetStringNodeID(), "dql", metrics.InProgressIndexTaskLabel).Set(float64(activateTaskNum))
 }
 
 func (queue *ddTaskQueue) Enqueue(t task) error {
@@ -493,7 +492,7 @@ func (sched *taskScheduler) processTask(t task, q taskQueue) {
 
 	waitDuration := t.GetDurationInQueue()
 	metrics.ProxyReqInQueueLatency.
-		WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), t.Type().String()).
+		WithLabelValues(paramtable.GetStringNodeID(), t.Type().String()).
 		Observe(float64(waitDuration.Milliseconds()))
 
 	err := t.PreExecute(ctx)

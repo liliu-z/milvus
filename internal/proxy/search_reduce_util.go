@@ -275,8 +275,8 @@ func reduceSearchResultDataWithGroupBy(ctx context.Context, subSearchResultData 
 			cursors = make([]int64, subSearchNum)
 
 			j              int64
-			groupByValMap  = make(map[interface{}][]*groupReduceInfo)
-			skipOffsetMap  = make(map[interface{}]bool)
+			groupByValMap  = make(map[interface{}][]*groupReduceInfo, limit)  // pre-allocate for limit groups
+			skipOffsetMap  = make(map[interface{}]bool, offset)               // pre-allocate for offset entries
 			groupByValList = make([]interface{}, limit)
 			groupByValIdx  = 0
 		)
@@ -587,7 +587,7 @@ func decodeSearchResults(ctx context.Context, searchResults []*internalpb.Search
 	ctx, sp := otel.Tracer(typeutil.ProxyRole).Start(ctx, "decodeSearchResults")
 	defer sp.End()
 	tr := timerecord.NewTimeRecorder("decodeSearchResults")
-	results := make([]*schemapb.SearchResultData, 0)
+	results := make([]*schemapb.SearchResultData, 0, len(searchResults)) // pre-allocate
 	for _, partialSearchResult := range searchResults {
 		if partialSearchResult.SlicedBlob == nil {
 			continue

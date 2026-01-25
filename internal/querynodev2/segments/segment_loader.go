@@ -354,9 +354,9 @@ func (loader *segmentLoader) Load(ctx context.Context,
 		logger := log.With(zap.Int64("partitionID", partitionID),
 			zap.Int64("segmentID", segmentID),
 			zap.String("segmentType", loadInfo.GetLevel().String()))
-		metrics.QueryNodeLoadSegmentConcurrency.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()), "LoadSegment").Inc()
+		metrics.QueryNodeLoadSegmentConcurrency.WithLabelValues(paramtable.GetStringNodeID(), "LoadSegment").Inc()
 		defer func() {
-			metrics.QueryNodeLoadSegmentConcurrency.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()), "LoadSegment").Dec()
+			metrics.QueryNodeLoadSegmentConcurrency.WithLabelValues(paramtable.GetStringNodeID(), "LoadSegment").Dec()
 			if err != nil {
 				logger.Warn("load segment failed when load data into memory", zap.Error(err))
 			}
@@ -397,7 +397,7 @@ func (loader *segmentLoader) Load(ctx context.Context,
 		loaded.Insert(segmentID, segment)
 		loader.notifyLoadFinish(loadInfo)
 
-		metrics.QueryNodeLoadSegmentLatency.WithLabelValues(fmt.Sprint(paramtable.GetNodeID())).Observe(float64(tr.ElapseSpan().Milliseconds()))
+		metrics.QueryNodeLoadSegmentLatency.WithLabelValues(paramtable.GetStringNodeID()).Observe(float64(tr.ElapseSpan().Milliseconds()))
 		return nil
 	}
 
@@ -1152,9 +1152,9 @@ func (loader *segmentLoader) filterPKStatsBinlogs(fieldBinlogs []*datapb.FieldBi
 }
 
 func (loader *segmentLoader) filterBM25Stats(fieldBinlogs []*datapb.FieldBinlog) map[int64][]string {
-	result := make(map[int64][]string, 0)
+	result := make(map[int64][]string, len(fieldBinlogs))
 	for _, fieldBinlog := range fieldBinlogs {
-		logpaths := []string{}
+		logpaths := make([]string, 0, len(fieldBinlog.GetBinlogs()))
 		for _, binlog := range fieldBinlog.GetBinlogs() {
 			_, logidx := path.Split(binlog.GetLogPath())
 			// if special status log exist
@@ -1272,9 +1272,9 @@ func (loader *segmentLoader) loadBm25Stats(ctx context.Context, segmentID int64,
 		return nil
 	}
 
-	pathList := []string{}
-	fieldList := []int64{}
-	fieldOffset := []int{}
+	fieldList := make([]int64, 0, len(binlogPaths))
+	fieldOffset := make([]int, 0, len(binlogPaths))
+	pathList := make([]string, 0, len(binlogPaths)*4) // estimate ~4 log files per field
 	for fieldId, logpaths := range binlogPaths {
 		pathList = append(pathList, logpaths...)
 		fieldList = append(fieldList, fieldId)
@@ -1324,7 +1324,7 @@ func (loader *segmentLoader) loadBloomFilter(ctx context.Context, segmentID int6
 	if err != nil {
 		return err
 	}
-	blobs := []*storage.Blob{}
+	blobs := make([]*storage.Blob, 0, len(values))
 	for i := 0; i < len(values); i++ {
 		blobs = append(blobs, &storage.Blob{Value: values[i]})
 	}
@@ -2263,11 +2263,11 @@ func (loader *segmentLoader) LoadIndex(ctx context.Context,
 	defer loader.freeRequestResource(requestResourceResult)
 
 	log.Info("segment loader start to load index", zap.Int("segmentNumAfterFilter", len(infos)))
-	metrics.QueryNodeLoadSegmentConcurrency.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()), "LoadIndex").Inc()
-	defer metrics.QueryNodeLoadSegmentConcurrency.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()), "LoadIndex").Dec()
+	metrics.QueryNodeLoadSegmentConcurrency.WithLabelValues(paramtable.GetStringNodeID(), "LoadIndex").Inc()
+	defer metrics.QueryNodeLoadSegmentConcurrency.WithLabelValues(paramtable.GetStringNodeID(), "LoadIndex").Dec()
 
 	tr := timerecord.NewTimeRecorder("segmentLoader.LoadIndex")
-	defer metrics.QueryNodeLoadIndexLatency.WithLabelValues(fmt.Sprint(paramtable.GetNodeID())).Observe(float64(tr.ElapseSpan().Milliseconds()))
+	defer metrics.QueryNodeLoadIndexLatency.WithLabelValues(paramtable.GetStringNodeID()).Observe(float64(tr.ElapseSpan().Milliseconds()))
 	for _, loadInfo := range infos {
 		for _, info := range loadInfo.GetIndexInfos() {
 			if len(info.GetIndexFilePaths()) == 0 {

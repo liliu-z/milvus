@@ -253,7 +253,7 @@ func ReadBinary(reader io.Reader, receiver interface{}, dataType schemapb.DataTy
 // TODO: string type.
 
 func readFloatVectors(blobReaders []io.Reader, dim int) []float32 {
-	ret := make([]float32, 0)
+	ret := make([]float32, 0, len(blobReaders)*dim)
 	for _, r := range blobReaders {
 		v := make([]float32, dim)
 		ReadBinary(r, &v, schemapb.DataType_FloatVector)
@@ -263,9 +263,10 @@ func readFloatVectors(blobReaders []io.Reader, dim int) []float32 {
 }
 
 func readBinaryVectors(blobReaders []io.Reader, dim int) []byte {
-	ret := make([]byte, 0)
+	bytesPerVec := dim / 8
+	ret := make([]byte, 0, len(blobReaders)*bytesPerVec)
 	for _, r := range blobReaders {
-		v := make([]byte, dim/8)
+		v := make([]byte, bytesPerVec)
 		ReadBinary(r, &v, schemapb.DataType_BinaryVector)
 		ret = append(ret, v...)
 	}
@@ -273,9 +274,10 @@ func readBinaryVectors(blobReaders []io.Reader, dim int) []byte {
 }
 
 func readFloat16Vectors(blobReaders []io.Reader, dim int) []byte {
-	ret := make([]byte, 0)
+	bytesPerVec := dim * 2
+	ret := make([]byte, 0, len(blobReaders)*bytesPerVec)
 	for _, r := range blobReaders {
-		v := make([]byte, dim*2)
+		v := make([]byte, bytesPerVec)
 		ReadBinary(r, &v, schemapb.DataType_Float16Vector)
 		ret = append(ret, v...)
 	}
@@ -283,9 +285,10 @@ func readFloat16Vectors(blobReaders []io.Reader, dim int) []byte {
 }
 
 func readBFloat16Vectors(blobReaders []io.Reader, dim int) []byte {
-	ret := make([]byte, 0)
+	bytesPerVec := dim * 2
+	ret := make([]byte, 0, len(blobReaders)*bytesPerVec)
 	for _, r := range blobReaders {
-		v := make([]byte, dim*2)
+		v := make([]byte, bytesPerVec)
 		ReadBinary(r, &v, schemapb.DataType_BFloat16Vector)
 		ret = append(ret, v...)
 	}
@@ -293,7 +296,7 @@ func readBFloat16Vectors(blobReaders []io.Reader, dim int) []byte {
 }
 
 func readInt8Vectors(blobReaders []io.Reader, dim int) []int8 {
-	ret := make([]int8, 0)
+	ret := make([]int8, 0, len(blobReaders)*dim)
 	for _, r := range blobReaders {
 		v := make([]int8, dim)
 		ReadBinary(r, &v, schemapb.DataType_Int8Vector)
@@ -303,7 +306,7 @@ func readInt8Vectors(blobReaders []io.Reader, dim int) []int8 {
 }
 
 func readBoolArray(blobReaders []io.Reader) []bool {
-	ret := make([]bool, 0)
+	ret := make([]bool, 0, len(blobReaders))
 	for _, r := range blobReaders {
 		var v bool
 		ReadBinary(r, &v, schemapb.DataType_Bool)
@@ -313,7 +316,7 @@ func readBoolArray(blobReaders []io.Reader) []bool {
 }
 
 func readInt8Array(blobReaders []io.Reader) []int8 {
-	ret := make([]int8, 0)
+	ret := make([]int8, 0, len(blobReaders))
 	for _, r := range blobReaders {
 		var v int8
 		ReadBinary(r, &v, schemapb.DataType_Int8)
@@ -323,7 +326,7 @@ func readInt8Array(blobReaders []io.Reader) []int8 {
 }
 
 func readInt16Array(blobReaders []io.Reader) []int16 {
-	ret := make([]int16, 0)
+	ret := make([]int16, 0, len(blobReaders))
 	for _, r := range blobReaders {
 		var v int16
 		ReadBinary(r, &v, schemapb.DataType_Int16)
@@ -333,7 +336,7 @@ func readInt16Array(blobReaders []io.Reader) []int16 {
 }
 
 func readInt32Array(blobReaders []io.Reader) []int32 {
-	ret := make([]int32, 0)
+	ret := make([]int32, 0, len(blobReaders))
 	for _, r := range blobReaders {
 		var v int32
 		ReadBinary(r, &v, schemapb.DataType_Int32)
@@ -343,7 +346,7 @@ func readInt32Array(blobReaders []io.Reader) []int32 {
 }
 
 func readInt64Array(blobReaders []io.Reader) []int64 {
-	ret := make([]int64, 0)
+	ret := make([]int64, 0, len(blobReaders))
 	for _, r := range blobReaders {
 		var v int64
 		ReadBinary(r, &v, schemapb.DataType_Int64)
@@ -353,7 +356,7 @@ func readInt64Array(blobReaders []io.Reader) []int64 {
 }
 
 func readFloatArray(blobReaders []io.Reader) []float32 {
-	ret := make([]float32, 0)
+	ret := make([]float32, 0, len(blobReaders))
 	for _, r := range blobReaders {
 		var v float32
 		ReadBinary(r, &v, schemapb.DataType_Float)
@@ -363,7 +366,7 @@ func readFloatArray(blobReaders []io.Reader) []float32 {
 }
 
 func readDoubleArray(blobReaders []io.Reader) []float64 {
-	ret := make([]float64, 0)
+	ret := make([]float64, 0, len(blobReaders))
 	for _, r := range blobReaders {
 		var v float64
 		ReadBinary(r, &v, schemapb.DataType_Double)
@@ -373,7 +376,7 @@ func readDoubleArray(blobReaders []io.Reader) []float64 {
 }
 
 func readTimestamptzArray(blobReaders []io.Reader) []int64 {
-	ret := make([]int64, 0)
+	ret := make([]int64, 0, len(blobReaders))
 	for _, r := range blobReaders {
 		var v int64
 		ReadBinary(r, &v, schemapb.DataType_Timestamptz) // DataType is only used for logging
@@ -383,7 +386,7 @@ func readTimestamptzArray(blobReaders []io.Reader) []int64 {
 }
 
 func RowBasedInsertMsgToInsertData(msg *msgstream.InsertMsg, collSchema *schemapb.CollectionSchema, skipFunction bool) (idata *InsertData, err error) {
-	blobReaders := make([]io.Reader, 0)
+	blobReaders := make([]io.Reader, 0, len(msg.RowData))
 	for _, blob := range msg.RowData {
 		blobReaders = append(blobReaders, bytes.NewReader(blob.GetValue()))
 	}

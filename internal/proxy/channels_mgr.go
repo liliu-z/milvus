@@ -19,7 +19,6 @@ package proxy
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"sync"
 
 	"go.uber.org/zap"
@@ -167,13 +166,13 @@ func (mgr *singleTypeChannelsMgr) getVChannels(collectionID UniqueID) ([]vChan, 
 
 func incPChansMetrics(pchans []pChan) {
 	for _, pc := range pchans {
-		metrics.ProxyMsgStreamObjectsForPChan.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), pc).Inc()
+		metrics.ProxyMsgStreamObjectsForPChan.WithLabelValues(paramtable.GetStringNodeID(), pc).Inc()
 	}
 }
 
 func decPChanMetrics(pchans []pChan) {
 	for _, pc := range pchans {
-		metrics.ProxyMsgStreamObjectsForPChan.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), pc).Dec()
+		metrics.ProxyMsgStreamObjectsForPChan.WithLabelValues(paramtable.GetStringNodeID(), pc).Dec()
 	}
 }
 

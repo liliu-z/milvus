@@ -385,8 +385,9 @@ func wrapperPost(newReq newReqFunc, v2 handlerFuncV2) gin.HandlerFunc {
 		if !ok {
 			return
 		}
+		nodeID := paramtable.GetStringNodeID()
 		metrics.ProxyFunctionCall.WithLabelValues(
-			strconv.FormatInt(paramtable.GetNodeID(), 10),
+			nodeID,
 			methodTag,
 			metrics.TotalLabel,
 			dbName,
@@ -395,7 +396,7 @@ func wrapperPost(newReq newReqFunc, v2 handlerFuncV2) gin.HandlerFunc {
 		label := requestutil.ParseMetricLabel(resp, err)
 		// set metrics for state code
 		metrics.ProxyFunctionCall.WithLabelValues(
-			strconv.FormatInt(paramtable.GetNodeID(), 10),
+			nodeID,
 			methodTag,
 			label,
 			dbName,

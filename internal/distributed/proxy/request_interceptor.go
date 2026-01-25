@@ -18,7 +18,6 @@ package grpcproxy
 
 import (
 	"context"
-	"strconv"
 	"strings"
 	"time"
 
@@ -53,8 +52,9 @@ func UnaryRequestStatsInterceptor(ctx context.Context, req any, rpcInfo *grpc.Un
 	dbName := db.(string)
 	collectionName := collection.(string)
 
+	nodeID := paramtable.GetStringNodeID()
 	metrics.ProxyFunctionCall.WithLabelValues(
-		strconv.FormatInt(paramtable.GetNodeID(), 10),
+		nodeID,
 		methodTag,
 		metrics.TotalLabel,
 		dbName,
@@ -67,7 +67,7 @@ func UnaryRequestStatsInterceptor(ctx context.Context, req any, rpcInfo *grpc.Un
 
 	// set metrics for state code
 	metrics.ProxyFunctionCall.WithLabelValues(
-		strconv.FormatInt(paramtable.GetNodeID(), 10),
+		nodeID,
 		methodTag,
 		label,
 		dbName,
@@ -76,7 +76,7 @@ func UnaryRequestStatsInterceptor(ctx context.Context, req any, rpcInfo *grpc.Un
 
 	// set metrics for latency
 	metrics.ProxyGRPCLatency.WithLabelValues(
-		strconv.FormatInt(paramtable.GetNodeID(), 10),
+		nodeID,
 		methodTag,
 		label,
 	).Observe(float64(time.Since(start).Milliseconds()))

@@ -19,7 +19,6 @@ package datanode
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	"github.com/cockroachdb/errors"
 	"go.opentelemetry.io/otel"
@@ -76,7 +75,7 @@ func (node *DataNode) CreateJob(ctx context.Context, req *workerpb.CreateJobRequ
 		attribute.String("clusterID", req.GetClusterID()),
 	))
 	defer sp.End()
-	metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), metrics.TotalLabel).Inc()
+	metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(paramtable.GetStringNodeID(), metrics.TotalLabel).Inc()
 
 	taskCtx, taskCancel := context.WithCancel(node.ctx)
 	if oldInfo := node.taskManager.LoadOrStoreIndexTask(req.GetClusterID(), req.GetBuildID(), &index.IndexTaskInfo{
@@ -85,7 +84,7 @@ func (node *DataNode) CreateJob(ctx context.Context, req *workerpb.CreateJobRequ
 	}); oldInfo != nil {
 		err := merr.WrapErrIndexDuplicate(req.GetIndexName(), "building index task existed")
 		log.Warn("duplicated index build task", zap.Error(err))
-		metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()), metrics.FailLabel).Inc()
+		metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(paramtable.GetStringNodeID(), metrics.FailLabel).Inc()
 		return merr.Status(err), nil
 	}
 	cm, err := node.storageFactory.NewChunkManager(node.ctx, req.GetStorageConfig())
@@ -95,7 +94,7 @@ func (node *DataNode) CreateJob(ctx context.Context, req *workerpb.CreateJobRequ
 			zap.Error(err),
 		)
 		node.taskManager.DeleteIndexTaskInfos(ctx, []index.Key{{ClusterID: req.GetClusterID(), TaskID: req.GetBuildID()}})
-		metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()), metrics.FailLabel).Inc()
+		metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(paramtable.GetStringNodeID(), metrics.FailLabel).Inc()
 		return merr.Status(err), nil
 	}
 	pluginContext, err := hookutil.GetCPluginContext(req.GetPluginContext(), req.GetCollectionID())
@@ -108,10 +107,10 @@ func (node *DataNode) CreateJob(ctx context.Context, req *workerpb.CreateJobRequ
 		log.Warn("DataNode failed to schedule",
 			zap.Error(err))
 		ret = merr.Status(err)
-		metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), metrics.FailLabel).Inc()
+		metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(paramtable.GetStringNodeID(), metrics.FailLabel).Inc()
 		return ret, nil
 	}
-	metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()), metrics.SuccessLabel).Inc()
+	metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(paramtable.GetStringNodeID(), metrics.SuccessLabel).Inc()
 	log.Info("DataNode successfully scheduled",
 		zap.String("indexName", req.GetIndexName()))
 	return ret, nil
@@ -295,7 +294,7 @@ func (node *DataNode) createIndexTask(ctx context.Context, req *workerpb.CreateJ
 		err := merr.WrapErrTaskDuplicate(indexpb.JobType_JobTypeIndexJob.String(),
 			fmt.Sprintf("building index task existed with %s-%d", req.GetClusterID(), req.GetBuildID()))
 		log.Warn("duplicated index build task", zap.Error(err))
-		metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()), metrics.FailLabel).Inc()
+		metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(paramtable.GetStringNodeID(), metrics.FailLabel).Inc()
 		return merr.Status(err), nil
 	}
 	cm, err := node.storageFactory.NewChunkManager(node.ctx, req.GetStorageConfig())
@@ -305,7 +304,7 @@ func (node *DataNode) createIndexTask(ctx context.Context, req *workerpb.CreateJ
 			zap.Error(err),
 		)
 		node.taskManager.DeleteIndexTaskInfos(ctx, []index.Key{{ClusterID: req.GetClusterID(), TaskID: req.GetBuildID()}})
-		metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()), metrics.FailLabel).Inc()
+		metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(paramtable.GetStringNodeID(), metrics.FailLabel).Inc()
 		return merr.Status(err), nil
 	}
 
@@ -320,10 +319,10 @@ func (node *DataNode) createIndexTask(ctx context.Context, req *workerpb.CreateJ
 		log.Warn("DataNode failed to schedule",
 			zap.Error(err))
 		ret = merr.Status(err)
-		metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), metrics.FailLabel).Inc()
+		metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(paramtable.GetStringNodeID(), metrics.FailLabel).Inc()
 		return ret, nil
 	}
-	metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(fmt.Sprint(paramtable.GetNodeID()), metrics.SuccessLabel).Inc()
+	metrics.DataNodeBuildIndexTaskCounter.WithLabelValues(paramtable.GetStringNodeID(), metrics.SuccessLabel).Inc()
 	log.Info("DataNode index job enqueued successfully",
 		zap.String("indexName", req.GetIndexName()))
 	return ret, nil

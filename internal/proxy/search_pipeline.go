@@ -241,7 +241,7 @@ func (op *hybridSearchReduceOperator) run(ctx context.Context, span trace.Span, 
 	}
 
 	multipleMilvusResults := make([]*milvuspb.SearchResults, len(op.subReqs))
-	searchMetrics := []string{}
+	searchMetrics := make([]string, 0, len(op.subReqs))
 	for index, internalResults := range multipleInternalResults {
 		subReq := op.subReqs[index]
 		// Since the metrictype in the request may be empty, it can only be obtained from the result
@@ -304,8 +304,8 @@ func (op *rerankOperator) run(ctx context.Context, span trace.Span, inputs ...an
 
 	reducedResults := inputs[0].([]*milvuspb.SearchResults)
 	metrics := inputs[1].([]string)
-	rankInputs := []*milvuspb.SearchResults{}
-	rankMetrics := []string{}
+	rankInputs := make([]*milvuspb.SearchResults, 0, len(reducedResults))
+	rankMetrics := make([]string, 0, len(reducedResults))
 	for idx, ret := range reducedResults {
 		rankInputs = append(rankInputs, ret)
 		rankMetrics = append(rankMetrics, metrics[idx])
@@ -400,7 +400,7 @@ func (op *requeryOperator) requery(ctx context.Context, span trace.Span, ids *sc
 	}
 	plan := planparserv2.CreateRequeryPlan(op.primaryFieldSchema, ids)
 	plan.Namespace = op.namespace
-	channelsMvcc := make(map[string]Timestamp)
+	channelsMvcc := make(map[string]Timestamp, len(op.queryChannelsTs)) // pre-allocate
 	for k, v := range op.queryChannelsTs {
 		channelsMvcc[k] = v
 	}

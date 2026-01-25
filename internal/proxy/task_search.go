@@ -446,7 +446,7 @@ func (t *searchTask) initAdvancedSearchRequest(ctx context.Context) error {
 
 	t.SearchRequest.SubReqs = make([]*internalpb.SubSearchRequest, len(t.request.GetSubReqs()))
 	t.queryInfos = make([]*planpb.QueryInfo, len(t.request.GetSubReqs()))
-	queryFieldIDs := []int64{}
+	queryFieldIDs := make([]int64, 0, len(t.request.GetSubReqs()))
 	for index, subReq := range t.request.GetSubReqs() {
 		plan, queryInfo, offset, _, err := t.tryGeneratePlan(subReq.GetSearchParams(), subReq.GetDsl(), subReq.GetExprTemplateValues())
 		if err != nil {
@@ -524,7 +524,7 @@ func (t *searchTask) initAdvancedSearchRequest(ctx context.Context) error {
 			return err
 		}
 		if typeutil.IsFieldSparseFloatVector(t.schema.CollectionSchema, internalSubReq.FieldId) {
-			metrics.ProxySearchSparseNumNonZeros.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), t.collectionName, metrics.HybridSearchLabel, strconv.FormatInt(internalSubReq.FieldId, 10)).Observe(float64(typeutil.EstimateSparseVectorNNZFromPlaceholderGroup(internalSubReq.PlaceholderGroup, int(internalSubReq.GetNq()))))
+			metrics.ProxySearchSparseNumNonZeros.WithLabelValues(paramtable.GetStringNodeID(), t.collectionName, metrics.HybridSearchLabel, strconv.FormatInt(internalSubReq.FieldId, 10)).Observe(float64(typeutil.EstimateSparseVectorNNZFromPlaceholderGroup(internalSubReq.PlaceholderGroup, int(internalSubReq.GetNq()))))
 		}
 		// Convert placeholder group vector type if needed (e.g., fp32 -> fp16/bf16)
 		internalSubReq.PlaceholderGroup, err = t.convertPlaceholderIfNeeded(subReq.GetPlaceholderGroup(), internalSubReq.FieldId)
@@ -721,7 +721,7 @@ func (t *searchTask) initSearchRequest(ctx context.Context) error {
 		return err
 	}
 	if typeutil.IsFieldSparseFloatVector(t.schema.CollectionSchema, t.SearchRequest.FieldId) {
-		metrics.ProxySearchSparseNumNonZeros.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), t.collectionName, metrics.SearchLabel, strconv.FormatInt(t.SearchRequest.FieldId, 10)).Observe(float64(typeutil.EstimateSparseVectorNNZFromPlaceholderGroup(t.request.GetPlaceholderGroup(), int(t.request.GetNq()))))
+		metrics.ProxySearchSparseNumNonZeros.WithLabelValues(paramtable.GetStringNodeID(), t.collectionName, metrics.SearchLabel, strconv.FormatInt(t.SearchRequest.FieldId, 10)).Observe(float64(typeutil.EstimateSparseVectorNNZFromPlaceholderGroup(t.request.GetPlaceholderGroup(), int(t.request.GetNq()))))
 	}
 	// Convert placeholder group vector type if needed (e.g., fp32 -> fp16/bf16)
 	t.SearchRequest.PlaceholderGroup, err = t.convertPlaceholderIfNeeded(t.request.GetPlaceholderGroup(), t.SearchRequest.FieldId)
@@ -799,10 +799,10 @@ func (t *searchTask) tryGeneratePlan(params []*commonpb.KeyValuePair, dsl string
 		log.Ctx(t.ctx).Warn("failed to create query plan", zap.Error(planErr),
 			zap.String("dsl", dsl), // may be very large if large term passed.
 			zap.String("anns field", annsFieldName), zap.Any("query info", searchInfo.planInfo))
-		metrics.ProxyParseExpressionLatency.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), "search", metrics.FailLabel).Observe(float64(time.Since(start).Milliseconds()))
+		metrics.ProxyParseExpressionLatency.WithLabelValues(paramtable.GetStringNodeID(), "search", metrics.FailLabel).Observe(float64(time.Since(start).Milliseconds()))
 		return nil, nil, 0, false, merr.WrapErrParameterInvalidMsg("failed to create query plan: %v", planErr)
 	}
-	metrics.ProxyParseExpressionLatency.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), "search", metrics.SuccessLabel).Observe(float64(time.Since(start).Milliseconds()))
+	metrics.ProxyParseExpressionLatency.WithLabelValues(paramtable.GetStringNodeID(), "search", metrics.SuccessLabel).Observe(float64(time.Since(start).Milliseconds()))
 	log.Ctx(t.ctx).Debug("create query plan",
 		zap.String("dsl", t.request.Dsl), // may be very large if large term passed.
 		zap.String("anns field", annsFieldName), zap.Any("query info", searchInfo.planInfo))
@@ -894,7 +894,12 @@ func (t *searchTask) PostExecute(ctx context.Context) error {
 		return err
 	}
 
-	t.queryChannelsTs = make(map[string]uint64)
+	// Estimate channel count from first result to pre-allocate map
+	estimatedChannels := 0
+	if len(toReduceResults) > 0 {
+		estimatedChannels = len(toReduceResults[0].GetChannelsMvcc())
+	}
+	t.queryChannelsTs = make(map[string]uint64, estimatedChannels)
 	t.relatedDataSize = 0
 	isTopkReduce := false
 	isRecallEvaluation := false
@@ -991,7 +996,7 @@ func (t *searchTask) PostExecute(ctx context.Context) error {
 		t.result.SessionTs = getMaxMvccTsFromChannels(t.queryChannelsTs, t.BeginTs())
 	}
 
-	metrics.ProxyReduceResultLatency.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), metrics.SearchLabel).Observe(float64(tr.RecordSpan().Milliseconds()))
+	metrics.ProxyReduceResultLatency.WithLabelValues(paramtable.GetStringNodeID(), metrics.SearchLabel).Observe(float64(tr.RecordSpan().Milliseconds()))
 
 	timeFields := parseTimeFields(t.request.SearchParams)
 	if timeFields != nil {

@@ -286,7 +286,8 @@ func (d *distribution) Serviceable() bool {
 func (d *distribution) updateServiceable(triggerAction string) {
 	loadedSealedSegments := int64(0)
 	totalSealedRowCount := int64(0)
-	unloadedSealedSegments := make([]SegmentEntry, 0)
+	// Pre-allocate with capacity hint - most segments are typically loaded
+	unloadedSealedSegments := make([]SegmentEntry, 0, len(d.queryView.sealedSegmentRowCount)/4+1)
 	for id, rowCount := range d.queryView.sealedSegmentRowCount {
 		if entry, ok := d.sealedSegments[id]; ok && !entry.Offline {
 			loadedSealedSegments += rowCount
@@ -521,7 +522,8 @@ func (d *distribution) genSnapshot() chan struct{} {
 	// ok to be nil
 	last := d.current.Load()
 
-	nodeSegments := make(map[int64][]SegmentEntry)
+	// Pre-allocate with estimated unique node count (segments typically distributed across few nodes)
+	nodeSegments := make(map[int64][]SegmentEntry, len(d.sealedSegments)/4+1)
 	for _, entry := range d.sealedSegments {
 		nodeSegments[entry.NodeID] = append(nodeSegments[entry.NodeID], entry)
 	}

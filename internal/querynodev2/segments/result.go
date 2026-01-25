@@ -231,7 +231,7 @@ func DecodeSearchResults(ctx context.Context, searchResults []*internalpb.Search
 	_, sp := otel.Tracer(typeutil.QueryNodeRole).Start(ctx, "DecodeSearchResults")
 	defer sp.End()
 
-	results := make([]*schemapb.SearchResultData, 0)
+	results := make([]*schemapb.SearchResultData, 0, len(searchResults)) // pre-allocate
 	for _, partialSearchResult := range searchResults {
 		if partialSearchResult.SlicedBlob == nil {
 			continue
@@ -291,7 +291,7 @@ func MergeInternalRetrieveResult(ctx context.Context, retrieveResults []*interna
 	_, sp := otel.Tracer(typeutil.QueryNodeRole).Start(ctx, "MergeInternalRetrieveResult")
 	defer sp.End()
 
-	validRetrieveResults := []*TimestampedRetrieveResult[*internalpb.RetrieveResults]{}
+	validRetrieveResults := make([]*TimestampedRetrieveResult[*internalpb.RetrieveResults], 0, len(retrieveResults))
 	relatedDataSize := int64(0)
 	hasMoreResult := false
 	for _, r := range retrieveResults {
@@ -322,7 +322,7 @@ func MergeInternalRetrieveResult(ctx context.Context, retrieveResults []*interna
 	}
 
 	ret.FieldsData = typeutil.PrepareResultFieldData(validRetrieveResults[0].Result.GetFieldsData(), int64(loopEnd))
-	idTsMap := make(map[interface{}]int64)
+	idTsMap := make(map[interface{}]int64, loopEnd) // pre-allocate for expected entries
 	cursors := make([]int64, len(validRetrieveResults))
 
 	idxComputers := make([]*typeutil.FieldDataIdxComputer, len(validRetrieveResults))
@@ -404,7 +404,7 @@ func MergeSegcoreRetrieveResults(ctx context.Context, retrieveResults []*segcore
 		loopEnd    int
 	)
 
-	validRetrieveResults := []*TimestampedRetrieveResult[*segcorepb.RetrieveResults]{}
+	validRetrieveResults := make([]*TimestampedRetrieveResult[*segcorepb.RetrieveResults], 0, len(retrieveResults))
 	validSegments := make([]Segment, 0, len(segments))
 	hasMoreResult := false
 	for i, r := range retrieveResults {
@@ -452,7 +452,8 @@ func MergeSegcoreRetrieveResults(ctx context.Context, retrieveResults []*segcore
 		offset      int64 // offset of the result
 	}
 
-	var selections []selection
+	// Pre-allocate selections slice with expected capacity
+	selections := make([]selection, 0, loopEnd)
 
 	for j := 0; j < loopEnd && (limit == -1 || availableCount < limit); j++ {
 		sel, drainOneResult := typeutil.SelectMinPKWithTimestamp(validRetrieveResults, cursors)

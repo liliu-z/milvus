@@ -1,7 +1,6 @@
 package scheduler
 
 import (
-	"fmt"
 	"sync"
 
 	"go.uber.org/atomic"
@@ -272,7 +271,7 @@ func (s *scheduler) setupReadyLenMetric() {
 	// Update the ReadyQueue counter for quota.
 	collector.Counter.Set(metricsinfo.ReadyQueueType, waitingTaskCount)
 	// Record the waiting task length of policy as ready task metric.
-	metrics.QueryNodeReadTaskReadyLen.WithLabelValues(fmt.Sprint(paramtable.GetNodeID())).Set(float64(waitingTaskCount))
+	metrics.QueryNodeReadTaskReadyLen.WithLabelValues(paramtable.GetStringNodeID()).Set(float64(waitingTaskCount))
 }
 
 // scheduler counter implement, concurrent safe.

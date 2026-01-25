@@ -281,8 +281,9 @@ func (t *SearchTask) Wait() error {
 
 func (t *SearchTask) SearchResult() *internalpb.SearchResults {
 	if t.result != nil {
-		channelsMvcc := make(map[string]uint64)
-		for _, ch := range t.req.GetDmlChannels() {
+		channels := t.req.GetDmlChannels()
+		channelsMvcc := make(map[string]uint64, len(channels)) // pre-allocate
+		for _, ch := range channels {
 			channelsMvcc[ch] = t.req.GetReq().GetMvccTimestamp()
 		}
 		t.result.ChannelsMvcc = channelsMvcc

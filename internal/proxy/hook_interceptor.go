@@ -71,6 +71,6 @@ func updateProxyFunctionCallMetric(fullMethod string) {
 	if method == "" {
 		return
 	}
-	metrics.ProxyFunctionCall.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), method, metrics.TotalLabel, "", "").Inc()
-	metrics.ProxyFunctionCall.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), method, metrics.FailLabel, "", "").Inc()
+	metrics.ProxyFunctionCall.WithLabelValues(paramtable.GetStringNodeID(), method, metrics.TotalLabel, "", "").Inc()
+	metrics.ProxyFunctionCall.WithLabelValues(paramtable.GetStringNodeID(), method, metrics.FailLabel, "", "").Inc()
 }

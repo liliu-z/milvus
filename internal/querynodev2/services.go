@@ -728,7 +728,7 @@ func (node *QueryNode) SearchSegments(ctx context.Context, req *querypb.SearchRe
 		zap.String("channel", channel),
 		zap.String("scope", req.GetScope().String()),
 	)
-	channelsMvcc := make(map[string]uint64)
+	channelsMvcc := make(map[string]uint64, len(req.GetDmlChannels()))
 	for _, ch := range req.GetDmlChannels() {
 		channelsMvcc[ch] = req.GetReq().GetMvccTimestamp()
 	}

@@ -351,10 +351,10 @@ func createCntPlan(expr string, schemaHelper *typeutil.SchemaHelper, exprTemplat
 	start := time.Now()
 	plan, err := planparserv2.CreateRetrievePlan(schemaHelper, expr, exprTemplateValues)
 	if err != nil {
-		metrics.ProxyParseExpressionLatency.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), "query", metrics.FailLabel).Observe(float64(time.Since(start).Milliseconds()))
+		metrics.ProxyParseExpressionLatency.WithLabelValues(paramtable.GetStringNodeID(), "query", metrics.FailLabel).Observe(float64(time.Since(start).Milliseconds()))
 		return nil, merr.WrapErrAsInputError(merr.WrapErrParameterInvalidMsg("failed to create query plan: %v", err))
 	}
-	metrics.ProxyParseExpressionLatency.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), "query", metrics.SuccessLabel).Observe(float64(time.Since(start).Milliseconds()))
+	metrics.ProxyParseExpressionLatency.WithLabelValues(paramtable.GetStringNodeID(), "query", metrics.SuccessLabel).Observe(float64(time.Since(start).Milliseconds()))
 	plan.Node.(*planpb.PlanNode_Query).Query.IsCount = true
 
 	return plan, nil
@@ -371,10 +371,10 @@ func (t *queryTask) createPlanArgs(ctx context.Context, visitorArgs *planparserv
 		start := time.Now()
 		t.plan, err = planparserv2.CreateRetrievePlanArgs(schema.schemaHelper, t.request.Expr, t.request.GetExprTemplateValues(), visitorArgs)
 		if err != nil {
-			metrics.ProxyParseExpressionLatency.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), "query", metrics.FailLabel).Observe(float64(time.Since(start).Milliseconds()))
+			metrics.ProxyParseExpressionLatency.WithLabelValues(paramtable.GetStringNodeID(), "query", metrics.FailLabel).Observe(float64(time.Since(start).Milliseconds()))
 			return merr.WrapErrAsInputError(merr.WrapErrParameterInvalidMsg("failed to create query plan: %v", err))
 		}
-		metrics.ProxyParseExpressionLatency.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), "query", metrics.SuccessLabel).Observe(float64(time.Since(start).Milliseconds()))
+		metrics.ProxyParseExpressionLatency.WithLabelValues(paramtable.GetStringNodeID(), "query", metrics.SuccessLabel).Observe(float64(time.Since(start).Milliseconds()))
 	}
 	// parse output fields names
 	originalOuputFields := t.request.GetOutputFields()
@@ -732,7 +732,7 @@ func (t *queryTask) PostExecute(ctx context.Context) error {
 		})
 	}
 
-	metrics.ProxyDecodeResultLatency.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), metrics.QueryLabel).Observe(0.0)
+	metrics.ProxyDecodeResultLatency.WithLabelValues(paramtable.GetStringNodeID(), metrics.QueryLabel).Observe(0.0)
 	tr.CtxRecord(ctx, "reduceResultStart")
 
 	reducer := createMilvusReducer(ctx, t.queryParams, t.RetrieveRequest, t.schema.CollectionSchema, t.plan, t.collectionName, t.aggregationFieldMap)
@@ -761,7 +761,7 @@ func (t *queryTask) PostExecute(ctx context.Context) error {
 		return err
 	}
 	t.result.PrimaryFieldName = primaryFieldSchema.GetName()
-	metrics.ProxyReduceResultLatency.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), metrics.QueryLabel).Observe(float64(tr.RecordSpan().Milliseconds()))
+	metrics.ProxyReduceResultLatency.WithLabelValues(paramtable.GetStringNodeID(), metrics.QueryLabel).Observe(float64(tr.RecordSpan().Milliseconds()))
 
 	if t.queryParams.isIterator && t.request.GetGuaranteeTimestamp() == 0 {
 		// first page for iteration, need to set up sessionTs for iterator
@@ -866,7 +866,7 @@ func reduceRetrieveResults(ctx context.Context, retrieveResults []*internalpb.Re
 		loopEnd int
 	)
 
-	validRetrieveResults := []*internalpb.RetrieveResults{}
+	validRetrieveResults := make([]*internalpb.RetrieveResults, 0, len(retrieveResults))
 	for _, r := range retrieveResults {
 		size := typeutil.GetSizeOfIDs(r.GetIds())
 		if r == nil || len(r.GetFieldsData()) == 0 || size == 0 {

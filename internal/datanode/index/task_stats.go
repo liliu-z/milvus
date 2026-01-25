@@ -704,7 +704,7 @@ func (st *statsTask) createJSONKeyStats(ctx context.Context,
 		st.req.GetInsertChannel(),
 		jsonKeyIndexStats)
 
-	metrics.DataNodeBuildJSONStatsLatency.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10)).Observe(totalElapse.Seconds())
+	metrics.DataNodeBuildJSONStatsLatency.WithLabelValues(paramtable.GetStringNodeID()).Observe(totalElapse.Seconds())
 	log.Info("create json key index done",
 		zap.Int64("target segmentID", st.req.GetTargetSegmentID()),
 		zap.Duration("total elapse", totalElapse))

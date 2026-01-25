@@ -36,13 +36,15 @@ func (scr *SearchCommonReduce) ReduceSearchResultData(ctx context.Context, searc
 			Topks:      make([]int64, 0),
 		}, nil
 	}
+	// Pre-allocate slices with expected capacity to reduce allocations
+	expectedResults := int(info.GetNq() * info.GetTopK())
 	ret := &schemapb.SearchResultData{
 		NumQueries: info.GetNq(),
 		TopK:       info.GetTopK(),
 		FieldsData: make([]*schemapb.FieldData, len(searchResultData[0].FieldsData)),
-		Scores:     make([]float32, 0),
+		Scores:     make([]float32, 0, expectedResults),
 		Ids:        &schemapb.IDs{},
-		Topks:      make([]int64, 0),
+		Topks:      make([]int64, 0, info.GetNq()),
 	}
 
 	// Check element-level consistency: all results must have ElementIndices or none
@@ -78,7 +80,7 @@ func (scr *SearchCommonReduce) ReduceSearchResultData(ctx context.Context, searc
 	maxOutputSize := paramtable.Get().QuotaConfig.MaxOutputSize.GetAsInt64()
 	for i := int64(0); i < info.GetNq(); i++ {
 		offsets := make([]int64, len(searchResultData))
-		idSet := make(map[interface{}]struct{})
+		idSet := make(map[interface{}]struct{}, info.GetTopK()) // pre-allocate for topK entries
 		var j int64
 		for j = 0; j < info.GetTopK(); {
 			sel := SelectSearchResultData(searchResultData, resultOffsets, offsets, i)
@@ -142,13 +144,15 @@ func (sbr *SearchGroupByReduce) ReduceSearchResultData(ctx context.Context, sear
 			Topks:      make([]int64, 0),
 		}, nil
 	}
+	// Pre-allocate slices with expected capacity to reduce allocations
+	expectedResults := int(info.GetNq() * info.GetTopK() * info.GetGroupSize())
 	ret := &schemapb.SearchResultData{
 		NumQueries: info.GetNq(),
 		TopK:       info.GetTopK(),
 		FieldsData: make([]*schemapb.FieldData, len(searchResultData[0].FieldsData)),
-		Scores:     make([]float32, 0),
+		Scores:     make([]float32, 0, expectedResults),
 		Ids:        &schemapb.IDs{},
-		Topks:      make([]int64, 0),
+		Topks:      make([]int64, 0, info.GetNq()),
 	}
 
 	// Check element-level consistency: all results must have ElementIndices or none
@@ -197,8 +201,9 @@ func (sbr *SearchGroupByReduce) ReduceSearchResultData(ctx context.Context, sear
 	for i := int64(0); i < info.GetNq(); i++ {
 		offsets := make([]int64, len(searchResultData))
 
-		idSet := make(map[interface{}]struct{})
-		groupByValueMap := make(map[interface{}]int64)
+		// Pre-allocate maps with expected capacity to reduce allocations
+		idSet := make(map[interface{}]struct{}, groupBound)
+		groupByValueMap := make(map[interface{}]int64, info.GetTopK())
 
 		var j int64
 		for j = 0; j < groupBound; {

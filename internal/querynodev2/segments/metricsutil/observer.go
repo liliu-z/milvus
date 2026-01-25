@@ -1,7 +1,6 @@
 package metricsutil
 
 import (
-	"strconv"
 	"sync"
 	"time"
 
@@ -52,7 +51,7 @@ func getGlobalObserver() *segmentsObserver {
 // Used to check if a segment is hot or cold.
 func newSegmentsObserver() *segmentsObserver {
 	return &segmentsObserver{
-		nodeID:   strconv.FormatInt(paramtable.GetNodeID(), 10),
+		nodeID:   paramtable.GetStringNodeID(),
 		segments: typeutil.NewConcurrentMap[SegmentLabel, *segmentObserver](),
 	}
 }

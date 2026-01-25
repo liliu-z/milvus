@@ -138,7 +138,7 @@ func (m *collectionManager) UpdateSchema(collectionID int64, schema *schemapb.Co
 }
 
 func (m *collectionManager) updateMetric() {
-	metrics.QueryNodeNumCollections.WithLabelValues(fmt.Sprint(paramtable.GetNodeID())).Set(float64(len(m.collections)))
+	metrics.QueryNodeNumCollections.WithLabelValues(paramtable.GetStringNodeID()).Set(float64(len(m.collections)))
 }
 
 func (m *collectionManager) Ref(collectionID int64, count uint32) bool {

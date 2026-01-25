@@ -21,7 +21,6 @@ package embedding
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"sync"
 
 	"github.com/cockroachdb/errors"
@@ -160,7 +159,7 @@ func (executor *FunctionExecutor) processSingleFunction(ctx context.Context, run
 		return nil, err
 	}
 
-	metrics.ProxyFunctionlatency.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), runner.GetCollectionName(), runner.GetFunctionTypeName(), runner.GetFunctionProvider(), runner.GetFunctionName()).Observe(float64(tr.RecordSpan().Milliseconds()))
+	metrics.ProxyFunctionlatency.WithLabelValues(paramtable.GetStringNodeID(), runner.GetCollectionName(), runner.GetFunctionTypeName(), runner.GetFunctionProvider(), runner.GetFunctionName()).Observe(float64(tr.RecordSpan().Milliseconds()))
 	tr.CtxElapse(ctx, "function ProcessInsert done")
 	return outputs, nil
 }
@@ -222,7 +221,7 @@ func (executor *FunctionExecutor) processSingleSearch(ctx context.Context, runne
 	if err != nil {
 		return nil, err
 	}
-	metrics.ProxyFunctionlatency.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10), runner.GetCollectionName(), runner.GetFunctionTypeName(), runner.GetFunctionProvider(), runner.GetFunctionName()).Observe(float64(tr.RecordSpan().Milliseconds()))
+	metrics.ProxyFunctionlatency.WithLabelValues(paramtable.GetStringNodeID(), runner.GetCollectionName(), runner.GetFunctionTypeName(), runner.GetFunctionProvider(), runner.GetFunctionName()).Observe(float64(tr.RecordSpan().Milliseconds()))
 	tr.CtxElapse(ctx, "function ProcessSearch done")
 	return proto.Marshal(res)
 }

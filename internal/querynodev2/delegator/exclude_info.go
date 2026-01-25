@@ -94,7 +94,7 @@ func (s *ExcludedSegments) CleanInvalid(ts uint64) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	invalidExcludedInfos := []int64{}
+	invalidExcludedInfos := make([]int64, 0, len(s.segments))
 	for segmentsID, excludeTs := range s.segments {
 		if excludeTs < ts {
 			invalidExcludedInfos = append(invalidExcludedInfos, segmentsID)

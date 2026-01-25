@@ -121,8 +121,8 @@ func (it *indexBuildTask) Name() string {
 func (it *indexBuildTask) SetState(state indexpb.JobState, failReason string) {
 	it.manager.StoreIndexTaskState(it.req.GetClusterID(), it.req.GetBuildID(), commonpb.IndexState(state), failReason)
 	if state == indexpb.JobState_JobStateFinished {
-		metrics.DataNodeBuildIndexLatency.WithLabelValues(fmt.Sprint(paramtable.GetNodeID())).Observe(it.tr.ElapseSpan().Seconds())
-		metrics.DataNodeIndexTaskLatencyInQueue.WithLabelValues(fmt.Sprint(paramtable.GetNodeID())).Observe(float64(it.queueDur.Milliseconds()))
+		metrics.DataNodeBuildIndexLatency.WithLabelValues(paramtable.GetStringNodeID()).Observe(it.tr.ElapseSpan().Seconds())
+		metrics.DataNodeIndexTaskLatencyInQueue.WithLabelValues(paramtable.GetStringNodeID()).Observe(float64(it.queueDur.Milliseconds()))
 	}
 }
 
@@ -332,7 +332,7 @@ func (it *indexBuildTask) Execute(ctx context.Context) error {
 	}
 
 	buildIndexLatency := it.tr.RecordSpan()
-	metrics.DataNodeKnowhereBuildIndexLatency.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10)).Observe(buildIndexLatency.Seconds())
+	metrics.DataNodeKnowhereBuildIndexLatency.WithLabelValues(paramtable.GetStringNodeID()).Observe(buildIndexLatency.Seconds())
 
 	log.Info("Successfully build index")
 	return nil
@@ -355,7 +355,7 @@ func (it *indexBuildTask) PostExecute(ctx context.Context) error {
 		return err
 	}
 	encodeIndexFileDur := it.tr.Record("index serialize and upload done")
-	metrics.DataNodeEncodeIndexFileLatency.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10)).Observe(encodeIndexFileDur.Seconds())
+	metrics.DataNodeEncodeIndexFileLatency.WithLabelValues(paramtable.GetStringNodeID()).Observe(encodeIndexFileDur.Seconds())
 
 	// early release index for gc, and we can ensure that Delete is idempotent.
 	gcIndex()
@@ -380,7 +380,7 @@ func (it *indexBuildTask) PostExecute(ctx context.Context) error {
 		it.req.GetCurrentScalarIndexVersion(),
 	)
 	saveIndexFileDur := it.tr.RecordSpan()
-	metrics.DataNodeSaveIndexFileLatency.WithLabelValues(strconv.FormatInt(paramtable.GetNodeID(), 10)).Observe(saveIndexFileDur.Seconds())
+	metrics.DataNodeSaveIndexFileLatency.WithLabelValues(paramtable.GetStringNodeID()).Observe(saveIndexFileDur.Seconds())
 	it.tr.Elapse("index building all done")
 	log.Info("Successfully save index files",
 		zap.Uint64("serializedSize", serializedSize),

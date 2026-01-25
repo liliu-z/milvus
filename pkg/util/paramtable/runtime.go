@@ -87,6 +87,8 @@ func GetCipherParams() *cipherConfig {
 
 func SetNodeID(newID UniqueID) {
 	runtimeParam.nodeID.Store(newID)
+	// Cache the string version to avoid repeated strconv.FormatInt calls
+	runtimeParam.nodeIDStr.Store(strconv.FormatInt(newID, 10))
 }
 
 func GetNodeID() UniqueID {
@@ -94,6 +96,10 @@ func GetNodeID() UniqueID {
 }
 
 func GetStringNodeID() string {
+	// Use cached string version if available, otherwise generate
+	if s := runtimeParam.nodeIDStr.Load(); s != "" {
+		return s
+	}
 	return strconv.FormatInt(GetNodeID(), 10)
 }
 

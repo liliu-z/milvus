@@ -7028,6 +7028,7 @@ type runtimeConfig struct {
 	updateTime atomic.Time
 	role       atomic.String
 	nodeID     atomic.Int64
+	nodeIDStr  atomic.String // cached string version of nodeID to avoid repeated strconv.FormatInt
 	components typeutil.ConcurrentSet[string]
 }
 

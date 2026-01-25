@@ -650,7 +650,7 @@ func getDim(field *schemapb.FieldSchema) (int64, error) {
 }
 
 func convertFloatVectorToArray(vector [][]float32, dim int64) ([]float32, error) {
-	floatArray := make([]float32, 0)
+	floatArray := make([]float32, 0, len(vector)*int(dim))
 	for _, arr := range vector {
 		if int64(len(arr)) != dim {
 			return nil, fmt.Errorf("[]float32 size %d doesn't equal to vector dimension %d of %s",
@@ -687,7 +687,7 @@ func convertBinaryVectorToArray(vector [][]byte, dim int64, dataType schemapb.Da
 }
 
 func convertInt8VectorToArray(vector [][]int8, dim int64) ([]byte, error) {
-	byteArray := make([]byte, 0)
+	byteArray := make([]byte, 0, len(vector)*int(dim))
 	for _, arr := range vector {
 		if int64(len(arr)) != dim {
 			return nil, fmt.Errorf("[]int8 size %d doesn't equal to vector dimension %d of %s",
@@ -1641,7 +1641,7 @@ func CheckLimiter(ctx context.Context, req interface{}, pxy types.ProxyComponent
 		return nil, err
 	}
 	err = limiter.Check(dbID, collectionIDToPartIDs, rt, n)
-	nodeID := strconv.FormatInt(paramtable.GetNodeID(), 10)
+	nodeID := paramtable.GetStringNodeID()
 	metrics.ProxyRateLimitReqCount.WithLabelValues(nodeID, rt.String(), metrics.TotalLabel).Inc()
 	if err != nil {
 		metrics.ProxyRateLimitReqCount.WithLabelValues(nodeID, rt.String(), metrics.FailLabel).Inc()
@@ -1809,12 +1809,13 @@ func getElementTypeParams(param interface{}) (string, error) {
 
 func MetricsHandlerFunc(c *gin.Context) {
 	path := c.Request.URL.Path
+	nodeID := paramtable.GetStringNodeID()
 	metrics.RestfulFunctionCall.WithLabelValues(
-		strconv.FormatInt(paramtable.GetNodeID(), 10), path,
+		nodeID, path,
 	).Inc()
 	if c.Request.ContentLength >= 0 {
 		metrics.RestfulReceiveBytes.WithLabelValues(
-			strconv.FormatInt(paramtable.GetNodeID(), 10), path,
+			nodeID, path,
 		).Add(float64(c.Request.ContentLength))
 	}
 	start := time.Now()
@@ -1824,14 +1825,14 @@ func MetricsHandlerFunc(c *gin.Context) {
 
 	latency := time.Since(start)
 	metrics.RestfulReqLatency.WithLabelValues(
-		strconv.FormatInt(paramtable.GetNodeID(), 10), path,
+		nodeID, path,
 	).Observe(float64(latency.Milliseconds()))
 
 	// see https://github.com/milvus-io/milvus/issues/35767, counter cannot add negative value
 	// when response is not written(say timeout/network broken), panicking may happen if not check
 	if size := c.Writer.Size(); size > 0 {
 		metrics.RestfulSendBytes.WithLabelValues(
-			strconv.FormatInt(paramtable.GetNodeID(), 10), path,
+			nodeID, path,
 		).Add(float64(c.Writer.Size()))
 	}
 }

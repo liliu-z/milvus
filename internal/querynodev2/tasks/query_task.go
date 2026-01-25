@@ -3,7 +3,6 @@ package tasks
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/samber/lo"
@@ -71,7 +70,7 @@ func (t *QueryTask) IsGpuIndex() bool {
 // PreExecute the task, only call once.
 func (t *QueryTask) PreExecute() error {
 	// Update task wait time metric before execute
-	nodeID := strconv.FormatInt(paramtable.GetNodeID(), 10)
+	nodeID := paramtable.GetStringNodeID()
 	inQueueDuration := t.tr.ElapseSpan()
 	inQueueDurationMS := inQueueDuration.Seconds() * 1000
 
@@ -143,7 +142,7 @@ func (t *QueryTask) Execute() error {
 	reducedResult, err := reducer.Reduce(t.ctx, reduceResults, querySegments, retrievePlan)
 
 	metrics.QueryNodeReduceLatency.WithLabelValues(
-		fmt.Sprint(paramtable.GetNodeID()),
+		paramtable.GetStringNodeID(),
 		metrics.QueryLabel,
 		metrics.ReduceSegments,
 		metrics.BatchReduce).Observe(float64(time.Since(beforeReduce).Milliseconds()))
