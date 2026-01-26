@@ -1,0 +1,61 @@
+Loading test vectors...
+Loaded 1000 test vectors (dim=768)
+Loading ground truth...
+Loaded 1000 ground truth rows
+Connecting to Milvus...
+Loading collection...
+Warming up...
+
+========== Benchmark Start ==========
+
+=== Concurrency: 1, Duration: 2m0s ===
+Results (concurrency=1):
+  Total queries: 64714
+  QPS: 539.3
+  Avg Latency: 1847 us
+  P50 Latency: 1812 us
+  P95 Latency: 2205 us
+  P99 Latency: 2406 us
+  Avg Recall@100: 0.9533
+
+=== Concurrency: 5, Duration: 2m0s ===
+Results (concurrency=5):
+  Total queries: 176507
+  QPS: 1470.9
+  Avg Latency: 3388 us
+  P50 Latency: 3261 us
+  P95 Latency: 4812 us
+  P99 Latency: 6000 us
+  Avg Recall@100: 0.9533
+
+=== Concurrency: 10, Duration: 2m0s ===
+Results (concurrency=10):
+  Total queries: 198902
+  QPS: 1657.5
+  Avg Latency: 6022 us
+  P50 Latency: 5764 us
+  P95 Latency: 8973 us
+  P99 Latency: 11763 us
+  Avg Recall@100: 0.9533
+
+=== Concurrency: 20, Duration: 2m0s ===
+Results (concurrency=20):
+  Total queries: 218059
+  QPS: 1817.0
+  Avg Latency: 10997 us
+  P50 Latency: 10664 us
+  P95 Latency: 16810 us
+  P99 Latency: 24690 us
+  Avg Recall@100: 0.9533
+
+=== Concurrency: 30, Duration: 2m0s ===
+Results (concurrency=30):
+  Total queries: 228398
+  QPS: 1903.1
+  Avg Latency: 15754 us
+  P50 Latency: 15413 us
+  P95 Latency: 24888 us
+  P99 Latency: 35263 us
+  Avg Recall@100: 0.9533
+
+========== Benchmark Complete ==========

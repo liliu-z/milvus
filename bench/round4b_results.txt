@@ -1,0 +1,62 @@
+Loading test vectors...
+Loaded 1000 test vectors (dim=768)
+Loading ground truth...
+Loaded 1000 ground truth rows
+Connecting to Milvus...
+Loading collection...
+Warming up...
+Warmup error: fail to search on QueryNode 56: channel distribution is not serviceable: channel not available[channel=by-dev-rootcoord-dml_0_463776216483628201v0]
+
+========== Benchmark Start ==========
+
+=== Concurrency: 1, Duration: 2m0s ===
+Results (concurrency=1):
+  Total queries: 33718
+  QPS: 281.0
+  Avg Latency: 3550 us
+  P50 Latency: 3565 us
+  P95 Latency: 4401 us
+  P99 Latency: 4781 us
+  Avg Recall@100: 0.3169
+
+=== Concurrency: 5, Duration: 2m0s ===
+Results (concurrency=5):
+  Total queries: 69807
+  QPS: 581.7
+  Avg Latency: 8583 us
+  P50 Latency: 8287 us
+  P95 Latency: 12460 us
+  P99 Latency: 15549 us
+  Avg Recall@100: 0.3170
+
+=== Concurrency: 10, Duration: 2m0s ===
+Results (concurrency=10):
+  Total queries: 72226
+  QPS: 601.8
+  Avg Latency: 16604 us
+  P50 Latency: 16076 us
+  P95 Latency: 21602 us
+  P99 Latency: 30438 us
+  Avg Recall@100: 0.3170
+
+=== Concurrency: 20, Duration: 2m0s ===
+Results (concurrency=20):
+  Total queries: 76269
+  QPS: 635.4
+  Avg Latency: 31461 us
+  P50 Latency: 31180 us
+  P95 Latency: 40316 us
+  P99 Latency: 51413 us
+  Avg Recall@100: 0.3169
+
+=== Concurrency: 30, Duration: 2m0s ===
+Results (concurrency=30):
+  Total queries: 77631
+  QPS: 646.7
+  Avg Latency: 46370 us
+  P50 Latency: 46472 us
+  P95 Latency: 59216 us
+  P99 Latency: 71365 us
+  Avg Recall@100: 0.3170
+
+========== Benchmark Complete ==========
