@@ -3100,6 +3100,7 @@ func Test_ShouldRebuildSegmentIndex_ForceRebuild_TargetExceedsMax_Converges(t *t
 			IndexID:             indexID,
 			IndexFileKeys:       []string{"file1"},
 			CurrentIndexVersion: 20, // matches resolved (clamped) target
+			IndexType:           "HNSW",
 		}
 		im := newSegmentIndexMeta(nil)
 		im.indexes[collID] = map[UniqueID]*model.Index{

@@ -184,6 +184,11 @@ func (m *versionManagerImpl) GetMaximumIndexEngineVersion() int32 {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
+	if len(m.versions) == 0 {
+		log.Info("index versions is empty")
+		return math.MaxInt32
+	}
+
 	maximum := int32(math.MaxInt32)
 	for _, version := range m.versions {
 		if version.MaximumIndexVersion == 0 {
@@ -193,14 +198,16 @@ func (m *versionManagerImpl) GetMaximumIndexEngineVersion() int32 {
 			maximum = version.MaximumIndexVersion
 		}
 	}
-	if maximum == math.MaxInt32 {
-		return math.MaxInt32
-	}
 	return maximum
 }
 
 // clampVersion clamps v into [minV, maxV], logging a warning on each adjustment.
 func clampVersion(v, minV, maxV int32, name string) int32 {
+	if minV > maxV {
+		log.Warn(name+" has inverted bounds, using maxV",
+			zap.Int32("minimum", minV), zap.Int32("maximum", maxV))
+		return maxV
+	}
 	if v < minV {
 		log.Warn(name+" below cluster minimum, clamping",
 			zap.Int32("target", v), zap.Int32("minimum", minV))
@@ -214,8 +221,35 @@ func clampVersion(v, minV, maxV int32, name string) int32 {
 	return v
 }
 
+// getVersionBounds returns (minimal, current, maximum) under a single lock acquisition
+// to avoid TOCTOU races from separate Get calls.
+func (m *versionManagerImpl) getVersionBounds() (minV, curV, maxV int32) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if len(m.versions) == 0 {
+		return 0, 0, math.MaxInt32
+	}
+
+	curV = int32(math.MaxInt32)
+	maxV = int32(math.MaxInt32)
+	for _, version := range m.versions {
+		if version.CurrentIndexVersion < curV {
+			curV = version.CurrentIndexVersion
+		}
+		if version.MinimalIndexVersion > minV {
+			minV = version.MinimalIndexVersion
+		}
+		if version.MaximumIndexVersion != 0 && version.MaximumIndexVersion < maxV {
+			maxV = version.MaximumIndexVersion
+		}
+	}
+	return minV, curV, maxV
+}
+
 func (m *versionManagerImpl) ResolveVecIndexVersion() int32 {
-	version := m.GetCurrentIndexEngineVersion()
+	minV, curV, maxV := m.getVersionBounds()
+	version := curV
 	if Params.DataCoordCfg.TargetVecIndexVersion.GetAsInt64() != -1 {
 		target := Params.DataCoordCfg.TargetVecIndexVersion.GetAsInt32()
 		if Params.DataCoordCfg.ForceRebuildSegmentIndex.GetAsBool() {
@@ -224,12 +258,7 @@ func (m *versionManagerImpl) ResolveVecIndexVersion() int32 {
 			version = max(version, target)
 		}
 	}
-	return clampVersion(
-		version,
-		m.GetMinimalIndexEngineVersion(),
-		m.GetMaximumIndexEngineVersion(),
-		"targetVecIndexVersion",
-	)
+	return clampVersion(version, minV, maxV, "targetVecIndexVersion")
 }
 
 func (m *versionManagerImpl) GetIndexNonEncoding() bool {

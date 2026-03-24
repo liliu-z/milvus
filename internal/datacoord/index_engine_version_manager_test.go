@@ -359,6 +359,49 @@ func Test_IndexEngineVersionManager_GetMaximumIndexEngineVersion(t *testing.T) {
 	assert.Equal(t, int32(30), m.GetMaximumIndexEngineVersion())
 }
 
+func Test_clampVersion(t *testing.T) {
+	t.Run("normal range", func(t *testing.T) {
+		assert.Equal(t, int32(5), clampVersion(5, 1, 10, "test"))
+	})
+	t.Run("below min", func(t *testing.T) {
+		assert.Equal(t, int32(3), clampVersion(1, 3, 10, "test"))
+	})
+	t.Run("above max", func(t *testing.T) {
+		assert.Equal(t, int32(10), clampVersion(15, 3, 10, "test"))
+	})
+	t.Run("inverted bounds returns maxV", func(t *testing.T) {
+		assert.Equal(t, int32(5), clampVersion(8, 10, 5, "test"))
+	})
+}
+
+func Test_getVersionBounds(t *testing.T) {
+	m := newIndexEngineVersionManager().(*versionManagerImpl)
+
+	// empty
+	minV, curV, maxV := m.getVersionBounds()
+	assert.Equal(t, int32(0), minV)
+	assert.Equal(t, int32(0), curV)
+	assert.Equal(t, int32(math.MaxInt32), maxV)
+
+	// two nodes
+	m.AddNode(&sessionutil.Session{
+		SessionRaw: sessionutil.SessionRaw{
+			ServerID:           1,
+			IndexEngineVersion: sessionutil.IndexEngineVersion{MinimalIndexVersion: 3, CurrentIndexVersion: 15, MaximumIndexVersion: 25},
+		},
+	})
+	m.AddNode(&sessionutil.Session{
+		SessionRaw: sessionutil.SessionRaw{
+			ServerID:           2,
+			IndexEngineVersion: sessionutil.IndexEngineVersion{MinimalIndexVersion: 5, CurrentIndexVersion: 12, MaximumIndexVersion: 30},
+		},
+	})
+	minV, curV, maxV = m.getVersionBounds()
+	assert.Equal(t, int32(5), minV)  // max of minimals
+	assert.Equal(t, int32(12), curV) // min of currents
+	assert.Equal(t, int32(25), maxV) // min of maximums
+}
+
 func Test_IndexEngineVersionManager_ResolveVecIndexVersion(t *testing.T) {
 	paramtable.Init()
 

@@ -183,15 +183,6 @@ func mergeRequestCost(requestCosts []*internalpb.CostAggregation) *internalpb.Co
 	return result
 }
 
-func getIndexEngineVersion() (minimal, current, maximum int32) {
-	GetDynamicPool().Submit(func() (any, error) {
-		cMinimal, cCurrent, cMaximum := C.GetMinimalIndexVersion(), C.GetCurrentIndexVersion(), C.GetMaximumIndexVersion()
-		minimal, current, maximum = int32(cMinimal), int32(cCurrent), int32(cMaximum)
-		return nil, nil
-	}).Await()
-	return minimal, current, maximum
-}
-
 // getSegmentMetricLabel returns the label for segment metrics.
 func getSegmentMetricLabel(segment Segment) metricsutil.SegmentLabel {
 	return metricsutil.SegmentLabel{
