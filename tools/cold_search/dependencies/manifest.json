@@ -18,7 +18,8 @@
     "repository": "https://github.com/milvus-io/milvus-storage.git",
     "revision": "e6e1ab0817ab85a140f37ba7c920a5e6ebba0d71",
     "patches": [
-      "milvus-storage-01-whole-parquet.patch"
+      "milvus-storage-01-whole-parquet.patch",
+      "milvus-storage-02-scoped-prefetch.patch"
     ]
   },
   "aws-sdk-cpp": {

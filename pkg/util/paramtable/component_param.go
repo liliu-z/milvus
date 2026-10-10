@@ -327,8 +327,9 @@ func (p *ComponentParam) CleanEvent() {
 // --- common ---
 
 type commonConfig struct {
-	InProcessGRPCEnabled ParamItem `refreshable:"false"`
-	ClusterPrefix        ParamItem `refreshable:"false"`
+	InProcessGRPCEnabled        ParamItem `refreshable:"false"`
+	AutoLoadFilePrefetchEnabled ParamItem `refreshable:"false"`
+	ClusterPrefix               ParamItem `refreshable:"false"`
 
 	RootCoordTimeTick   ParamItem `refreshable:"true"`
 	RootCoordStatistics ParamItem `refreshable:"true"`
@@ -518,6 +519,14 @@ func (p *commonConfig) ResolveLoadAdmissionLimits(asyncEnabled bool) (budgetByte
 }
 
 func (p *commonConfig) init(base *BaseTable) {
+	p.AutoLoadFilePrefetchEnabled = ParamItem{
+		Key:          "common.autoLoadFilePrefetchEnabled",
+		DefaultValue: "false",
+		Version:      "3.0.0",
+		Doc:          "Experimental standalone-only read-ahead during automatic loading. Consume-once; maximum 16 MiB speculative file bytes per process; requires restart.",
+		Export:       true,
+	}
+	p.AutoLoadFilePrefetchEnabled.Init(base.mgr)
 	p.InProcessGRPCEnabled = ParamItem{
 		Key:          "common.inProcessGRPCEnabled",
 		DefaultValue: "false",

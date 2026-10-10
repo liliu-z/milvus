@@ -1,0 +1,200 @@
+diff --git a/cpp/include/milvus-storage/format/parquet/scoped_file_prefetch.h b/cpp/include/milvus-storage/format/parquet/scoped_file_prefetch.h
+new file mode 100644
+index 0000000..2f5c796
+--- /dev/null
++++ b/cpp/include/milvus-storage/format/parquet/scoped_file_prefetch.h
+@@ -0,0 +1,34 @@
++// Copyright 2026 Zilliz
++// Licensed under the Apache License, Version 2.0.
++#pragma once
++
++#include <cstdint>
++#include <memory>
++#include <string>
++#include <arrow/buffer.h>
++#include <arrow/filesystem/filesystem.h>
++
++namespace milvus_storage::parquet {
++
++// A consume-once handoff, owned by an explicit operation scope. This is NOT a
++// persistent file cache. Keep the scope alive until the load completes, and
++// Cancel it on every exit. Filesystem identity retains the credentials/bucket
++// boundary; callers must use immutable object keys.
++class ScopedFilePrefetch {
++ public:
++  struct State;
++  static std::shared_ptr<ScopedFilePrefetch> Reserve(
++      std::shared_ptr<arrow::fs::FileSystem> fs, std::string path, int64_t size);
++  ~ScopedFilePrefetch();
++  void Run() noexcept;
++  void Cancel() noexcept;
++  uint64_t Hits() const;
++  static std::shared_ptr<arrow::Buffer> Take(
++      const std::shared_ptr<arrow::fs::FileSystem>& fs, const std::string& path, int64_t size);
++  static int64_t ReservedBytes();
++
++ private:
++  explicit ScopedFilePrefetch(std::shared_ptr<State> state) : state_(std::move(state)) {}
++  std::shared_ptr<State> state_;
++};
++}  // namespace milvus_storage::parquet
+diff --git a/cpp/src/format/parquet/parquet_format_reader.cpp b/cpp/src/format/parquet/parquet_format_reader.cpp
+index be47c2a..8068e27 100644
+--- a/cpp/src/format/parquet/parquet_format_reader.cpp
++++ b/cpp/src/format/parquet/parquet_format_reader.cpp
+@@ -13,7 +13,13 @@
+ // limitations under the License.
+ 
+ #include "milvus-storage/format/parquet/parquet_format_reader.h"
++#include "milvus-storage/format/parquet/scoped_file_prefetch.h"
+ 
++#include <atomic>
++#include <condition_variable>
++#include <map>
++#include <mutex>
++#include <tuple>
+ #include <cstring>
+ #include <exception>
+ #include <limits>
+@@ -57,6 +63,129 @@
+ 
+ namespace milvus_storage::parquet {
+ 
++namespace {
++using PrefetchKey = std::tuple<const arrow::fs::FileSystem*, std::string, int64_t>;
++struct PrefetchRegistry {
++  std::mutex mutex;
++  std::map<PrefetchKey, std::weak_ptr<ScopedFilePrefetch::State>> pending;
++  std::atomic<int64_t> bytes{0};
++  std::atomic<int64_t> entries{0};
++};
++PrefetchRegistry& prefetch_registry() {
++  // Process lifetime: in-flight IO may outlive other static destructors.
++  static auto* registry = new PrefetchRegistry;
++  return *registry;
++}
++}  // namespace
++
++struct ScopedFilePrefetch::State {
++  std::shared_ptr<arrow::fs::FileSystem> fs;
++  PrefetchKey key;
++  bool reserved = false;
++  std::mutex mutex;
++  std::condition_variable ready;
++  bool running = false;
++  bool completed = false;
++  bool canceled = false;
++  std::shared_ptr<arrow::Buffer> data;
++  std::atomic<uint64_t> hits{0};
++
++  ~State() {
++    if (reserved) {
++      prefetch_registry().bytes.fetch_sub(std::get<2>(key));
++      prefetch_registry().entries.fetch_sub(1);
++    }
++  }
++
++  void Read() noexcept {
++    {
++      std::lock_guard lock(mutex);
++      if (running || completed || canceled) return;
++      running = true;
++    }
++    std::shared_ptr<arrow::Buffer> bytes;
++    try {
++      arrow::fs::FileInfo info(std::get<1>(key), arrow::fs::FileType::File);
++      info.set_size(std::get<2>(key));
++      auto file = fs->OpenInputFile(info);
++      if (file.ok()) {
++        auto read = (*file)->ReadAt(0, info.size());
++        if (read.ok() && (*read)->size() == info.size()) bytes = *read;
++      }
++    } catch (...) {
++      // Speculation is optional. The ordinary reader retries and preserves its
++      // own storage status, including corruption, throttle, OOM and timeout.
++    }
++    {
++      std::lock_guard lock(mutex);
++      if (!canceled) data = std::move(bytes);
++      completed = true;
++    }
++    ready.notify_all();
++  }
++};
++
++std::shared_ptr<ScopedFilePrefetch> ScopedFilePrefetch::Reserve(
++    std::shared_ptr<arrow::fs::FileSystem> fs, std::string path, int64_t size) {
++  if (!fs || path.empty() || size <= 0 || size > 4 * 1024 * 1024) return nullptr;
++  auto state = std::make_shared<State>();
++  state->fs = std::move(fs);
++  state->key = PrefetchKey(state->fs.get(), std::move(path), size);
++  auto scope = std::shared_ptr<ScopedFilePrefetch>(new ScopedFilePrefetch(state));
++  auto& registry = prefetch_registry();
++  std::lock_guard lock(registry.mutex);
++  if (registry.bytes.load() + size > 16 * 1024 * 1024 || registry.entries.load() >= 16) return nullptr;
++  auto it = registry.pending.find(state->key);
++  if (it != registry.pending.end() && !it->second.expired()) return nullptr;
++  registry.bytes.fetch_add(size);
++  registry.entries.fetch_add(1);
++  state->reserved = true;
++  registry.pending[state->key] = state;
++  return scope;
++}
++
++ScopedFilePrefetch::~ScopedFilePrefetch() { Cancel(); }
++void ScopedFilePrefetch::Run() noexcept { state_->Read(); }
++void ScopedFilePrefetch::Cancel() noexcept {
++  auto& registry = prefetch_registry();
++  {
++    std::lock_guard lock(registry.mutex);
++    auto it = registry.pending.find(state_->key);
++    if (it != registry.pending.end() && it->second.lock() == state_) registry.pending.erase(it);
++  }
++  {
++    std::lock_guard lock(state_->mutex);
++    state_->canceled = true;
++    state_->data.reset();
++  }
++  state_->ready.notify_all();
++}
++uint64_t ScopedFilePrefetch::Hits() const { return state_->hits.load(); }
++int64_t ScopedFilePrefetch::ReservedBytes() { return prefetch_registry().bytes.load(); }
++
++std::shared_ptr<arrow::Buffer> ScopedFilePrefetch::Take(
++    const std::shared_ptr<arrow::fs::FileSystem>& fs, const std::string& path, int64_t size) {
++  auto& registry = prefetch_registry();
++  if (registry.entries.load() == 0) return nullptr;
++  std::shared_ptr<State> state;
++  {
++    std::lock_guard lock(registry.mutex);
++    auto it = registry.pending.find(PrefetchKey(fs.get(), path, size));
++    if (it == registry.pending.end()) return nullptr;
++    state = it->second.lock();
++    registry.pending.erase(it);
++  }
++  if (!state) return nullptr;
++  // If queued work has not started, the foreground owns the read. This avoids
++  // waiting for a queued job on the very executor running the foreground load.
++  state->Read();
++  std::unique_lock lock(state->mutex);
++  state->ready.wait(lock, [&] { return state->completed || state->canceled; });
++  if (state->canceled || !state->data) return nullptr;
++  state->hits.fetch_add(1);
++  return std::move(state->data);
++}
++
+ static constexpr int64_t kParquetFooterTrailerSize = 8;
+ static constexpr int64_t kParquetMagicSize = 4;
+ static constexpr char kParquetMagic[] = "PAR1";
+@@ -373,7 +502,10 @@ static arrow::Result<std::shared_ptr<::parquet::arrow::FileReader>> create_parqu
+   if (whole_file && !*whole_file && prefetch_limit > 0 && file_size > 0 &&
+       file_size <= static_cast<uint64_t>(prefetch_limit)) {
+     // Preserve storage status details (throttle, timeout, not-found) unchanged.
+-    ARROW_ASSIGN_OR_RAISE(auto bytes, parquet_file->ReadAt(0, static_cast<int64_t>(file_size)));
++    auto bytes = ScopedFilePrefetch::Take(fs, file_path, static_cast<int64_t>(file_size));
++    if (!bytes) {
++      ARROW_ASSIGN_OR_RAISE(bytes, parquet_file->ReadAt(0, static_cast<int64_t>(file_size)));
++    }
+     if (bytes->size() != static_cast<int64_t>(file_size)) {
+       return MakeExtendError(ExtendStatusCode::PackedFileCorrupted,
+                              fmt::format("Short Parquet file read: expected {} bytes, got {} [path={}]",

@@ -38,6 +38,119 @@
 #include "storage/Util.h"
 #include "storage/loon_ffi/property_singleton.h"
 #include "milvus-storage/thread_pool.h"
+#include "milvus-storage/filesystem/fs.h"
+#include "milvus-storage/format/parquet/scoped_file_prefetch.h"
+#include "milvus-storage/manifest.h"
+#include "cachinglayer/Manager.h"
+#include <algorithm>
+#include <unordered_set>
+
+namespace {
+struct AutoLoadFilePrefetchScope {
+    std::vector<std::shared_ptr<milvus_storage::parquet::ScopedFilePrefetch>>
+        files;
+    ~AutoLoadFilePrefetchScope() {
+        for (auto& file : files) {
+            file->Cancel();
+        }
+    }
+};
+}  // namespace
+
+void*
+BeginAutoLoadFilePrefetch(const char* manifest,
+                          const int64_t* field_ids,
+                          int64_t field_count) {
+    try {
+        if (!manifest || !field_ids || field_count <= 0 || field_count > 64) {
+            return nullptr;
+        }
+        auto properties =
+            milvus::storage::LoonFFIPropertiesSingleton::GetInstance()
+                .GetProperties();
+        if (!properties) {
+            return nullptr;
+        }
+        auto limit = milvus_storage::api::GetValueNoError<int64_t>(
+            *properties, PROPERTY_READER_PARQUET_WHOLE_FILE_PREFETCH_LIMIT);
+        if (limit <= 0) {
+            return nullptr;
+        }
+        auto data = GetLoonManifest(manifest, properties);
+        std::unordered_set<std::string> fields;
+        for (int64_t i = 0; i < field_count; ++i) {
+            fields.insert(std::to_string(field_ids[i]));
+        }
+        // Validate the entire speculative batch before reserving or issuing IO.
+        // Large datasets retain the ordinary load path.
+        std::vector<milvus_storage::api::ColumnGroupFile> candidates;
+        int64_t bytes = 0;
+        for (const auto& group : data->columnGroups()) {
+            if (!group || group->format != "parquet" ||
+                std::none_of(
+                    group->columns.begin(),
+                    group->columns.end(),
+                    [&](const auto& field) { return fields.count(field); })) {
+                continue;
+            }
+            for (const auto& file : group->files) {
+                auto size =
+                    file.Get<int64_t>(milvus_storage::api::kPropertyFileSize);
+                if (size <= 0 ||
+                    size > std::min<int64_t>(limit, 4 * 1024 * 1024)) {
+                    return nullptr;
+                }
+                bytes += size;
+                if (bytes > 16 * 1024 * 1024 || candidates.size() >= 16) {
+                    return nullptr;
+                }
+                candidates.push_back(file);
+            }
+        }
+        auto scope = std::make_unique<AutoLoadFilePrefetchScope>();
+        scope->files.reserve(candidates.size());
+        for (const auto& file : candidates) {
+            auto fs = milvus_storage::FilesystemCache::getInstance().get(
+                *properties, file.path);
+            auto uri = milvus_storage::StorageUri::Parse(file.path);
+            if (!fs.ok() || !uri.ok()) {
+                continue;
+            }
+            auto prepared =
+                milvus_storage::parquet::ScopedFilePrefetch::Reserve(
+                    *fs,
+                    uri->key,
+                    file.Get<int64_t>(milvus_storage::api::kPropertyFileSize));
+            if (prepared) {
+                scope->files.push_back(std::move(prepared));
+            }
+        }
+        auto pool =
+            milvus::cachinglayer::Manager::GetInstance().GetPrefetchPool();
+        for (const auto& file : scope->files) {
+            pool->add([file] { file->Run(); });
+        }
+        return scope.release();
+    } catch (...) {
+        // Best-effort read-ahead. Normal load remains the authoritative error
+        // path and re-reads files after any speculative failure.
+        return nullptr;
+    }
+}
+
+CAutoLoadFilePrefetchStats
+EndAutoLoadFilePrefetch(void* pointer) {
+    std::unique_ptr<AutoLoadFilePrefetchScope> scope(
+        static_cast<AutoLoadFilePrefetchScope*>(pointer));
+    CAutoLoadFilePrefetchStats stats{};
+    if (scope) {
+        stats.files = scope->files.size();
+        for (const auto& file : scope->files) {
+            stats.hits += file->Hits();
+        }
+    }
+    return stats;
+}
 
 CStatus
 GetLocalUsedSize(const char* c_dir, int64_t* size) {

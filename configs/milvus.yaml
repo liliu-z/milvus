@@ -1285,6 +1285,7 @@ internaltls:
   sni: localhost # The server name indication (SNI) for internal TLS, should be the same as the name provided by the certificates ref: https://en.wikipedia.org/wiki/Server_Name_Indication
 
 common:
+  autoLoadFilePrefetchEnabled: false # Experimental scoped standalone read-ahead during WAL broadcast.
   inProcessGRPCEnabled: false # Experimental internal gRPC byte transport; standalone performance experiments.
   nodeScheduler:
     maxConcurrencyRatio: 100

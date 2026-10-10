@@ -56,6 +56,21 @@ InitDiskFileWriterConfig(CDiskWriteConfig c_disk_write_config);
 CStatus
 SetParquetWholeFilePrefetchLimit(int64_t bytes);
 
+// Optional, bounded and consume-once read-ahead scoped to one auto-load. No
+// segment or readiness state is published by this API. Always call End.
+void*
+BeginAutoLoadFilePrefetch(const char* manifest,
+                          const int64_t* field_ids,
+                          int64_t field_count);
+
+typedef struct {
+    uint64_t files;
+    uint64_t hits;
+} CAutoLoadFilePrefetchStats;
+
+CAutoLoadFilePrefetchStats
+EndAutoLoadFilePrefetch(void* scope);
+
 CStatus
 InitArrowReaderConfig(CArrowReaderConfig c_arrow_reader_config);
 

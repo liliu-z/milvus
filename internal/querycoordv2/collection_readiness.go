@@ -80,6 +80,8 @@ func (s *Server) ensureCollectionReady(ctx context.Context, req *querypb.EnsureC
 			if err != nil {
 				return nil, err
 			}
+			endPrefetch := s.startAutoLoadFilePrefetch(loadCtx, coll)
+			defer endPrefetch()
 			status, err := s.LoadCollection(loadCtx, loadReq)
 			if err := merr.CheckRPCCall(status, err); err != nil {
 				return nil, err
