@@ -71,6 +71,53 @@ func (s Catalog) SaveCollection(ctx context.Context, collection *querypb.Collect
 	return s.multiSaveInBatches(ctx, kvs)
 }
 
+// SaveLoadConfig combines small desired-state updates into one metadata write.
+// Larger configs retain the existing collection-before-replica write order.
+// This does not include removal of stale partition or replica keys.
+func (s Catalog) SaveLoadConfig(ctx context.Context, collection *querypb.CollectionLoadInfo, partitions []*querypb.PartitionLoadInfo, replicas []*querypb.Replica) error {
+	const maxCombinedBytes = 64 * 1024
+	limit := min(MetaOpsBatchSize, paramtable.Get().MetaStoreCfg.MaxEtcdTxnNum.GetAsInt())
+	size := proto.Size(collection)
+	for _, partition := range partitions {
+		size += proto.Size(partition)
+	}
+	for _, replica := range replicas {
+		size += proto.Size(replica)
+	}
+	// Leave ample room for keys and transaction framing. Avoid increasing the
+	// request size for large configurations that previously used separate writes.
+	if 1+len(partitions)+len(replicas) > limit || size > maxCombinedBytes {
+		if err := s.SaveCollection(ctx, collection, partitions...); err != nil {
+			return err
+		}
+		if len(replicas) == 0 {
+			return nil
+		}
+		return s.SaveReplica(ctx, replicas...)
+	}
+	kvs := make(map[string]string, 1+len(partitions)+len(replicas))
+	value, err := proto.Marshal(collection)
+	if err != nil {
+		return err
+	}
+	kvs[EncodeCollectionLoadInfoKey(collection.GetCollectionID())] = string(value)
+	for _, partition := range partitions {
+		key, value, err := marshalPartitionLoadInfo(partition)
+		if err != nil {
+			return err
+		}
+		kvs[key] = value
+	}
+	for _, replica := range replicas {
+		value, err := proto.Marshal(replica)
+		if err != nil {
+			return err
+		}
+		kvs[encodeReplicaKey(replica.GetCollectionID(), replica.GetID())] = string(value)
+	}
+	return s.cli.MultiSave(ctx, kvs)
+}
+
 func (s Catalog) SavePartition(ctx context.Context, info ...*querypb.PartitionLoadInfo) error {
 	kvs := make(map[string]string, len(info))
 	for _, partition := range info {

@@ -51,6 +51,12 @@ type LoadConfigEntry struct {
 	StoreVersion  uint64
 }
 
+// loadConfigSaver is implemented by catalogs that can combine the desired
+// collection, partition and replica state into fewer metadata writes.
+type loadConfigSaver interface {
+	SaveLoadConfig(context.Context, *querypb.CollectionLoadInfo, []*querypb.PartitionLoadInfo, []*querypb.Replica) error
+}
+
 // RecoverLoadConfigStore constructs a LoadConfigStore and rebuilds its
 // in-memory state from ETCD via the catalog. It is the sole constructor:
 // the store is always fully recovered before any operation.
@@ -130,21 +136,24 @@ func (s *LoadConfigStore) Put(ctx context.Context, cfg *LoadConfig) error {
 		}
 	}
 
-	// Save the full collection (including all partitions) and all replicas.
-	if err := s.catalog.SaveCollection(
-		ctx,
-		cfg.toCollectionLoadInfoProto(),
-		cfg.toPartitionLoadInfoProtos()...,
-	); err != nil {
-		return err
+	collection := cfg.toCollectionLoadInfoProto()
+	partitions := cfg.toPartitionLoadInfoProtos()
+	replicas := make([]*querypb.Replica, 0, len(cfg.Replicas))
+	for _, r := range cfg.Replicas {
+		replicas = append(replicas, r.toReplicaProto(cfg.CollectionID))
 	}
-	if len(cfg.Replicas) > 0 {
-		replicaProtos := make([]*querypb.Replica, 0, len(cfg.Replicas))
-		for _, r := range cfg.Replicas {
-			replicaProtos = append(replicaProtos, r.toReplicaProto(cfg.CollectionID))
-		}
-		if err := s.catalog.SaveReplica(ctx, replicaProtos...); err != nil {
+	if catalog, ok := s.catalog.(loadConfigSaver); ok {
+		if err := catalog.SaveLoadConfig(ctx, collection, partitions, replicas); err != nil {
 			return err
+		}
+	} else {
+		if err := s.catalog.SaveCollection(ctx, collection, partitions...); err != nil {
+			return err
+		}
+		if len(replicas) > 0 {
+			if err := s.catalog.SaveReplica(ctx, replicas...); err != nil {
+				return err
+			}
 		}
 	}
 
