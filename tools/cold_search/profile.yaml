@@ -1,0 +1,51 @@
+# Final experiment profile, applied over configs/milvus.yaml.
+# Render ${COLD_SEARCH_ROOT} with render-config.py; use a dedicated local NVMe directory.
+etcd:
+  endpoints: 127.0.0.1:2379
+  rootPath: cold-search-qv
+minio:
+  address: 127.0.0.1
+  port: 9000
+  accessKeyID: minioadmin
+  secretAccessKey: minioadmin
+  useSSL: false
+  useIAM: false
+  bucketName: cold-search-qv
+  rootPath: files
+  region: us-east-1
+proxy:
+  enableAutoLoad: true
+mq:
+  type: woodpecker
+woodpecker:
+  storage:
+    type: local
+    rootPath: ${COLD_SEARCH_ROOT}/wal/qv-experiment
+localStorage:
+  path: ${COLD_SEARCH_ROOT}/data
+common:
+  inProcessGRPCEnabled: true
+  autoLoadFilePrefetchEnabled: true
+  manifestStatsCacheEnabled: true
+  arrow:
+    reader:
+      parquetWholeFilePrefetchLimitBytes: 4194304
+  localResourcePath: ${COLD_SEARCH_ROOT}/resources
+  requery:
+    searchPolicy: OutputText
+log:
+  level: warn
+  format: json
+trace:
+  exporter: otlp
+  sampleFraction: 1
+  otlp:
+    endpoint: 127.0.0.1:4318
+    method: http
+    secure: false
+queryNode:
+  preferFieldDataWhenIndexHasRawData: true
+  segcore:
+    nativeFutureWaiters: 1
+queryView:
+  leaseDuration: 60s
