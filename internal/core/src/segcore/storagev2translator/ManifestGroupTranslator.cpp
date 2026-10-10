@@ -42,6 +42,7 @@
 #include "storage/StatusToErrorCode.h"
 #include "common/FieldMeta.h"
 #include "common/GroupChunk.h"
+#include "common/ImmutableVectorChunk.h"
 #include "common/Schema.h"
 #include "common/Types.h"
 #include "fmt/core.h"
@@ -782,8 +783,18 @@ ManifestGroupTranslator::load_group_chunk(
     std::unordered_map<FieldId, std::shared_ptr<Chunk>> chunks;
     if (!use_mmap_) {
         // Memory mode
-        chunks = create_group_chunk(
-            field_ids, field_metas, array_vecs, mmap_populate_);
+        // Decoded Arrow tables are immutable. Retain a whole small vector
+        // buffer directly when its layout already matches FixedWidthChunk.
+        if (field_ids.size() == 1) {
+            if (auto chunk =
+                    TryAdoptImmutableFloatVector(field_metas[0], array_vecs[0])) {
+                chunks.emplace(field_ids[0], std::move(chunk));
+            }
+        }
+        if (chunks.empty()) {
+            chunks = create_group_chunk(
+                field_ids, field_metas, array_vecs, mmap_populate_);
+        }
     } else {
         // Mmap mode — use unique generation suffix to avoid truncating files
         // that old MAP_SHARED mmaps still reference (see #48658).
