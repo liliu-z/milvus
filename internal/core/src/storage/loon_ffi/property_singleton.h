@@ -34,6 +34,7 @@ namespace milvus::storage {
 struct ArrowReaderLimits {
     int64_t hole_size_limit_bytes = 0;
     int64_t range_size_limit_bytes = 0;
+    int64_t whole_file_prefetch_limit_bytes = 0;
 };
 
 // Process-local policy applied only when an External Table filesystem is
@@ -76,8 +77,23 @@ class LoonFFIPropertiesSingleton {
         // transiently expose 8MiB/4MiB and fail the build task.
         {
             std::unique_lock cfg_lck(config_mutex_);
-            arrow_reader_limits_ = {hole_size_limit_bytes,
-                                    range_size_limit_bytes};
+            arrow_reader_limits_.hole_size_limit_bytes = hole_size_limit_bytes;
+            arrow_reader_limits_.range_size_limit_bytes = range_size_limit_bytes;
+        }
+        std::unique_lock lck(mutex_);
+        if (properties_ != nullptr) {
+            auto properties =
+                std::make_shared<milvus_storage::api::Properties>(*properties_);
+            ApplyArrowReaderConfig(*properties);
+            properties_ = std::move(properties);
+        }
+    }
+
+    void
+    SetParquetWholeFilePrefetchLimit(int64_t bytes) {
+        {
+            std::unique_lock cfg_lck(config_mutex_);
+            arrow_reader_limits_.whole_file_prefetch_limit_bytes = bytes;
         }
         std::unique_lock lck(mutex_);
         if (properties_ != nullptr) {
@@ -156,6 +172,10 @@ class LoonFFIPropertiesSingleton {
     void
     ApplyArrowReaderConfig(milvus_storage::api::Properties& properties) const {
         auto limits = GetArrowReaderLimits();
+        milvus_storage::api::SetValue(
+            properties,
+            PROPERTY_READER_PARQUET_WHOLE_FILE_PREFETCH_LIMIT,
+            std::to_string(limits.whole_file_prefetch_limit_bytes).c_str());
         milvus_storage::api::SetValue(
             properties,
             PROPERTY_READER_PARQUET_PREBUFFER_HOLE_SIZE_LIMIT,

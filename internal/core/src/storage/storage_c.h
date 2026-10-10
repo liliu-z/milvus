@@ -54,6 +54,9 @@ CStatus
 InitDiskFileWriterConfig(CDiskWriteConfig c_disk_write_config);
 
 CStatus
+SetParquetWholeFilePrefetchLimit(int64_t bytes);
+
+CStatus
 InitArrowReaderConfig(CArrowReaderConfig c_arrow_reader_config);
 
 void

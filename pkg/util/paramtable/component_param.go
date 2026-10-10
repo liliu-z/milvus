@@ -356,6 +356,7 @@ type commonConfig struct {
 	ArrowIOThreadPoolMaxCapacity        ParamItem `refreshable:"true"`
 	ArrowReaderHoleSizeLimitBytes       ParamItem `refreshable:"true"`
 	ArrowReaderRangeSizeLimitBytes      ParamItem `refreshable:"true"`
+	ParquetWholeFilePrefetchLimitBytes  ParamItem `refreshable:"false"`
 	StorageReaderThreadPoolSize         ParamItem `refreshable:"true"`
 	IndexBuildReadWindowBytes           ParamItem `refreshable:"true"`
 	EnableMaterializedView              ParamItem `refreshable:"false"`
@@ -973,6 +974,15 @@ This configuration is only used by querynode and indexnode, it selects CPU instr
 		Export: false,
 	}
 	p.ArrowReaderRangeSizeLimitBytes.Init(base.mgr)
+
+	p.ParquetWholeFilePrefetchLimitBytes = ParamItem{
+		Key:          "common.arrow.reader.parquetWholeFilePrefetchLimitBytes",
+		Version:      "3.0.0",
+		DefaultValue: "0",
+		Doc:          "Synchronous Parquet readers fetch files up to this size in one request, including footer and data. 0 disables this. Immutable file bytes stay in memory until the reader is released, in addition to decoded data; sparse projections can read extra bytes.",
+		Export:       true,
+	}
+	p.ParquetWholeFilePrefetchLimitBytes.Init(base.mgr)
 
 	p.StorageReaderThreadPoolSize = ParamItem{
 		Key:          "common.storage.readerThreadPoolSize",

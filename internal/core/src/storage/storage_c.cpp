@@ -198,6 +198,21 @@ InitDiskFileWriterConfig(CDiskWriteConfig c_disk_write_config) {
 }
 
 CStatus
+SetParquetWholeFilePrefetchLimit(int64_t bytes) {
+    try {
+        if (bytes < 0) {
+            return milvus::FailureCStatus(
+                milvus::ConfigInvalid,
+                "Parquet whole-file prefetch limit must be non-negative");
+        }
+        milvus::storage::LoonFFIPropertiesSingleton::GetInstance()
+            .SetParquetWholeFilePrefetchLimit(bytes);
+        return milvus::SuccessCStatus();
+    }
+    CGO_CATCH_AND_RETURN_CSTATUS
+}
+
+CStatus
 InitArrowReaderConfig(CArrowReaderConfig c_arrow_reader_config) {
     try {
         if (c_arrow_reader_config.hole_size_limit_bytes < 0) {

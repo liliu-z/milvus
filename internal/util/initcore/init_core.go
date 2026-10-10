@@ -630,7 +630,11 @@ func InitArrowReaderConfig(params *paramtable.ComponentParam) error {
 		range_size_limit_bytes: C.int64_t(params.CommonCfg.ArrowReaderRangeSizeLimitBytes.GetAsInt64()),
 	}
 	status := C.InitArrowReaderConfig(arrowReaderConfig)
-	return HandleCStatus(&status, "InitArrowReaderConfig failed")
+	if err := HandleCStatus(&status, "InitArrowReaderConfig failed"); err != nil {
+		return err
+	}
+	status = C.SetParquetWholeFilePrefetchLimit(C.int64_t(params.CommonCfg.ParquetWholeFilePrefetchLimitBytes.GetAsInt64()))
+	return HandleCStatus(&status, "SetParquetWholeFilePrefetchLimit failed")
 }
 
 // InitExternalVectorNullPolicy publishes the process-wide normalization policy

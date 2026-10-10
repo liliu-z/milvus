@@ -362,12 +362,21 @@ func TestRegisterArrowReaderConfigWatchers(t *testing.T) {
 func TestInitArrowReaderConfig(t *testing.T) {
 	paramtable.Init()
 	pt := paramtable.Get()
+	prefetch := &pt.CommonCfg.ParquetWholeFilePrefetchLimitBytes
+	t.Cleanup(func() {
+		pt.Reset(prefetch.Key)
+		assert.NoError(t, InitArrowReaderConfig(pt))
+	})
 
 	assert.NoError(t, InitArrowReaderConfig(pt))
 
 	assert.NoError(t, pt.Save(pt.CommonCfg.ArrowReaderHoleSizeLimitBytes.Key, "32768"))
 	assert.NoError(t, pt.Save(pt.CommonCfg.ArrowReaderRangeSizeLimitBytes.Key, "1048576"))
 	assert.NoError(t, InitArrowReaderConfig(pt))
+	assert.NoError(t, pt.Save(prefetch.Key, "4194304"))
+	assert.NoError(t, InitArrowReaderConfig(pt))
+	assert.NoError(t, pt.Save(prefetch.Key, "-1"))
+	assert.Error(t, InitArrowReaderConfig(pt))
 }
 
 func TestInitExternalVectorNullPolicy(t *testing.T) {
