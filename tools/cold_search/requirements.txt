@@ -1,0 +1,6 @@
+numpy==2.2.6
+pymilvus==3.0.2
+orjson==3.13.0
+prometheus-client==0.26.0
+opentelemetry-proto==1.45.1
+protobuf==7.36.2
