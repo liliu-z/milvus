@@ -37,6 +37,21 @@ func (m *queryViewCollectionRuntimeManager) Acquire(ctx context.Context, view *q
 	}
 	pb := view.IntoProto()
 	meta := pb.GetMeta()
+	// Schema and desired load metadata depend only on the collection/view IDs.
+	// Fetch them concurrently, but retain the schema error's original priority
+	// and join the metadata request on every exit before publishing a runtime.
+	metadataCtx, cancelMetadata := context.WithCancel(ctx)
+	metadataDone := make(chan struct{})
+	var loadInfo qnview.QueryViewLoadInfo
+	var loadInfoErr error
+	go func() {
+		defer close(metadataDone)
+		loadInfo, loadInfoErr = m.loadInfo(metadataCtx, meta)
+	}()
+	defer func() {
+		cancelMetadata()
+		<-metadataDone
+	}()
 	collection, err := m.meta.DescribeCollection(ctx, meta.GetCollectionId())
 	if err != nil {
 		return nil, isRetryableCollectionRuntimeError(err), err
@@ -44,9 +59,9 @@ func (m *queryViewCollectionRuntimeManager) Acquire(ctx context.Context, view *q
 	if collection == nil || collection.GetSchema() == nil {
 		return nil, false, merr.WrapErrServiceInternalMsg("collection metadata is incomplete")
 	}
-	loadInfo, err := m.loadInfo(ctx, meta)
-	if err != nil {
-		return nil, isRetryableCollectionRuntimeError(err), err
+	<-metadataDone
+	if loadInfoErr != nil {
+		return nil, isRetryableCollectionRuntimeError(loadInfoErr), loadInfoErr
 	}
 	if err := m.collections.PutOrRef(
 		meta.GetCollectionId(),
