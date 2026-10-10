@@ -1,0 +1,14 @@
+v74 diagnostics: same v73 optimization plus StreamingNode catalog-save timer. Short lease0/wait0.1, six samples per scenario; not formal acceptance.
+nvme-v74-sn-persist-probe-id-only-0: SDK9.525475ms SNsave0.309145ms Up-roundtrip0.390574ms
+nvme-v74-sn-persist-probe-with-vector-0: SDK9.664735ms SNsave0.291329ms Up-roundtrip0.372781ms
+nvme-v74-sn-persist-probe-id-only-1: SDK10.613089ms SNsave0.318574ms Up-roundtrip0.420781ms
+nvme-v74-sn-persist-probe-with-vector-1: SDK9.441600ms SNsave0.304253ms Up-roundtrip0.391459ms
+nvme-v74-sn-persist-probe-id-only-2: SDK9.812605ms SNsave0.269801ms Up-roundtrip0.359979ms
+nvme-v74-sn-persist-probe-with-vector-2: SDK9.702673ms SNsave0.261416ms Up-roundtrip0.333809ms
+nvme-v74-sn-persist-probe-id-only-3: SDK9.726959ms SNsave0.275042ms Up-roundtrip0.358612ms
+nvme-v74-sn-persist-probe-with-vector-3: SDK9.977276ms SNsave0.431945ms Up-roundtrip0.524041ms
+nvme-v74-sn-persist-probe-id-only-4: SDK9.877206ms SNsave0.262459ms Up-roundtrip0.344635ms
+nvme-v74-sn-persist-probe-with-vector-4: SDK9.771514ms SNsave0.482025ms Up-roundtrip0.555432ms
+nvme-v74-sn-persist-probe-id-only-5: SDK9.676323ms SNsave0.286815ms Up-roundtrip0.371750ms
+nvme-v74-sn-persist-probe-with-vector-5: SDK9.729682ms SNsave0.272423ms Up-roundtrip0.351446ms
+No 5ms Up outlier reproduced; cannot retrospectively attribute v73 outlier to catalog IO. Save timer excludes shard-lock wait and transport, includes metadata packing and etcd call. Original persist-before-report and terminal failure/cancel handling unchanged; SN handler tests + race PASS1.647s.

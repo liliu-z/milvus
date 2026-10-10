@@ -1,0 +1,177 @@
+{
+  "base_commit": "2dd24a2189a11c7f61652eb5a4b1c17921348325",
+  "variant": "nvme-v83-confirm",
+  "runtime": {
+    "config": "nvme-v83-confirm.yaml",
+    "binary": "sn-persist-timing",
+    "label": "nvme-v83-confirm",
+    "gomaxprocs": 2,
+    "malloc_conf": "background_thread:true,narenas:1,dirty_decay_ms:600000,muzzy_decay_ms:600000,thp:always",
+    "mem_limit": 66206023680,
+    "cpu_affinity": {
+      "milvus": "0-4",
+      "minio": "5-6",
+      "etcd": "7"
+    },
+    "minio_network": "host, listen 127.0.0.1:9000",
+    "native_core_source": "libmilvus_core.so",
+    "prefer_field_data": true,
+    "minio_container": "cold-search-minio-gomax2",
+    "minio_gomaxprocs": 2,
+    "etcd_container": "cold-search-etcd-host",
+    "etcd_gomaxprocs": 1,
+    "etcd_network": "host",
+    "etcd_endpoint": "127.0.0.1:2379",
+    "wal_loop_direct_io": true,
+    "inprocess_grpc": true,
+    "autoload_prefetch": true,
+    "manifest_stats_cache": true,
+    "trace_fraction": "1",
+    "native_future_waiters": 1,
+    "wal_idle_interval": "10ms"
+  },
+  "files": {
+    "go_binary": {
+      "path": "milvus-sn-persist-timing",
+      "sha256": "9f193ad5ad5a5a0de45dfa061f1c0a3bd806143d13629e9599e417fc2e3a1096"
+    },
+    "native_core": {
+      "path": "libmilvus_core.so",
+      "sha256": "3366a0366f6bed893a6f5e7cb29bcfb50091a19636ad912df23714b58d746c44"
+    },
+    "native_storage": {
+      "path": "libmilvus-storage.so",
+      "sha256": "8598ce6102980a1feb30c833ad857e795429a99620f2e05390b99cb65bb00fa2"
+    },
+    "runtime_config": {
+      "path": "nvme-v83-confirm.yaml",
+      "sha256": "a4dc0788855500d1580e3a8368a613776eab885f9d5bd5bb3ddf79c9eba6f696"
+    },
+    "milvus_patch": {
+      "path": "milvus-v83.patch",
+      "sha256": "706d6d2ecf7b5f742c840eaad9f97a8e76813a0ed32e3c131bba66d9fe163ca1"
+    },
+    "storage_patch": {
+      "path": "milvus-storage-v62.patch",
+      "sha256": "7cff15078e4b2e355fa67757a325baf6cc049f67e50df7f3167e57438d91353a"
+    },
+    "aws_patch": {
+      "path": "aws-sdk-cpp-checksum-header.patch",
+      "sha256": "b2b99dd86e7d6c1b457be96a4beb7352f4f187394bdda133ce2ddf35b37bcabf"
+    },
+    "woodpecker_patch": {
+      "path": "woodpecker-local-fence.patch",
+      "sha256": "304755fccd5bd750afd0e5c67e3a7cc39d42dfcbe84a2c98d8965cdcd5b2d89b"
+    },
+    "go_modfile": {
+      "path": "milvus-local-grpc.mod",
+      "sha256": "b7de07863c97a2cd858bebed4e969f93a3908db6bb7ba0ff98c2260d20812c1a"
+    },
+    "grpc_patch": {
+      "path": "grpc-inprocess-experiment.patch",
+      "sha256": "c21b33e2626e8965e36f8dac9f7455a4e5a3bec1a8592f299220347675b20253"
+    },
+    "go_sumfile": {
+      "path": "milvus-local-grpc.sum",
+      "sha256": "60066afd331c7c3d7256b118732152457bbca4cba5be14ea326337558e92a0cb"
+    },
+    "native_scope_test": {
+      "path": "scoped-prefetch-check.cpp",
+      "sha256": "265e6980d122e7a73967a32f150474567f0f2f5b56d1126fcf31e55cdda2206f"
+    },
+    "native_scope_test_log": {
+      "path": "test-scoped-prefetch-check.log",
+      "sha256": "0b2470ff183132dfc132c8fec2d4d926fef61b1360d96e0f49213e037a6a4a49"
+    },
+    "go_scope_test_log": {
+      "path": "test-autoload-prefetch-async-race.log",
+      "sha256": "b944712a8db47930bd90f8085e390eac6481043ef04be08c4e55dbaf6b52b857"
+    },
+    "manifest_stats_cache_tests": {
+      "path": "test-manifest-stats-cache-race.log",
+      "sha256": "aa931ef499a1560093e8d2619cb34a11032a2010fa2f2f7fd1f5c3101b4c0782"
+    },
+    "manifest_metadata_cache_tests": {
+      "path": "test-manifest-delta-cache-race.log",
+      "sha256": "ebae760bb7ab9a3f79e4ddcee4b8d0747061371a0af0ff0d789db76f9319780e"
+    },
+    "delta_loader_tests": {
+      "path": "test-load-delta-cache-race-fixed-env.log",
+      "sha256": "941262ed5a809bf9ad5402720f67f7fd3f22425cd5e8b63778a2f7824da8ff10"
+    },
+    "delta_correctness_audit": {
+      "path": "delta-cache-correctness-audit.txt",
+      "sha256": "1d81bf41dd3cc5c63e261c311495283305a194ecd9b08851fbbe87e5b4d4e2cf"
+    },
+    "candidate_comparison": {
+      "path": "10ms-v71-candidate-report.txt",
+      "sha256": "4a758c6311f8b3030fe6936fac7796c2843b6b8cbf6184396fb349d4f32e5d1e"
+    },
+    "pk_tests": {
+      "path": "test-int64-pk-output.log",
+      "sha256": "40daf4a058c0f17e5aff1b85143b4855c3d8e2de57c7e1582310f1f9ec436a62"
+    },
+    "pk_negative_control": {
+      "path": "test-int64-pk-old-core-negative.log",
+      "sha256": "c655befd6c0e411ade3bc0683745bd43ea2f08afc5bc7a2c91b7660d8ef21eae"
+    },
+    "pk_audit": {
+      "path": "int64-pk-correctness-audit.txt",
+      "sha256": "c5042ecef1902e9f9e4aab1c93420b339a81def7fa51b08bef026251021e5d43"
+    },
+    "pk_comparison": {
+      "path": "int64-pk-v78-comparison.txt",
+      "sha256": "cb1827a07760fbe21671f67ce39d621991611b039056f3dbf5c1270a06ecb0e4"
+    },
+    "sn_timer_tests": {
+      "path": "test-sn-persist-timing-race.log",
+      "sha256": "60dacac270a96a7a2692c2852bd7a9185c3204c5f6bb6f5d3795825ddb84eca0"
+    },
+    "prefetch_pool_tests": {
+      "path": "test-prefetch-io-pool.log",
+      "sha256": "0b2470ff183132dfc132c8fec2d4d926fef61b1360d96e0f49213e037a6a4a49"
+    },
+    "prefetch_pool_pk_tests": {
+      "path": "test-prefetch-io-pool-pk.log",
+      "sha256": "bad915bcafd09a29815f21cf80ea37cd89fe7ff4b2231063c30f4ae6354710df"
+    }
+  },
+  "native_candidate": "async FLOAT_VECTOR reader open with existing CacheSlot async warmup",
+  "native_tests": "17 ChunkedColumnGroup + 5 ImmutableVectorChunk PASS",
+  "not_included": [
+    "AWS receive buffer v42",
+    "AWS checksum selection cache v43",
+    "parallel JSON stats candidate: source edited after v57 start, not built into v57 binary"
+  ],
+  "minio_deployment": {
+    "name": "cold-search-minio-gomax2",
+    "image": "milvusdb/minio:RELEASE.2024-12-18T13-15-44Z",
+    "cpuset_cpus": "5-6",
+    "GOMAXPROCS": "2",
+    "network": "host",
+    "data": [
+      "$COLD_SEARCH_ROOT/minio:/data"
+    ]
+  },
+  "etcd_deployment": {
+    "image": "quay.io/coreos/etcd:v3.5.25",
+    "name": "cold-search-etcd-host",
+    "GOMAXPROCS": 1,
+    "cpuset_cpus": "7",
+    "network": "host",
+    "endpoint": "127.0.0.1:2379",
+    "data": [
+      "$COLD_SEARCH_ROOT/etcd:/etcd"
+    ]
+  },
+  "source_note": "Full source frozen in milvus-v83.patch; unchanged v74 sn-persist-timing Go binary plus rebuilt native core for dedicated two-worker speculative IO pool; PK/output optimization retained. Storage/Woodpecker/grpc/AWS artifacts unchanged. No source edits during formal cohort. Published production files are byte-identical to this frozen v83 tree; publication tool paths are made portable.",
+  "status": "Formal v83: all six <=10ms=True; full samples=[9.691247, 9.954684, 9.608509, 9.836449, 9.378333, 9.640484]",
+  "grpc_candidate": "Opt-in same-process bufconn transport preserving HTTP2/protobuf/TLS/interceptors, custom dialer/proxy precedence, TCP fallback. Dependency fork grpc v1.83.2.",
+  "future_candidate": "Opt-in bounded native future waiting with independent semaphore, default disabled, experiment capacity 1; fallback existing Go callback. Full internal/util/cgo/... tests + race passed.",
+  "prefetch_candidate": "Opt-in standalone: up to4segments/4096rows, only system/PK/vector raw groups without index files; native speculative cap16MiB/16files,4MiB/file; fs identity/path/size exact keys, scope cleanup on success/failure.",
+  "prefetch_tests": "Native actual Parquet handoff/status/cancellation/budget checks PASS; Go readiness and prefetch tests + race PASS2.257s, includes WAL failure no publication and late preparation cleanup.",
+  "delta_metadata_candidate": "Default-off shared switch; ordinary explicit immutable-version delta path descriptions only, separate128entries/1MiB accounted cap; no delete file content cached.",
+  "delta_metadata_tests": "Packed selection+race PASS4.431s; actual packed Parquet parent/child/new-version/missing-file/recovery plus regressions+race PASS3.144s. See audit and test logs.",
+  "pk_optimization": "Existing default-off preferFieldDataWhenIndexHasRawData enabled; internal INT64 PK fill and late output use available raw column; non-PK output no longer pins PK index. External/index-only fallback and lazy index for deletes retained.",
+  "prefetch_pool": "Default-off admitted auto-load IO only, dedicated fixed two-worker executor; cache warmup remains on original pool. Limits/ownership/cleanup/fallback unchanged. No longest-first ordering retained."
+}

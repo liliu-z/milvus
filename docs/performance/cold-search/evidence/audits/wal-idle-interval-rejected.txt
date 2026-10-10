@@ -1,0 +1,11 @@
+WAL idle interval experiment: configuration-only; no source changes; no durability relaxation.
+Both runs used maxEntries=1, fsync before acknowledgment, Go2, normal candidate scoped-prefetch-async; short lease0/wait0.1 diagnostic only.
+nvme-v66-wal-idle100 id-only: [9.666697, 9.436726, 12.090434], mean=10.397952333ms
+nvme-v66-wal-idle100 with-vector: [9.885742, 9.608039, 9.035526], mean=9.509769000ms
+nvme-v67-wal-idle10-control id-only: [9.33064, 9.67505, 9.525872], mean=9.510520667ms
+nvme-v67-wal-idle10-control with-vector: [9.330856, 9.857074, 9.592602], mean=9.593510667ms
+At 100ms, per-search idle fence checks dropped to0-1; actual writes still had immediate Sync.
+One v66 ID sample12.090434ms had WAL appendimpl3.36ms versus usual0.5-0.6ms. All samples retained.
+Adjacent10ms control does not establish a stable latency benefit from100ms. Rejected; restored10ms.
+Fencing source audit: remote recovery Fence retains5s wait; own-flock drain unchanged. Changing idle interval would delay passive external-fence observation from10ms to100ms; this configuration was not adopted.
+Formal latest remainsv64; v66/v67 are not substituted for formal normallease measurements.

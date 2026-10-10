@@ -1,0 +1,4 @@
+v58 parallel JSON stats: ID[13.727578,11.333688,10.218870], vector[11.461216,12.066091,10.828759].
+v59 adjacent control without change: ID[11.199672,10.417497,10.456801], vector[10.798865,10.426802,10.610903].
+No end-to-end benefit; candidate source reverted. Native/S3 variance prevents claiming causal regression from only 3 rounds/scenario. Tests TestLocalSegment* with race PASS; source patch retained.
+MinIO exact-release source: ReadFileStream uses ordinary OpenFile(readMode), single-disk oDirect false; do not change O_DIRECT as read optimization. https://github.com/minio/minio/blob/RELEASE.2024-12-18T13-15-44Z/cmd/xl-storage.go

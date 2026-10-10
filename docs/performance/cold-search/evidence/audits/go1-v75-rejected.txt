@@ -1,0 +1,5 @@
+Go parallelism1 candidate REJECTED; preserve2. Same sn-persist-timing binary, native libraries and other config; short lease0/wait0.1,6 samples per scenario.
+nvme-v74-sn-persist-probe id-only: samples=[9.525475, 10.613089, 9.812605, 9.726959, 9.877206, 9.676323];mean=9.871943ms
+nvme-v74-sn-persist-probe with-vector: samples=[9.664735, 9.4416, 9.702673, 9.977276, 9.771514, 9.729682];mean=9.714580ms
+nvme-v75-go1 id-only: samples=[10.458139, 10.181883, 10.105636, 9.520432, 9.768668, 9.764194];mean=9.966492ms
+nvme-v75-go1 with-vector: samples=[11.744629, 10.055212, 10.16189, 10.175122, 10.405743, 10.079229];mean=10.436971ms

@@ -1,0 +1,4483 @@
+[
+  {
+    "label": "nvme-baseline-id-repeat",
+    "run": {
+      "label": "nvme-baseline-id-repeat",
+      "round": 0,
+      "start_ns": 1791612688580046389,
+      "before": "NotLoad",
+      "manual_load": false,
+      "release_wait_s": 62.0,
+      "release_rpc_ms": 11.720967,
+      "scenario": "id-only",
+      "output_fields": [],
+      "latency_ms": 33.495457,
+      "return_ns": 1791612688613549396,
+      "ids": [
+        123,
+        660,
+        322,
+        541,
+        913,
+        593,
+        694,
+        56,
+        947,
+        348
+      ],
+      "distances": [
+        0.9999998807907104,
+        0.10951204597949982,
+        0.10621106624603271,
+        0.10212098807096481,
+        0.09275553375482559,
+        0.09181385487318039,
+        0.08825279772281647,
+        0.08425603061914444,
+        0.08256486058235168,
+        0.08228766173124313
+      ],
+      "id_only_verified": true,
+      "ok": true,
+      "end_ns": 1791612688613939208,
+      "after": "Loaded"
+    },
+    "minio": [
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/0_0752b749-cd8d-4c86-be38-501393469000.parquet",
+        "time": "2026-10-10T06:11:28.595390384Z",
+        "offset_ms": 15.343995,
+        "duration_ms": 0.448576,
+        "statusCode": 206,
+        "bytes": 473
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/1_c226ff0a-4be9-4ba7-b6ea-fe3261d903cc.parquet",
+        "time": "2026-10-10T06:11:28.59539346Z",
+        "offset_ms": 15.347071,
+        "duration_ms": 0.50708,
+        "statusCode": 206,
+        "bytes": 603
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/2_609a9ba3-1346-4e30-b72e-38390b757e79.parquet",
+        "time": "2026-10-10T06:11:28.595390406Z",
+        "offset_ms": 15.344017,
+        "duration_ms": 1.138373,
+        "statusCode": 206,
+        "bytes": 438
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/0_0752b749-cd8d-4c86-be38-501393469000.parquet",
+        "time": "2026-10-10T06:11:28.597049142Z",
+        "offset_ms": 17.002753,
+        "duration_ms": 0.412914,
+        "statusCode": 206,
+        "bytes": 5620
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_stats/bloom_filter.100/469658685339286657",
+        "time": "2026-10-10T06:11:28.599357215Z",
+        "offset_ms": 19.310826,
+        "duration_ms": 0.402708,
+        "statusCode": 200,
+        "bytes": 3189
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/2_609a9ba3-1346-4e30-b72e-38390b757e79.parquet",
+        "time": "2026-10-10T06:11:28.603348331Z",
+        "offset_ms": 23.301942,
+        "duration_ms": 2.678693,
+        "statusCode": 206,
+        "bytes": 3073439
+      }
+    ],
+    "spans": [
+      {
+        "name": "milvus.proto.milvus.MilvusService/Search",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 0.855298,
+        "ms": 32.256276,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "t2Tsjq/xaD0="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 1.080086,
+        "ms": 20.193881,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "Xd4Hg0U+qug=",
+        "parentSpanId": "t2Tsjq/xaD0="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 1.220769,
+        "ms": 19.987268,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "igCDd3RSj6w=",
+        "parentSpanId": "Xd4Hg0U+qug="
+      },
+      {
+        "name": "wal.broadcast",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 1.676938,
+        "ms": 10.242584,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "B3Cq7dsa49g=",
+        "parentSpanId": "igCDd3RSj6w="
+      },
+      {
+        "name": "wal.append",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.356117,
+        "ms": 7.895962,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "7u8o8ckUfW8=",
+        "parentSpanId": "B3Cq7dsa49g="
+      },
+      {
+        "name": "wal.appendimpl",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.395995,
+        "ms": 7.779882,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "wfGAQdxKuFU=",
+        "parentSpanId": "7u8o8ckUfW8="
+      },
+      {
+        "name": "Write",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.437391,
+        "ms": 7.737716,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "I6BCiLTgFmk=",
+        "parentSpanId": "wfGAQdxKuFU="
+      },
+      {
+        "name": "GetOrCreateWritableSegmentHandle",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.449785,
+        "ms": 0.036623,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "8fvBCEwZI3g=",
+        "parentSpanId": "I6BCiLTgFmk="
+      },
+      {
+        "name": "GetLastAddConfirmed",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.454255,
+        "ms": 0.028464,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "IdN6kaNhl+s=",
+        "parentSpanId": "8fvBCEwZI3g="
+      },
+      {
+        "name": "GetQuorumInfo",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.456477,
+        "ms": 0.002315,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "9BVHmce8HHc=",
+        "parentSpanId": "IdN6kaNhl+s="
+      },
+      {
+        "name": "GetSegmentBlockCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.467308,
+        "ms": 0.012708,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "iy7RAIyJCFI=",
+        "parentSpanId": "IdN6kaNhl+s="
+      },
+      {
+        "name": "GetBlocksCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.473799,
+        "ms": 0.002624,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "f2sjzYMwQ+I=",
+        "parentSpanId": "iy7RAIyJCFI="
+      },
+      {
+        "name": "AppendAsync",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.48751,
+        "ms": 0.008322,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "qa8TzPBPn1w=",
+        "parentSpanId": "I6BCiLTgFmk="
+      },
+      {
+        "name": "wal.bc_callback",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 10.845096,
+        "ms": 0.738176,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "a7tESiQf8Kg=",
+        "parentSpanId": "B3Cq7dsa49g="
+      },
+      {
+        "name": "Proxy-Search",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 21.292101,
+        "ms": 11.692166,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "XoZcIzaD7Xs=",
+        "parentSpanId": "t2Tsjq/xaD0="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 21.35332,
+        "ms": 0.168863,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "SVyzWuXjjWo=",
+        "parentSpanId": "XoZcIzaD7Xs="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 21.436608,
+        "ms": 0.04682,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "pgb8lKKKVLI=",
+        "parentSpanId": "SVyzWuXjjWo="
+      },
+      {
+        "name": "SearchTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 21.548484,
+        "ms": 11.39448,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "4lRGbAV/4uo=",
+        "parentSpanId": "XoZcIzaD7Xs="
+      },
+      {
+        "name": "Proxy-Search-PreExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 21.554913,
+        "ms": 0.130133,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "X+9/+x3Il/Q=",
+        "parentSpanId": "4lRGbAV/4uo="
+      },
+      {
+        "name": "init search request",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 21.581618,
+        "ms": 0.081812,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "fbFLCMFX9zg=",
+        "parentSpanId": "X+9/+x3Il/Q="
+      },
+      {
+        "name": "Proxy-Search-Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 21.686783,
+        "ms": 9.65005,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "2Bu7OvkXS9Q=",
+        "parentSpanId": "4lRGbAV/4uo="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 21.741902,
+        "ms": 0.288881,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "mXhIBQbJS2I=",
+        "parentSpanId": "2Bu7OvkXS9Q="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 21.857311,
+        "ms": 0.110814,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "BaEe4CnJ9oE=",
+        "parentSpanId": "mXhIBQbJS2I="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 22.091682,
+        "ms": 9.204948,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "7JRQ9/I/OY4=",
+        "parentSpanId": "2Bu7OvkXS9Q="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 22.203186,
+        "ms": 8.98811,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "EbcMhJwY5wQ=",
+        "parentSpanId": "7JRQ9/I/OY4="
+      },
+      {
+        "name": "schedule",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 22.276922,
+        "ms": 0.004463,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "znSFSJtqmwI=",
+        "parentSpanId": "EbcMhJwY5wQ="
+      },
+      {
+        "name": "SegCoreSearch",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 22.484789,
+        "ms": 8.127758,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "IQILb5psGlM=",
+        "parentSpanId": "znSFSJtqmwI="
+      },
+      {
+        "name": "ExecuteTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 22.52763,
+        "ms": 8.077932,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "CAfs2aWsn/E=",
+        "parentSpanId": "IQILb5psGlM="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 22.545793,
+        "ms": 8.047059,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "flhCO7nIkPk=",
+        "parentSpanId": "CAfs2aWsn/E="
+      },
+      {
+        "name": "PhyMvccNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 30.093218,
+        "ms": 0.010601,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "kYg5/dhlZFk=",
+        "parentSpanId": "flhCO7nIkPk="
+      },
+      {
+        "name": "PhyVectorSearchNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 30.10785,
+        "ms": 0.480748,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "6miCHwUPdrs=",
+        "parentSpanId": "flhCO7nIkPk="
+      },
+      {
+        "name": "knowhere bf search with buf",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 30.197696,
+        "ms": 0.37038,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "g/pOOD5mk00=",
+        "parentSpanId": "IQILb5psGlM="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 30.596796,
+        "ms": 0.00591,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "SG3DTwJ7rRQ=",
+        "parentSpanId": "CAfs2aWsn/E="
+      },
+      {
+        "name": "ReduceHelper::PreReduce",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 30.789104,
+        "ms": 0.180406,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "cjmLAEH5IiI=",
+        "parentSpanId": "znSFSJtqmwI="
+      },
+      {
+        "name": "ReduceHelper::FilterInvalidSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 30.7918,
+        "ms": 0.002461,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "zirEmeARtds=",
+        "parentSpanId": "cjmLAEH5IiI="
+      },
+      {
+        "name": "ReduceHelper::FillPrimaryKey",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 30.79621,
+        "ms": 0.172708,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "15eguh5NE9o=",
+        "parentSpanId": "cjmLAEH5IiI="
+      },
+      {
+        "name": "EncodeSearchResultData",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 31.116392,
+        "ms": 0.012874,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "qzt9hgyVvMU=",
+        "parentSpanId": "znSFSJtqmwI="
+      },
+      {
+        "name": "Proxy-Search-PostExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 31.340549,
+        "ms": 1.597607,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "tXiy0FEMiWk=",
+        "parentSpanId": "4lRGbAV/4uo="
+      },
+      {
+        "name": "searchReduceOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 31.356728,
+        "ms": 0.014247,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "f4jy6hDdFYY=",
+        "parentSpanId": "tXiy0FEMiWk="
+      },
+      {
+        "name": "reduceResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 31.357936,
+        "ms": 0.011175,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "/2J1m+xVPCo=",
+        "parentSpanId": "XoZcIzaD7Xs="
+      },
+      {
+        "name": "decodeSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 31.3597,
+        "ms": 0.004814,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "aPj/Dwf8UdQ=",
+        "parentSpanId": "/2J1m+xVPCo="
+      },
+      {
+        "name": "RetrieveTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 31.422501,
+        "ms": 1.439033,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "gtBCf8agmW8=",
+        "parentSpanId": "XoZcIzaD7Xs="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 31.545995,
+        "ms": 0.31074,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "eJTVnNK3Ww0=",
+        "parentSpanId": "gtBCf8agmW8="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 31.681639,
+        "ms": 0.112164,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "nTY+WYXc2v8=",
+        "parentSpanId": "eJTVnNK3Ww0="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/QueryOnView",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 31.922308,
+        "ms": 0.880429,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "VVS952IAzGk=",
+        "parentSpanId": "gtBCf8agmW8="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/QueryOnView",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 32.037921,
+        "ms": 0.681592,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "dhQneLOV4bg=",
+        "parentSpanId": "VVS952IAzGk="
+      },
+      {
+        "name": "schedule",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.096268,
+        "ms": 0.057347,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "b9xFWiGeOfo=",
+        "parentSpanId": "dhQneLOV4bg="
+      },
+      {
+        "name": "SegCoreRetrieve",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.297311,
+        "ms": 0.264773,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "1hVDsAr8APA=",
+        "parentSpanId": "b9xFWiGeOfo="
+      },
+      {
+        "name": "Retrieve",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.306186,
+        "ms": 0.246167,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "rN3h4WwbLY8=",
+        "parentSpanId": "1hVDsAr8APA="
+      },
+      {
+        "name": "ExecuteTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.316723,
+        "ms": 0.161835,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "Dmf/pSamdTs=",
+        "parentSpanId": "rN3h4WwbLY8="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.333715,
+        "ms": 0.135904,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "6ny7qO242V4=",
+        "parentSpanId": "Dmf/pSamdTs="
+      },
+      {
+        "name": "PhyMvccNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.385825,
+        "ms": 0.0006,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "nEH2TZTxUhI=",
+        "parentSpanId": "6ny7qO242V4="
+      },
+      {
+        "name": "PhyFilterBitsNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.388891,
+        "ms": 0.042643,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "nTkURpID/wc=",
+        "parentSpanId": "6ny7qO242V4="
+      },
+      {
+        "name": "ExprSet::Eval",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.400504,
+        "ms": 0.028769,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "kX+Kkjv2grs=",
+        "parentSpanId": "nTkURpID/wc="
+      },
+      {
+        "name": "PhyTermFilterExpr::Eval",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.402204,
+        "ms": 0.026424,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "aIzYJtm5plo=",
+        "parentSpanId": "kX+Kkjv2grs="
+      },
+      {
+        "name": "PhyMvccNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.433565,
+        "ms": 0.033491,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "NwAjUuHOrLw=",
+        "parentSpanId": "6ny7qO242V4="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.471788,
+        "ms": 0.005254,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "JZF2qvkXVW0=",
+        "parentSpanId": "Dmf/pSamdTs="
+      },
+      {
+        "name": "Find Limit Pk",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.48186,
+        "ms": 0.001908,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "Z0e9rj4yQSE=",
+        "parentSpanId": "rN3h4WwbLY8="
+      },
+      {
+        "name": "FillTargetEntry",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.488996,
+        "ms": 0.062455,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "HCoz2p95mLg=",
+        "parentSpanId": "rN3h4WwbLY8="
+      },
+      {
+        "name": "partial-segcore-results-deserialization",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.599784,
+        "ms": 0.015092,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "+S6Ahi0K1Ck=",
+        "parentSpanId": "b9xFWiGeOfo="
+      },
+      {
+        "name": "ReduceByPKWithTimestampOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.659603,
+        "ms": 0.011072,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "aCyVkU0c9zA=",
+        "parentSpanId": "b9xFWiGeOfo="
+      },
+      {
+        "name": "QueryPipeline.Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.849756,
+        "ms": 0.007152,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "G394hAcAfNU=",
+        "parentSpanId": "gtBCf8agmW8="
+      },
+      {
+        "name": "ReduceByPKOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.851852,
+        "ms": 0.000615,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "UiNl2UPoxoo=",
+        "parentSpanId": "gtBCf8agmW8="
+      },
+      {
+        "name": "SliceOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.853836,
+        "ms": 0.000471,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "pqCmzx8uiVw=",
+        "parentSpanId": "gtBCf8agmW8="
+      },
+      {
+        "name": "organizeOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.894785,
+        "ms": 0.013494,
+        "traceId": "28pXOpFMdu6CoyQLHMoH7g==",
+        "spanId": "uLL6AXzC+FI=",
+        "parentSpanId": "XoZcIzaD7Xs="
+      }
+    ]
+  },
+  {
+    "label": "nvme-baseline-vector",
+    "run": {
+      "label": "nvme-baseline-vector",
+      "round": 0,
+      "start_ns": 1791612607734068231,
+      "before": "NotLoad",
+      "manual_load": false,
+      "release_wait_s": 62.0,
+      "release_rpc_ms": 5.848101,
+      "scenario": "with-vector",
+      "output_fields": [
+        "vector"
+      ],
+      "latency_ms": 35.57219,
+      "return_ns": 1791612607769648075,
+      "ids": [
+        123,
+        660,
+        322,
+        541,
+        913,
+        593,
+        694,
+        56,
+        947,
+        348
+      ],
+      "distances": [
+        0.9999998807907104,
+        0.10951204597949982,
+        0.10621106624603271,
+        0.10212098807096481,
+        0.09275553375482559,
+        0.09181385487318039,
+        0.08825279772281647,
+        0.08425603061914444,
+        0.08256486058235168,
+        0.08228766173124313
+      ],
+      "vectors_verified": true,
+      "returned_vector_count": 10,
+      "returned_vector_values": 7680,
+      "ok": true,
+      "end_ns": 1791612607770473443,
+      "after": "Loaded"
+    },
+    "minio": [
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/0_0752b749-cd8d-4c86-be38-501393469000.parquet",
+        "time": "2026-10-10T06:10:07.751439707Z",
+        "offset_ms": 17.371476,
+        "duration_ms": 0.445888,
+        "statusCode": 206,
+        "bytes": 473
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/1_c226ff0a-4be9-4ba7-b6ea-fe3261d903cc.parquet",
+        "time": "2026-10-10T06:10:07.75143958Z",
+        "offset_ms": 17.371349,
+        "duration_ms": 0.529064,
+        "statusCode": 206,
+        "bytes": 603
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/2_609a9ba3-1346-4e30-b72e-38390b757e79.parquet",
+        "time": "2026-10-10T06:10:07.751439531Z",
+        "offset_ms": 17.3713,
+        "duration_ms": 1.057033,
+        "statusCode": 206,
+        "bytes": 438
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/0_0752b749-cd8d-4c86-be38-501393469000.parquet",
+        "time": "2026-10-10T06:10:07.753032894Z",
+        "offset_ms": 18.964663,
+        "duration_ms": 0.379341,
+        "statusCode": 206,
+        "bytes": 5620
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_stats/bloom_filter.100/469658685339286657",
+        "time": "2026-10-10T06:10:07.755358289Z",
+        "offset_ms": 21.290058,
+        "duration_ms": 0.321137,
+        "statusCode": 200,
+        "bytes": 3189
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/2_609a9ba3-1346-4e30-b72e-38390b757e79.parquet",
+        "time": "2026-10-10T06:10:07.759183861Z",
+        "offset_ms": 25.11563,
+        "duration_ms": 2.563935,
+        "statusCode": 206,
+        "bytes": 3073439
+      }
+    ],
+    "spans": [
+      {
+        "name": "milvus.proto.milvus.MilvusService/Search",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 0.853833,
+        "ms": 34.328225,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "cXfJvOMzBoY="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 1.057734,
+        "ms": 22.083165,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "4UGL2yq6RDY=",
+        "parentSpanId": "cXfJvOMzBoY="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 1.181314,
+        "ms": 21.892709,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "6UpZXxjQR80=",
+        "parentSpanId": "4UGL2yq6RDY="
+      },
+      {
+        "name": "wal.broadcast",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 1.646895,
+        "ms": 12.447823,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "lQ6WWv1y5r8=",
+        "parentSpanId": "6UpZXxjQR80="
+      },
+      {
+        "name": "wal.append",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.36565,
+        "ms": 9.931838,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "4iQ7vW0s9+c=",
+        "parentSpanId": "lQ6WWv1y5r8="
+      },
+      {
+        "name": "wal.appendimpl",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.407261,
+        "ms": 9.804962,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "TQhhZCy+XqE=",
+        "parentSpanId": "4iQ7vW0s9+c="
+      },
+      {
+        "name": "Write",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.452406,
+        "ms": 9.758766,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "W6JijYwHlVE=",
+        "parentSpanId": "TQhhZCy+XqE="
+      },
+      {
+        "name": "GetOrCreateWritableSegmentHandle",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.466414,
+        "ms": 0.038663,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "YTlPneecNkk=",
+        "parentSpanId": "W6JijYwHlVE="
+      },
+      {
+        "name": "GetLastAddConfirmed",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.4709,
+        "ms": 0.030235,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "0TaVtwEgGKs=",
+        "parentSpanId": "YTlPneecNkk="
+      },
+      {
+        "name": "GetQuorumInfo",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.473408,
+        "ms": 0.001457,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "3oWzt2MKGEc=",
+        "parentSpanId": "0TaVtwEgGKs="
+      },
+      {
+        "name": "GetSegmentBlockCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.484221,
+        "ms": 0.013771,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "7KNGikRDrZg=",
+        "parentSpanId": "0TaVtwEgGKs="
+      },
+      {
+        "name": "GetBlocksCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.491051,
+        "ms": 0.002609,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "qMsDPWGc6oE=",
+        "parentSpanId": "7KNGikRDrZg="
+      },
+      {
+        "name": "AppendAsync",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.506234,
+        "ms": 0.008713,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "v3Q9wLY/eec=",
+        "parentSpanId": "W6JijYwHlVE="
+      },
+      {
+        "name": "wal.bc_callback",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 12.86546,
+        "ms": 0.754685,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "EIga8v7uM8E=",
+        "parentSpanId": "lQ6WWv1y5r8="
+      },
+      {
+        "name": "Proxy-Search",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 23.161851,
+        "ms": 11.818158,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "KjqBcOTFNzk=",
+        "parentSpanId": "cXfJvOMzBoY="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 23.223059,
+        "ms": 0.165418,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "IuOB3iteppA=",
+        "parentSpanId": "KjqBcOTFNzk="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 23.302633,
+        "ms": 0.041328,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "qb9oLfKkBqw=",
+        "parentSpanId": "IuOB3iteppA="
+      },
+      {
+        "name": "SearchTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 23.42673,
+        "ms": 11.513704,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "pFzFI8ebo60=",
+        "parentSpanId": "KjqBcOTFNzk="
+      },
+      {
+        "name": "Proxy-Search-PreExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 23.433666,
+        "ms": 0.147473,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "g5FImBtr1Qg=",
+        "parentSpanId": "pFzFI8ebo60="
+      },
+      {
+        "name": "init search request",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 23.473298,
+        "ms": 0.089577,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "ureGS6bI7Kw=",
+        "parentSpanId": "g5FImBtr1Qg="
+      },
+      {
+        "name": "Proxy-Search-Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 23.582959,
+        "ms": 9.487686,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "2Eb4F8afB4k=",
+        "parentSpanId": "pFzFI8ebo60="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 23.641031,
+        "ms": 0.260143,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "1NjZrbdb1p0=",
+        "parentSpanId": "2Eb4F8afB4k="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 23.749829,
+        "ms": 0.087828,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "/2wSbkRFkZM=",
+        "parentSpanId": "1NjZrbdb1p0="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 23.974209,
+        "ms": 9.062762,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "xr7dIfX4kGY=",
+        "parentSpanId": "2Eb4F8afB4k="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 24.087111,
+        "ms": 8.86282,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "CHnn5rNwzrI=",
+        "parentSpanId": "xr7dIfX4kGY="
+      },
+      {
+        "name": "schedule",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 24.148495,
+        "ms": 0.003886,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "cb0YDGwhTjc=",
+        "parentSpanId": "CHnn5rNwzrI="
+      },
+      {
+        "name": "SegCoreSearch",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 24.339165,
+        "ms": 7.821683,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "HrlON9b7nio=",
+        "parentSpanId": "cb0YDGwhTjc="
+      },
+      {
+        "name": "ExecuteTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 24.38165,
+        "ms": 7.772403,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "P0JQXsecHfY=",
+        "parentSpanId": "HrlON9b7nio="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 24.398163,
+        "ms": 7.743084,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "JmP7VpL6mtg=",
+        "parentSpanId": "P0JQXsecHfY="
+      },
+      {
+        "name": "PhyMvccNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 31.691086,
+        "ms": 0.011387,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "HoBZ6Oygz74=",
+        "parentSpanId": "JmP7VpL6mtg="
+      },
+      {
+        "name": "PhyVectorSearchNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 31.706236,
+        "ms": 0.431355,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "x0/W+5nzaR0=",
+        "parentSpanId": "JmP7VpL6mtg="
+      },
+      {
+        "name": "knowhere bf search with buf",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 31.794647,
+        "ms": 0.329872,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "5EOmWPqaJqU=",
+        "parentSpanId": "HrlON9b7nio="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.144491,
+        "ms": 0.006464,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "cKi6eEda2lQ=",
+        "parentSpanId": "P0JQXsecHfY="
+      },
+      {
+        "name": "ReduceHelper::PreReduce",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.519238,
+        "ms": 0.200192,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "CFdsLRsRb8A=",
+        "parentSpanId": "cb0YDGwhTjc="
+      },
+      {
+        "name": "ReduceHelper::FilterInvalidSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.522059,
+        "ms": 0.00258,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "yoBvEdiGZxo=",
+        "parentSpanId": "CFdsLRsRb8A="
+      },
+      {
+        "name": "ReduceHelper::FillPrimaryKey",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.52689,
+        "ms": 0.191592,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "qGXee6boLsg=",
+        "parentSpanId": "CFdsLRsRb8A="
+      },
+      {
+        "name": "EncodeSearchResultData",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 32.881992,
+        "ms": 0.009802,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "zFh04yyOXHY=",
+        "parentSpanId": "cb0YDGwhTjc="
+      },
+      {
+        "name": "Proxy-Search-PostExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 33.073744,
+        "ms": 1.863374,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "lytuSc2W+h4=",
+        "parentSpanId": "pFzFI8ebo60="
+      },
+      {
+        "name": "searchReduceOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 33.085775,
+        "ms": 0.014693,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "MAOArkzZI5g=",
+        "parentSpanId": "lytuSc2W+h4="
+      },
+      {
+        "name": "reduceResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 33.087916,
+        "ms": 0.010113,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "OlZmZ+/uInI=",
+        "parentSpanId": "KjqBcOTFNzk="
+      },
+      {
+        "name": "decodeSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 33.088868,
+        "ms": 0.00482,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "GsL+/9dqqy0=",
+        "parentSpanId": "OlZmZ+/uInI="
+      },
+      {
+        "name": "RetrieveTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 33.149847,
+        "ms": 1.686644,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "aIODhK7aAX8=",
+        "parentSpanId": "KjqBcOTFNzk="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 33.283411,
+        "ms": 0.282453,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "oBHedSG9phk=",
+        "parentSpanId": "aIODhK7aAX8="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 33.415212,
+        "ms": 0.09349,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "KMk/np2x2gw=",
+        "parentSpanId": "oBHedSG9phk="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/QueryOnView",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 33.615773,
+        "ms": 1.171928,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "DY2nXsPMJl8=",
+        "parentSpanId": "aIODhK7aAX8="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/QueryOnView",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 33.722518,
+        "ms": 0.963599,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "e/MCjnlPKlg=",
+        "parentSpanId": "DY2nXsPMJl8="
+      },
+      {
+        "name": "schedule",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 33.789887,
+        "ms": 0.069753,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "ExIp8PepTEI=",
+        "parentSpanId": "e/MCjnlPKlg="
+      },
+      {
+        "name": "SegCoreRetrieve",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.048236,
+        "ms": 0.361729,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "19iYGHeAmCw=",
+        "parentSpanId": "ExIp8PepTEI="
+      },
+      {
+        "name": "Retrieve",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.053218,
+        "ms": 0.287282,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "POVlezSiMvM=",
+        "parentSpanId": "19iYGHeAmCw="
+      },
+      {
+        "name": "ExecuteTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.059029,
+        "ms": 0.153,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "p0Buh2eWJoE=",
+        "parentSpanId": "POVlezSiMvM="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.067754,
+        "ms": 0.134336,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "RtL7T6I4MnA=",
+        "parentSpanId": "p0Buh2eWJoE="
+      },
+      {
+        "name": "PhyMvccNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.113724,
+        "ms": 0.000534,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "ZCzg+hqU39s=",
+        "parentSpanId": "RtL7T6I4MnA="
+      },
+      {
+        "name": "PhyFilterBitsNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.116642,
+        "ms": 0.030108,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "sdqR7FC/xRw=",
+        "parentSpanId": "RtL7T6I4MnA="
+      },
+      {
+        "name": "ExprSet::Eval",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.12031,
+        "ms": 0.024587,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "KcoMG1ejYyw=",
+        "parentSpanId": "sdqR7FC/xRw="
+      },
+      {
+        "name": "PhyTermFilterExpr::Eval",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.122117,
+        "ms": 0.022151,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "NKjspP9gNmg=",
+        "parentSpanId": "KcoMG1ejYyw="
+      },
+      {
+        "name": "PhyMvccNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.148826,
+        "ms": 0.051136,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "crVjzo+AWKE=",
+        "parentSpanId": "RtL7T6I4MnA="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.205279,
+        "ms": 0.005303,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "TwixQo+h8Lg=",
+        "parentSpanId": "p0Buh2eWJoE="
+      },
+      {
+        "name": "Find Limit Pk",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.214402,
+        "ms": 0.00196,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "h0nns9obk18=",
+        "parentSpanId": "POVlezSiMvM="
+      },
+      {
+        "name": "FillTargetEntry",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.221552,
+        "ms": 0.118088,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "7rTcEIdiA6A=",
+        "parentSpanId": "POVlezSiMvM="
+      },
+      {
+        "name": "partial-segcore-results-deserialization",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.452065,
+        "ms": 0.119569,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "hYbT5N7sWCA=",
+        "parentSpanId": "ExIp8PepTEI="
+      },
+      {
+        "name": "ReduceByPKWithTimestampOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.61732,
+        "ms": 0.016172,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "4bWBffmuXKI=",
+        "parentSpanId": "ExIp8PepTEI="
+      },
+      {
+        "name": "QueryPipeline.Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.823436,
+        "ms": 0.007046,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "D86n0CwYAE8=",
+        "parentSpanId": "aIODhK7aAX8="
+      },
+      {
+        "name": "ReduceByPKOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.82548,
+        "ms": 0.000526,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "+OmjnjMrxLU=",
+        "parentSpanId": "aIODhK7aAX8="
+      },
+      {
+        "name": "SliceOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.827328,
+        "ms": 0.000515,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "9Ym4sPw5b28=",
+        "parentSpanId": "aIODhK7aAX8="
+      },
+      {
+        "name": "organizeOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 34.869258,
+        "ms": 0.03721,
+        "traceId": "MWiQlkK+zeYaf0dfUjGfnA==",
+        "spanId": "o06CIC0trN8=",
+        "parentSpanId": "KjqBcOTFNzk="
+      }
+    ]
+  },
+  {
+    "label": "nvme-v83-confirm-id-only-0",
+    "run": {
+      "label": "nvme-v83-confirm-id-only-0",
+      "round": 0,
+      "start_ns": 1791644143758535085,
+      "before": "NotLoad",
+      "manual_load": false,
+      "release_wait_s": 62.0,
+      "release_rpc_ms": 3.663345,
+      "scenario": "id-only",
+      "output_fields": [],
+      "collection_id": 469658685339075637,
+      "index_type": "FLAT",
+      "latency_ms": 9.691247,
+      "return_ns": 1791644143768378878,
+      "process_fault_delta": {
+        "minor": 227,
+        "major": 0
+      },
+      "ids": [
+        123,
+        660,
+        322,
+        541,
+        913,
+        593,
+        694,
+        56,
+        947,
+        348
+      ],
+      "distances": [
+        0.9999998807907104,
+        0.10951204597949982,
+        0.10621106624603271,
+        0.10212098807096481,
+        0.09275553375482559,
+        0.09181385487318039,
+        0.08825279772281647,
+        0.08425603061914444,
+        0.08256486058235168,
+        0.08228766173124313
+      ],
+      "id_only_verified": true,
+      "ok": true,
+      "end_ns": 1791644143768908508,
+      "after": "Loaded"
+    },
+    "minio": [
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/0_0752b749-cd8d-4c86-be38-501393469000.parquet",
+        "time": "2026-10-10T14:55:43.761049446Z",
+        "offset_ms": 2.514361,
+        "duration_ms": 0.543509,
+        "statusCode": 206,
+        "bytes": 6191
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/2_609a9ba3-1346-4e30-b72e-38390b757e79.parquet",
+        "time": "2026-10-10T14:55:43.761060973Z",
+        "offset_ms": 2.525888,
+        "duration_ms": 2.412212,
+        "statusCode": 206,
+        "bytes": 3073941
+      }
+    ],
+    "spans": [
+      {
+        "name": "milvus.proto.milvus.MilvusService/Search",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 0.984334,
+        "ms": 8.464792,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "hWLVGASpF2M="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 1.189403,
+        "ms": 5.893064,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "+8hlc9c2iKA=",
+        "parentSpanId": "hWLVGASpF2M="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 1.309118,
+        "ms": 5.711095,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "KPVDx/eWu6M=",
+        "parentSpanId": "+8hlc9c2iKA="
+      },
+      {
+        "name": "wal.broadcast",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 1.638996,
+        "ms": 2.056362,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "S2YYtbd1qfA=",
+        "parentSpanId": "KPVDx/eWu6M="
+      },
+      {
+        "name": "wal.append",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.19867,
+        "ms": 0.624079,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "l4FhkTN+5Y8=",
+        "parentSpanId": "S2YYtbd1qfA="
+      },
+      {
+        "name": "wal.appendimpl",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.24352,
+        "ms": 0.53524,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "9aDusrTdw0g=",
+        "parentSpanId": "l4FhkTN+5Y8="
+      },
+      {
+        "name": "Write",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.285223,
+        "ms": 0.492811,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "o2X3OSgrjqQ=",
+        "parentSpanId": "9aDusrTdw0g="
+      },
+      {
+        "name": "GetOrCreateWritableSegmentHandle",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.298468,
+        "ms": 0.038109,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "beIFZGskbSU=",
+        "parentSpanId": "o2X3OSgrjqQ="
+      },
+      {
+        "name": "GetLastAddConfirmed",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.303079,
+        "ms": 0.029564,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "Tv07+NQ5tPU=",
+        "parentSpanId": "beIFZGskbSU="
+      },
+      {
+        "name": "GetQuorumInfo",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.305235,
+        "ms": 0.003031,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "8VrIhzagpoY=",
+        "parentSpanId": "Tv07+NQ5tPU="
+      },
+      {
+        "name": "GetSegmentBlockCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.316442,
+        "ms": 0.013455,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "gXBaZhmAkio=",
+        "parentSpanId": "Tv07+NQ5tPU="
+      },
+      {
+        "name": "GetBlocksCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.322968,
+        "ms": 0.002592,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "5U8hHiZITac=",
+        "parentSpanId": "gXBaZhmAkio="
+      },
+      {
+        "name": "AppendAsync",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.337806,
+        "ms": 0.007564,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "SybNFG+BIAg=",
+        "parentSpanId": "o2X3OSgrjqQ="
+      },
+      {
+        "name": "wal.bc_callback",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 3.145778,
+        "ms": 0.307158,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "0NIg6xesWys=",
+        "parentSpanId": "S2YYtbd1qfA="
+      },
+      {
+        "name": "Proxy-Search",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.105984,
+        "ms": 2.144407,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "VClr8LQeKHo=",
+        "parentSpanId": "hWLVGASpF2M="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.166025,
+        "ms": 0.173379,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "64bQnYzpgDw=",
+        "parentSpanId": "VClr8LQeKHo="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.249899,
+        "ms": 0.048733,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "qeiI9NLDEEQ=",
+        "parentSpanId": "64bQnYzpgDw="
+      },
+      {
+        "name": "SearchTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.368779,
+        "ms": 1.847038,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "/H45kVzuPSg=",
+        "parentSpanId": "VClr8LQeKHo="
+      },
+      {
+        "name": "Proxy-Search-PreExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.373985,
+        "ms": 0.153278,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "VT1JinQ97qU=",
+        "parentSpanId": "/H45kVzuPSg="
+      },
+      {
+        "name": "init search request",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.403735,
+        "ms": 0.105759,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "qhjFnhxJUag=",
+        "parentSpanId": "VT1JinQ97qU="
+      },
+      {
+        "name": "Proxy-Search-Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.529193,
+        "ms": 1.637914,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "B/ulqV8B+oQ=",
+        "parentSpanId": "/H45kVzuPSg="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.56864,
+        "ms": 0.213506,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "Mib3Rmw1yw0=",
+        "parentSpanId": "B/ulqV8B+oQ="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.662608,
+        "ms": 0.086638,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "iC+LngbR6kk=",
+        "parentSpanId": "Mib3Rmw1yw0="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.805772,
+        "ms": 1.348489,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "empQsvsdgJs=",
+        "parentSpanId": "B/ulqV8B+oQ="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.869385,
+        "ms": 1.247502,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "v4sXNC4xISk=",
+        "parentSpanId": "empQsvsdgJs="
+      },
+      {
+        "name": "schedule",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.916006,
+        "ms": 0.003385,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "uQ7HrOaP6vk=",
+        "parentSpanId": "v4sXNC4xISk="
+      },
+      {
+        "name": "SegCoreSearch",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.072246,
+        "ms": 0.602159,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "CqFBrnZI/o4=",
+        "parentSpanId": "uQ7HrOaP6vk="
+      },
+      {
+        "name": "ExecuteTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.103278,
+        "ms": 0.565721,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "/RoXSmEWfGA=",
+        "parentSpanId": "CqFBrnZI/o4="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.116377,
+        "ms": 0.538144,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "j4ceTPjMJpU=",
+        "parentSpanId": "/RoXSmEWfGA="
+      },
+      {
+        "name": "PhyMvccNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.212076,
+        "ms": 0.008406,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "2EUnFbnEr4U=",
+        "parentSpanId": "j4ceTPjMJpU="
+      },
+      {
+        "name": "PhyVectorSearchNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.225271,
+        "ms": 0.426457,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "q4uR148WA20=",
+        "parentSpanId": "j4ceTPjMJpU="
+      },
+      {
+        "name": "knowhere bf search with buf",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.291734,
+        "ms": 0.341393,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "uTL2ClPiwEQ=",
+        "parentSpanId": "CqFBrnZI/o4="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.660944,
+        "ms": 0.00565,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "jjiivhB7UIA=",
+        "parentSpanId": "/RoXSmEWfGA="
+      },
+      {
+        "name": "ReduceHelper::PreReduce",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.801453,
+        "ms": 0.027698,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "oGtfYJcqnpc=",
+        "parentSpanId": "uQ7HrOaP6vk="
+      },
+      {
+        "name": "ReduceHelper::FilterInvalidSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.803813,
+        "ms": 0.001855,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "6qxl5Qfuhws=",
+        "parentSpanId": "oGtfYJcqnpc="
+      },
+      {
+        "name": "ReduceHelper::FillPrimaryKey",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.807545,
+        "ms": 0.021281,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "xKOY8jkMGjk=",
+        "parentSpanId": "oGtfYJcqnpc="
+      },
+      {
+        "name": "EncodeSearchResultData",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.05621,
+        "ms": 0.01299,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "X5qmkJquY4c=",
+        "parentSpanId": "uQ7HrOaP6vk="
+      },
+      {
+        "name": "Proxy-Search-PostExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.169751,
+        "ms": 0.043721,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "Ktk3ezssbGY=",
+        "parentSpanId": "/H45kVzuPSg="
+      },
+      {
+        "name": "searchReduceOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.180936,
+        "ms": 0.015911,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "84w795cxQCk=",
+        "parentSpanId": "Ktk3ezssbGY="
+      },
+      {
+        "name": "reduceResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.183088,
+        "ms": 0.0117,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "dvh8UYKoZdA=",
+        "parentSpanId": "VClr8LQeKHo="
+      },
+      {
+        "name": "decodeSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.184317,
+        "ms": 0.005025,
+        "traceId": "PwYbtJszh3caAf8oeRU+zg==",
+        "spanId": "BfPioBIAvDU=",
+        "parentSpanId": "dvh8UYKoZdA="
+      }
+    ]
+  },
+  {
+    "label": "nvme-v83-confirm-with-vector-0",
+    "run": {
+      "label": "nvme-v83-confirm-with-vector-0",
+      "round": 0,
+      "start_ns": 1791644214989142875,
+      "before": "NotLoad",
+      "manual_load": false,
+      "release_wait_s": 62.0,
+      "release_rpc_ms": 3.428615,
+      "scenario": "with-vector",
+      "output_fields": [
+        "vector"
+      ],
+      "collection_id": 469658685339075637,
+      "index_type": "FLAT",
+      "latency_ms": 9.954684,
+      "return_ns": 1791644214999242076,
+      "process_fault_delta": {
+        "minor": 63,
+        "major": 0
+      },
+      "ids": [
+        123,
+        660,
+        322,
+        541,
+        913,
+        593,
+        694,
+        56,
+        947,
+        348
+      ],
+      "distances": [
+        0.9999998807907104,
+        0.10951204597949982,
+        0.10621106624603271,
+        0.10212098807096481,
+        0.09275553375482559,
+        0.09181385487318039,
+        0.08825279772281647,
+        0.08425603061914444,
+        0.08256486058235168,
+        0.08228766173124313
+      ],
+      "vectors_verified": true,
+      "returned_vector_count": 10,
+      "returned_vector_values": 7680,
+      "ok": true,
+      "end_ns": 1791644215000163034,
+      "after": "Loaded"
+    },
+    "minio": [
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/0_0752b749-cd8d-4c86-be38-501393469000.parquet",
+        "time": "2026-10-10T14:56:54.991653545Z",
+        "offset_ms": 2.51067,
+        "duration_ms": 0.502116,
+        "statusCode": 206,
+        "bytes": 6191
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/2_609a9ba3-1346-4e30-b72e-38390b757e79.parquet",
+        "time": "2026-10-10T14:56:54.991646272Z",
+        "offset_ms": 2.503397,
+        "duration_ms": 2.379925,
+        "statusCode": 206,
+        "bytes": 3073941
+      }
+    ],
+    "spans": [
+      {
+        "name": "milvus.proto.milvus.MilvusService/Search",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 0.962527,
+        "ms": 8.711139,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "0jrxA06Cfdg="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 1.157487,
+        "ms": 6.006197,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "HiH6eAuhznY=",
+        "parentSpanId": "0jrxA06Cfdg="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 1.283574,
+        "ms": 5.824532,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "rdRKQluZ0/k=",
+        "parentSpanId": "HiH6eAuhznY="
+      },
+      {
+        "name": "wal.broadcast",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 1.619731,
+        "ms": 2.423082,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "WlzNwceXxpo=",
+        "parentSpanId": "rdRKQluZ0/k="
+      },
+      {
+        "name": "wal.append",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.247058,
+        "ms": 0.645226,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "1zS2y8uMtMY=",
+        "parentSpanId": "WlzNwceXxpo="
+      },
+      {
+        "name": "wal.appendimpl",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.308026,
+        "ms": 0.541641,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "K8xyQ2qKP90=",
+        "parentSpanId": "1zS2y8uMtMY="
+      },
+      {
+        "name": "Write",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.345292,
+        "ms": 0.503569,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "Yx/YnnVY/e0=",
+        "parentSpanId": "K8xyQ2qKP90="
+      },
+      {
+        "name": "GetOrCreateWritableSegmentHandle",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.358178,
+        "ms": 0.037887,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "1Rw2U8BxDcA=",
+        "parentSpanId": "Yx/YnnVY/e0="
+      },
+      {
+        "name": "GetLastAddConfirmed",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.363274,
+        "ms": 0.029091,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "T0XUF/v119U=",
+        "parentSpanId": "1Rw2U8BxDcA="
+      },
+      {
+        "name": "GetQuorumInfo",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.365795,
+        "ms": 0.002552,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "wPuc/Sn+wlk=",
+        "parentSpanId": "T0XUF/v119U="
+      },
+      {
+        "name": "GetSegmentBlockCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.376829,
+        "ms": 0.01279,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "hVQeMRA3iEI=",
+        "parentSpanId": "T0XUF/v119U="
+      },
+      {
+        "name": "GetBlocksCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.382767,
+        "ms": 0.003201,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "Ix3/RuOHKBc=",
+        "parentSpanId": "hVQeMRA3iEI="
+      },
+      {
+        "name": "AppendAsync",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.397276,
+        "ms": 0.007797,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "/Q7R+X+8g/k=",
+        "parentSpanId": "Yx/YnnVY/e0="
+      },
+      {
+        "name": "wal.bc_callback",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 3.235017,
+        "ms": 0.311448,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "4kgxLbt4CgM=",
+        "parentSpanId": "WlzNwceXxpo="
+      },
+      {
+        "name": "Proxy-Search",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.180814,
+        "ms": 2.316854,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "4IDN9gW20NQ=",
+        "parentSpanId": "0jrxA06Cfdg="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.234961,
+        "ms": 0.159331,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "pPK3SNHAUus=",
+        "parentSpanId": "4IDN9gW20NQ="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.312065,
+        "ms": 0.044504,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "p1Tv4lpNPaE=",
+        "parentSpanId": "pPK3SNHAUus="
+      },
+      {
+        "name": "SearchTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.421564,
+        "ms": 2.040086,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "ZnPwSl6wcGw=",
+        "parentSpanId": "4IDN9gW20NQ="
+      },
+      {
+        "name": "Proxy-Search-PreExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.427044,
+        "ms": 0.134643,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "kTWxRvJ/1vY=",
+        "parentSpanId": "ZnPwSl6wcGw="
+      },
+      {
+        "name": "init search request",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.458628,
+        "ms": 0.085488,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "7xgugG+ACIQ=",
+        "parentSpanId": "kTWxRvJ/1vY="
+      },
+      {
+        "name": "Proxy-Search-Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.563455,
+        "ms": 1.841519,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "AiERKubsY78=",
+        "parentSpanId": "ZnPwSl6wcGw="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.602662,
+        "ms": 0.202109,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "ZjWbuYjsJnI=",
+        "parentSpanId": "AiERKubsY78="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.685234,
+        "ms": 0.090099,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "crprawzJYbM=",
+        "parentSpanId": "ZjWbuYjsJnI="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.828264,
+        "ms": 1.560909,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "188MkqI5uN4=",
+        "parentSpanId": "AiERKubsY78="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.890089,
+        "ms": 1.427844,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "FQ1+lywpdGc=",
+        "parentSpanId": "188MkqI5uN4="
+      },
+      {
+        "name": "schedule",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.938454,
+        "ms": 0.002917,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "lhkaY4BZgyQ=",
+        "parentSpanId": "FQ1+lywpdGc="
+      },
+      {
+        "name": "SegCoreSearch",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.10367,
+        "ms": 0.562016,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "Phhor8fVLBE=",
+        "parentSpanId": "lhkaY4BZgyQ="
+      },
+      {
+        "name": "ExecuteTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.134478,
+        "ms": 0.525852,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "/5lF9+CmOuY=",
+        "parentSpanId": "Phhor8fVLBE="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.148413,
+        "ms": 0.504016,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "N9MPCZ5e5Dg=",
+        "parentSpanId": "/5lF9+CmOuY="
+      },
+      {
+        "name": "PhyMvccNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.246124,
+        "ms": 0.007487,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "RRQv5z7vLII=",
+        "parentSpanId": "N9MPCZ5e5Dg="
+      },
+      {
+        "name": "PhyVectorSearchNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.258028,
+        "ms": 0.392681,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "p4qvWaPdY/g=",
+        "parentSpanId": "N9MPCZ5e5Dg="
+      },
+      {
+        "name": "knowhere bf search with buf",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.325421,
+        "ms": 0.313695,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "sYW1H3ZZg9U=",
+        "parentSpanId": "Phhor8fVLBE="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.654509,
+        "ms": 0.00385,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "z8l5BXgyerY=",
+        "parentSpanId": "/5lF9+CmOuY="
+      },
+      {
+        "name": "ReduceHelper::PreReduce",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.784805,
+        "ms": 0.03037,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "bBEaEU5c9yU=",
+        "parentSpanId": "lhkaY4BZgyQ="
+      },
+      {
+        "name": "ReduceHelper::FilterInvalidSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.787628,
+        "ms": 0.002248,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "FreqGZDSd3I=",
+        "parentSpanId": "bBEaEU5c9yU="
+      },
+      {
+        "name": "ReduceHelper::FillPrimaryKey",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.791709,
+        "ms": 0.023237,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "89sdCbr+h0U=",
+        "parentSpanId": "bBEaEU5c9yU="
+      },
+      {
+        "name": "EncodeSearchResultData",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.136798,
+        "ms": 0.119336,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "9kvf0+N70FY=",
+        "parentSpanId": "lhkaY4BZgyQ="
+      },
+      {
+        "name": "Proxy-Search-PostExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.409243,
+        "ms": 0.05006,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "zWCW/38qEH0=",
+        "parentSpanId": "ZnPwSl6wcGw="
+      },
+      {
+        "name": "searchReduceOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.420786,
+        "ms": 0.019898,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "oTHGOnsu1QA=",
+        "parentSpanId": "zWCW/38qEH0="
+      },
+      {
+        "name": "reduceResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.422506,
+        "ms": 0.016627,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "seFOcadv2JA=",
+        "parentSpanId": "4IDN9gW20NQ="
+      },
+      {
+        "name": "decodeSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.423402,
+        "ms": 0.00827,
+        "traceId": "J+mQSecu79hqhv6G+PHOQA==",
+        "spanId": "cO1y85ue62Q=",
+        "parentSpanId": "seFOcadv2JA="
+      }
+    ]
+  },
+  {
+    "label": "nvme-v83-confirm-id-only-1",
+    "run": {
+      "label": "nvme-v83-confirm-id-only-1",
+      "round": 0,
+      "start_ns": 1791644286189252527,
+      "before": "NotLoad",
+      "manual_load": false,
+      "release_wait_s": 62.0,
+      "release_rpc_ms": 3.446362,
+      "scenario": "id-only",
+      "output_fields": [],
+      "collection_id": 469658685339075637,
+      "index_type": "FLAT",
+      "latency_ms": 9.608509,
+      "return_ns": 1791644286199006527,
+      "process_fault_delta": {
+        "minor": 47,
+        "major": 0
+      },
+      "ids": [
+        123,
+        660,
+        322,
+        541,
+        913,
+        593,
+        694,
+        56,
+        947,
+        348
+      ],
+      "distances": [
+        0.9999998807907104,
+        0.10951204597949982,
+        0.10621106624603271,
+        0.10212098807096481,
+        0.09275553375482559,
+        0.09181385487318039,
+        0.08825279772281647,
+        0.08425603061914444,
+        0.08256486058235168,
+        0.08228766173124313
+      ],
+      "id_only_verified": true,
+      "ok": true,
+      "end_ns": 1791644286199544150,
+      "after": "Loaded"
+    },
+    "minio": [
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/0_0752b749-cd8d-4c86-be38-501393469000.parquet",
+        "time": "2026-10-10T14:58:06.191773175Z",
+        "offset_ms": 2.520648,
+        "duration_ms": 0.496117,
+        "statusCode": 206,
+        "bytes": 6191
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/2_609a9ba3-1346-4e30-b72e-38390b757e79.parquet",
+        "time": "2026-10-10T14:58:06.191773117Z",
+        "offset_ms": 2.52059,
+        "duration_ms": 2.289168,
+        "statusCode": 206,
+        "bytes": 3073941
+      }
+    ],
+    "spans": [
+      {
+        "name": "milvus.proto.milvus.MilvusService/Search",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 0.984147,
+        "ms": 8.43469,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "lb/ikRo1LBk="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 1.176921,
+        "ms": 6.075499,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "HlynuH7fr7U=",
+        "parentSpanId": "lb/ikRo1LBk="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 1.307823,
+        "ms": 5.888555,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "chWMIesOZe0=",
+        "parentSpanId": "HlynuH7fr7U="
+      },
+      {
+        "name": "wal.broadcast",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 1.643462,
+        "ms": 2.364984,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "J+k771jt8yY=",
+        "parentSpanId": "chWMIesOZe0="
+      },
+      {
+        "name": "wal.append",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.131457,
+        "ms": 0.726651,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "TWL4wqJbNtw=",
+        "parentSpanId": "J+k771jt8yY="
+      },
+      {
+        "name": "wal.appendimpl",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.168779,
+        "ms": 0.642133,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "VAsNxD/29OQ=",
+        "parentSpanId": "TWL4wqJbNtw="
+      },
+      {
+        "name": "Write",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.21154,
+        "ms": 0.59851,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "+XrD+f2kJNs=",
+        "parentSpanId": "VAsNxD/29OQ="
+      },
+      {
+        "name": "GetOrCreateWritableSegmentHandle",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.225148,
+        "ms": 0.037117,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "9SjDgkva7FU=",
+        "parentSpanId": "+XrD+f2kJNs="
+      },
+      {
+        "name": "GetLastAddConfirmed",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.229493,
+        "ms": 0.029301,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "WPEUS5veJ8Q=",
+        "parentSpanId": "9SjDgkva7FU="
+      },
+      {
+        "name": "GetQuorumInfo",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.231904,
+        "ms": 0.002665,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "j1mbr59Bc0A=",
+        "parentSpanId": "WPEUS5veJ8Q="
+      },
+      {
+        "name": "GetSegmentBlockCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.244197,
+        "ms": 0.012086,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "iNDupJT0OuI=",
+        "parentSpanId": "WPEUS5veJ8Q="
+      },
+      {
+        "name": "GetBlocksCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.250093,
+        "ms": 0.002676,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "q/FnUvqDwx8=",
+        "parentSpanId": "iNDupJT0OuI="
+      },
+      {
+        "name": "AppendAsync",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.26359,
+        "ms": 0.008078,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "SMoOZZhdCpU=",
+        "parentSpanId": "+XrD+f2kJNs="
+      },
+      {
+        "name": "wal.bc_callback",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 3.183501,
+        "ms": 0.525436,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "4o1OaOf7NMk=",
+        "parentSpanId": "J+k771jt8yY="
+      },
+      {
+        "name": "Proxy-Search",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.26792,
+        "ms": 2.03967,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "OL/hDEYapRg=",
+        "parentSpanId": "lb/ikRo1LBk="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.318754,
+        "ms": 0.147444,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "upxA/FjHLjY=",
+        "parentSpanId": "OL/hDEYapRg="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.391714,
+        "ms": 0.035197,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "aCdZhIrsPv0=",
+        "parentSpanId": "upxA/FjHLjY="
+      },
+      {
+        "name": "SearchTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.497371,
+        "ms": 1.772174,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "suKZF8BwHtc=",
+        "parentSpanId": "OL/hDEYapRg="
+      },
+      {
+        "name": "Proxy-Search-PreExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.503307,
+        "ms": 0.135039,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "cW8103vUV1U=",
+        "parentSpanId": "suKZF8BwHtc="
+      },
+      {
+        "name": "init search request",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.53219,
+        "ms": 0.087518,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "xJNGW5RCbmc=",
+        "parentSpanId": "cW8103vUV1U="
+      },
+      {
+        "name": "Proxy-Search-Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.63994,
+        "ms": 1.576625,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "RdODiGiajEU=",
+        "parentSpanId": "suKZF8BwHtc="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.688325,
+        "ms": 0.219968,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "7ypTB5p47+c=",
+        "parentSpanId": "RdODiGiajEU="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.785477,
+        "ms": 0.084693,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "REPXz4+Epl4=",
+        "parentSpanId": "7ypTB5p47+c="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.930471,
+        "ms": 1.273508,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "/HXbKKsFBdM=",
+        "parentSpanId": "RdODiGiajEU="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.993266,
+        "ms": 1.178968,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "gHj8WKGNE4k=",
+        "parentSpanId": "/HXbKKsFBdM="
+      },
+      {
+        "name": "schedule",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.038687,
+        "ms": 0.003242,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "JXHNzONaUQs=",
+        "parentSpanId": "gHj8WKGNE4k="
+      },
+      {
+        "name": "SegCoreSearch",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.203956,
+        "ms": 0.557371,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "RJLvT15V254=",
+        "parentSpanId": "JXHNzONaUQs="
+      },
+      {
+        "name": "ExecuteTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.229171,
+        "ms": 0.526875,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "q95Ur0EWibQ=",
+        "parentSpanId": "RJLvT15V254="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.242114,
+        "ms": 0.50527,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "r14Y0c2xlYQ=",
+        "parentSpanId": "q95Ur0EWibQ="
+      },
+      {
+        "name": "PhyMvccNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.330773,
+        "ms": 0.007529,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "yS8lej2gJLE=",
+        "parentSpanId": "r14Y0c2xlYQ="
+      },
+      {
+        "name": "PhyVectorSearchNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.343117,
+        "ms": 0.4022,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "YlXjh8hOdwM=",
+        "parentSpanId": "r14Y0c2xlYQ="
+      },
+      {
+        "name": "knowhere bf search with buf",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.409211,
+        "ms": 0.323745,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "JMvUM3XDkzA=",
+        "parentSpanId": "RJLvT15V254="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.749743,
+        "ms": 0.004238,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "TTuah7/qcLE=",
+        "parentSpanId": "q95Ur0EWibQ="
+      },
+      {
+        "name": "ReduceHelper::PreReduce",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.863997,
+        "ms": 0.031494,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "3C5cTh4Jn6o=",
+        "parentSpanId": "JXHNzONaUQs="
+      },
+      {
+        "name": "ReduceHelper::FilterInvalidSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.86679,
+        "ms": 0.002275,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "UCQRlBTh52U=",
+        "parentSpanId": "3C5cTh4Jn6o="
+      },
+      {
+        "name": "ReduceHelper::FillPrimaryKey",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.871839,
+        "ms": 0.023435,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "hh5wko6bEQg=",
+        "parentSpanId": "3C5cTh4Jn6o="
+      },
+      {
+        "name": "EncodeSearchResultData",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.114497,
+        "ms": 0.011371,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "v+z56R8DkJY=",
+        "parentSpanId": "JXHNzONaUQs="
+      },
+      {
+        "name": "Proxy-Search-PostExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.219295,
+        "ms": 0.043174,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "Hpxl3mcfoyY=",
+        "parentSpanId": "suKZF8BwHtc="
+      },
+      {
+        "name": "searchReduceOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.23183,
+        "ms": 0.013851,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "vzGVosQVJyk=",
+        "parentSpanId": "Hpxl3mcfoyY="
+      },
+      {
+        "name": "reduceResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.232821,
+        "ms": 0.011447,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "HdibhmkBn2Q=",
+        "parentSpanId": "OL/hDEYapRg="
+      },
+      {
+        "name": "decodeSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.233643,
+        "ms": 0.004125,
+        "traceId": "jIGNPFfZcrTfmInFIsyaxg==",
+        "spanId": "jmX9A+9Zltg=",
+        "parentSpanId": "HdibhmkBn2Q="
+      }
+    ]
+  },
+  {
+    "label": "nvme-v83-confirm-with-vector-1",
+    "run": {
+      "label": "nvme-v83-confirm-with-vector-1",
+      "round": 0,
+      "start_ns": 1791644357417561330,
+      "before": "NotLoad",
+      "manual_load": false,
+      "release_wait_s": 62.0,
+      "release_rpc_ms": 3.6705,
+      "scenario": "with-vector",
+      "output_fields": [
+        "vector"
+      ],
+      "collection_id": 469658685339075637,
+      "index_type": "FLAT",
+      "latency_ms": 9.836449,
+      "return_ns": 1791644357427561487,
+      "process_fault_delta": {
+        "minor": 272,
+        "major": 0
+      },
+      "ids": [
+        123,
+        660,
+        322,
+        541,
+        913,
+        593,
+        694,
+        56,
+        947,
+        348
+      ],
+      "distances": [
+        0.9999998807907104,
+        0.10951204597949982,
+        0.10621106624603271,
+        0.10212098807096481,
+        0.09275553375482559,
+        0.09181385487318039,
+        0.08825279772281647,
+        0.08425603061914444,
+        0.08256486058235168,
+        0.08228766173124313
+      ],
+      "vectors_verified": true,
+      "returned_vector_count": 10,
+      "returned_vector_values": 7680,
+      "ok": true,
+      "end_ns": 1791644357429736805,
+      "after": "Loaded"
+    },
+    "minio": [
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/0_0752b749-cd8d-4c86-be38-501393469000.parquet",
+        "time": "2026-10-10T14:59:17.420210952Z",
+        "offset_ms": 2.649622,
+        "duration_ms": 0.552699,
+        "statusCode": 206,
+        "bytes": 6191
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/2_609a9ba3-1346-4e30-b72e-38390b757e79.parquet",
+        "time": "2026-10-10T14:59:17.420181198Z",
+        "offset_ms": 2.619868,
+        "duration_ms": 2.587564,
+        "statusCode": 206,
+        "bytes": 3073941
+      }
+    ],
+    "spans": [
+      {
+        "name": "milvus.proto.milvus.MilvusService/Search",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 1.022396,
+        "ms": 8.60386,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "+w/mR60CRS4="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 1.226394,
+        "ms": 6.050594,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "EZ0owxDxLgM=",
+        "parentSpanId": "+w/mR60CRS4="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 1.357889,
+        "ms": 5.869283,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "FYCyB4gyUQA=",
+        "parentSpanId": "EZ0owxDxLgM="
+      },
+      {
+        "name": "wal.broadcast",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 1.704067,
+        "ms": 2.666928,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "EV1zb34Ts6g=",
+        "parentSpanId": "FYCyB4gyUQA="
+      },
+      {
+        "name": "wal.append",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.277682,
+        "ms": 0.645876,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "xA+w/lQ2PY4=",
+        "parentSpanId": "EV1zb34Ts6g="
+      },
+      {
+        "name": "wal.appendimpl",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.323912,
+        "ms": 0.55223,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "haoT4xXrbXo=",
+        "parentSpanId": "xA+w/lQ2PY4="
+      },
+      {
+        "name": "Write",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.380093,
+        "ms": 0.495239,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "ON5mk9CLfus=",
+        "parentSpanId": "haoT4xXrbXo="
+      },
+      {
+        "name": "GetOrCreateWritableSegmentHandle",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.393457,
+        "ms": 0.038893,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "rV/Bdv7hhvY=",
+        "parentSpanId": "ON5mk9CLfus="
+      },
+      {
+        "name": "GetLastAddConfirmed",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.398265,
+        "ms": 0.030179,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "HOmdk/KeIHU=",
+        "parentSpanId": "rV/Bdv7hhvY="
+      },
+      {
+        "name": "GetQuorumInfo",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.401553,
+        "ms": 0.001589,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "U5a27bytkN8=",
+        "parentSpanId": "HOmdk/KeIHU="
+      },
+      {
+        "name": "GetSegmentBlockCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.41235,
+        "ms": 0.013246,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "aLfLWrK8zYY=",
+        "parentSpanId": "HOmdk/KeIHU="
+      },
+      {
+        "name": "GetBlocksCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.419063,
+        "ms": 0.002336,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "Ui1yer+Vgwo=",
+        "parentSpanId": "aLfLWrK8zYY="
+      },
+      {
+        "name": "AppendAsync",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.433568,
+        "ms": 0.008323,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "eDvIztX/WAM=",
+        "parentSpanId": "ON5mk9CLfus="
+      },
+      {
+        "name": "wal.bc_callback",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 3.43049,
+        "ms": 0.402448,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "SbTRhdaXmBA=",
+        "parentSpanId": "EV1zb34Ts6g="
+      },
+      {
+        "name": "Proxy-Search",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.292607,
+        "ms": 2.162179,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "NOnUWQFpp6w=",
+        "parentSpanId": "+w/mR60CRS4="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.344197,
+        "ms": 0.142268,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "zj2yfcfz6ME=",
+        "parentSpanId": "NOnUWQFpp6w="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.414031,
+        "ms": 0.036702,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "+dODUFLdVwQ=",
+        "parentSpanId": "zj2yfcfz6ME="
+      },
+      {
+        "name": "SearchTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.519117,
+        "ms": 1.896197,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "CLH5NyO12HE=",
+        "parentSpanId": "NOnUWQFpp6w="
+      },
+      {
+        "name": "Proxy-Search-PreExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.524615,
+        "ms": 0.13306,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "hJD4MCd4GMA=",
+        "parentSpanId": "CLH5NyO12HE="
+      },
+      {
+        "name": "init search request",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.557545,
+        "ms": 0.087052,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "is57+BLKyvU=",
+        "parentSpanId": "hJD4MCd4GMA="
+      },
+      {
+        "name": "Proxy-Search-Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.659264,
+        "ms": 1.693191,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "9Evbh5lQTZw=",
+        "parentSpanId": "CLH5NyO12HE="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.717253,
+        "ms": 0.208214,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "rZLReawb6sE=",
+        "parentSpanId": "9Evbh5lQTZw="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.808027,
+        "ms": 0.087893,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "6nasCQRrWw4=",
+        "parentSpanId": "rZLReawb6sE="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.948923,
+        "ms": 1.382169,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "E6EEY9vEVGw=",
+        "parentSpanId": "9Evbh5lQTZw="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 8.008622,
+        "ms": 1.264617,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "GKUCmwknpw0=",
+        "parentSpanId": "E6EEY9vEVGw="
+      },
+      {
+        "name": "schedule",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.059017,
+        "ms": 0.003519,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "0/fyafNpGww=",
+        "parentSpanId": "GKUCmwknpw0="
+      },
+      {
+        "name": "SegCoreSearch",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.224793,
+        "ms": 0.574284,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "ksG+Iz9UQzs=",
+        "parentSpanId": "0/fyafNpGww="
+      },
+      {
+        "name": "ExecuteTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.263927,
+        "ms": 0.529851,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "lWbAEd1rlqk=",
+        "parentSpanId": "ksG+Iz9UQzs="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.277365,
+        "ms": 0.506858,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "WzxvODVknY4=",
+        "parentSpanId": "lWbAEd1rlqk="
+      },
+      {
+        "name": "PhyMvccNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.378931,
+        "ms": 0.007543,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "LJzCtIDcOfY=",
+        "parentSpanId": "WzxvODVknY4="
+      },
+      {
+        "name": "PhyVectorSearchNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.39055,
+        "ms": 0.391594,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "o/wfDmQQiFQ=",
+        "parentSpanId": "WzxvODVknY4="
+      },
+      {
+        "name": "knowhere bf search with buf",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.471339,
+        "ms": 0.298777,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "1tkyz6xr5B4=",
+        "parentSpanId": "ksG+Iz9UQzs="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.786738,
+        "ms": 0.004596,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "79jGtbUOldw=",
+        "parentSpanId": "lWbAEd1rlqk="
+      },
+      {
+        "name": "ReduceHelper::PreReduce",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.915203,
+        "ms": 0.025031,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "vt/pqzVNcpM=",
+        "parentSpanId": "0/fyafNpGww="
+      },
+      {
+        "name": "ReduceHelper::FilterInvalidSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.917333,
+        "ms": 0.001517,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "sLwTgLQ5XCA=",
+        "parentSpanId": "vt/pqzVNcpM="
+      },
+      {
+        "name": "ReduceHelper::FillPrimaryKey",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.920047,
+        "ms": 0.019917,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "OxCakMzrlzM=",
+        "parentSpanId": "vt/pqzVNcpM="
+      },
+      {
+        "name": "EncodeSearchResultData",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.183805,
+        "ms": 0.037164,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "x+oMCm5eGTk=",
+        "parentSpanId": "0/fyafNpGww="
+      },
+      {
+        "name": "Proxy-Search-PostExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.355711,
+        "ms": 0.053017,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "rWDBilpu/5M=",
+        "parentSpanId": "CLH5NyO12HE="
+      },
+      {
+        "name": "searchReduceOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.367822,
+        "ms": 0.022197,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "Ry61GKoBp8A=",
+        "parentSpanId": "rWDBilpu/5M="
+      },
+      {
+        "name": "reduceResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.368921,
+        "ms": 0.019363,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "HcFpTWZzapw=",
+        "parentSpanId": "NOnUWQFpp6w="
+      },
+      {
+        "name": "decodeSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.370003,
+        "ms": 0.007916,
+        "traceId": "TiRNicx7dYJ66sCi56L0Vw==",
+        "spanId": "eQKKmhoRTFE=",
+        "parentSpanId": "HcFpTWZzapw="
+      }
+    ]
+  },
+  {
+    "label": "nvme-v83-confirm-id-only-2",
+    "run": {
+      "label": "nvme-v83-confirm-id-only-2",
+      "round": 0,
+      "start_ns": 1791644428666042908,
+      "before": "NotLoad",
+      "manual_load": false,
+      "release_wait_s": 62.0,
+      "release_rpc_ms": 3.621867,
+      "scenario": "id-only",
+      "output_fields": [],
+      "collection_id": 469658685339075637,
+      "index_type": "FLAT",
+      "latency_ms": 9.378333,
+      "return_ns": 1791644428675595883,
+      "process_fault_delta": {
+        "minor": 43,
+        "major": 0
+      },
+      "ids": [
+        123,
+        660,
+        322,
+        541,
+        913,
+        593,
+        694,
+        56,
+        947,
+        348
+      ],
+      "distances": [
+        0.9999998807907104,
+        0.10951204597949982,
+        0.10621106624603271,
+        0.10212098807096481,
+        0.09275553375482559,
+        0.09181385487318039,
+        0.08825279772281647,
+        0.08425603061914444,
+        0.08256486058235168,
+        0.08228766173124313
+      ],
+      "id_only_verified": true,
+      "ok": true,
+      "end_ns": 1791644428676139923,
+      "after": "Loaded"
+    },
+    "minio": [
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/0_0752b749-cd8d-4c86-be38-501393469000.parquet",
+        "time": "2026-10-10T15:00:28.668560034Z",
+        "offset_ms": 2.517126,
+        "duration_ms": 0.551792,
+        "statusCode": 206,
+        "bytes": 6191
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/2_609a9ba3-1346-4e30-b72e-38390b757e79.parquet",
+        "time": "2026-10-10T15:00:28.668559969Z",
+        "offset_ms": 2.517061,
+        "duration_ms": 2.410702,
+        "statusCode": 206,
+        "bytes": 3073941
+      }
+    ],
+    "spans": [
+      {
+        "name": "milvus.proto.milvus.MilvusService/Search",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 1.024987,
+        "ms": 8.167463,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "EfWT3eCnR4o="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 1.204138,
+        "ms": 5.820141,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "WWquUR3L3/c=",
+        "parentSpanId": "EfWT3eCnR4o="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 1.321228,
+        "ms": 5.651547,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "353OLV3Jp4E=",
+        "parentSpanId": "WWquUR3L3/c="
+      },
+      {
+        "name": "wal.broadcast",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 1.644174,
+        "ms": 2.263438,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "j5pGhaGRw2s=",
+        "parentSpanId": "353OLV3Jp4E="
+      },
+      {
+        "name": "wal.append",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.421538,
+        "ms": 0.629797,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "GjoE5O/kUKk=",
+        "parentSpanId": "j5pGhaGRw2s="
+      },
+      {
+        "name": "wal.appendimpl",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.464978,
+        "ms": 0.538262,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "52yIQhHppQ4=",
+        "parentSpanId": "GjoE5O/kUKk="
+      },
+      {
+        "name": "Write",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.510838,
+        "ms": 0.490422,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "MXCfCbKdpug=",
+        "parentSpanId": "52yIQhHppQ4="
+      },
+      {
+        "name": "GetOrCreateWritableSegmentHandle",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.528463,
+        "ms": 0.04258,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "gdBqw1h4Xd4=",
+        "parentSpanId": "MXCfCbKdpug="
+      },
+      {
+        "name": "GetLastAddConfirmed",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.534651,
+        "ms": 0.032147,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "AQtRCl7PYwk=",
+        "parentSpanId": "gdBqw1h4Xd4="
+      },
+      {
+        "name": "GetQuorumInfo",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.537808,
+        "ms": 0.002176,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "Y9NENlBGAzA=",
+        "parentSpanId": "AQtRCl7PYwk="
+      },
+      {
+        "name": "GetSegmentBlockCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.54918,
+        "ms": 0.014749,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "3CnGrVH/09o=",
+        "parentSpanId": "AQtRCl7PYwk="
+      },
+      {
+        "name": "GetBlocksCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.556394,
+        "ms": 0.002537,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "FsDC3sensxk=",
+        "parentSpanId": "3CnGrVH/09o="
+      },
+      {
+        "name": "AppendAsync",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.572288,
+        "ms": 0.009886,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "MPaZMWmKViU=",
+        "parentSpanId": "MXCfCbKdpug="
+      },
+      {
+        "name": "wal.bc_callback",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 3.369376,
+        "ms": 0.285605,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "zR+KMh/7Pv0=",
+        "parentSpanId": "j5pGhaGRw2s="
+      },
+      {
+        "name": "Proxy-Search",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.038882,
+        "ms": 2.028406,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "vmJytUlLYOg=",
+        "parentSpanId": "EfWT3eCnR4o="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.091016,
+        "ms": 0.170479,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "TF+HzBmAYts=",
+        "parentSpanId": "vmJytUlLYOg="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.187747,
+        "ms": 0.041649,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "4Qbo3evcgoY=",
+        "parentSpanId": "TF+HzBmAYts="
+      },
+      {
+        "name": "SearchTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.287289,
+        "ms": 1.736326,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "GsmaUiyLjJg=",
+        "parentSpanId": "vmJytUlLYOg="
+      },
+      {
+        "name": "Proxy-Search-PreExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.292705,
+        "ms": 0.121596,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "IJSRLBOcOCE=",
+        "parentSpanId": "GsmaUiyLjJg="
+      },
+      {
+        "name": "init search request",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.315999,
+        "ms": 0.081774,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "AjrZhxJapRo=",
+        "parentSpanId": "IJSRLBOcOCE="
+      },
+      {
+        "name": "Proxy-Search-Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.415821,
+        "ms": 1.541814,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "Gpim6Qla/qM=",
+        "parentSpanId": "GsmaUiyLjJg="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.451831,
+        "ms": 0.181984,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "WkAYDUOvlow=",
+        "parentSpanId": "Gpim6Qla/qM="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.529421,
+        "ms": 0.079498,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "uRZxzF333iM=",
+        "parentSpanId": "WkAYDUOvlow="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.657356,
+        "ms": 1.277783,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "3cCNtA62IlA=",
+        "parentSpanId": "Gpim6Qla/qM="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.713993,
+        "ms": 1.179683,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "AdKEBR0jneA=",
+        "parentSpanId": "3cCNtA62IlA="
+      },
+      {
+        "name": "schedule",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.758089,
+        "ms": 0.00299,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "J6ZuxOB9c+0=",
+        "parentSpanId": "AdKEBR0jneA="
+      },
+      {
+        "name": "SegCoreSearch",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.898935,
+        "ms": 0.558031,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "i0HqAj7PKKY=",
+        "parentSpanId": "J6ZuxOB9c+0="
+      },
+      {
+        "name": "ExecuteTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.94069,
+        "ms": 0.51148,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "eJGWvh9jayY=",
+        "parentSpanId": "i0HqAj7PKKY="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.955323,
+        "ms": 0.488732,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "ShAKY8sNRB8=",
+        "parentSpanId": "eJGWvh9jayY="
+      },
+      {
+        "name": "PhyMvccNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.043028,
+        "ms": 0.008001,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "RHdZtpDyuKg=",
+        "parentSpanId": "ShAKY8sNRB8="
+      },
+      {
+        "name": "PhyVectorSearchNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.055541,
+        "ms": 0.386466,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "lUbtz5aOP28=",
+        "parentSpanId": "ShAKY8sNRB8="
+      },
+      {
+        "name": "knowhere bf search with buf",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.119839,
+        "ms": 0.309866,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "KkXXiJFwqXo=",
+        "parentSpanId": "i0HqAj7PKKY="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.446138,
+        "ms": 0.004112,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "ppcxdeHsgcc=",
+        "parentSpanId": "eJGWvh9jayY="
+      },
+      {
+        "name": "ReduceHelper::PreReduce",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.575374,
+        "ms": 0.032421,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "3lJ3aGXCC2o=",
+        "parentSpanId": "J6ZuxOB9c+0="
+      },
+      {
+        "name": "ReduceHelper::FilterInvalidSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.578022,
+        "ms": 0.001965,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "+pdehEGlUX4=",
+        "parentSpanId": "3lJ3aGXCC2o="
+      },
+      {
+        "name": "ReduceHelper::FillPrimaryKey",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.583215,
+        "ms": 0.024319,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "Jf79xpbX8dw=",
+        "parentSpanId": "3lJ3aGXCC2o="
+      },
+      {
+        "name": "EncodeSearchResultData",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.831987,
+        "ms": 0.013417,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "B8BzhFOkvY0=",
+        "parentSpanId": "J6ZuxOB9c+0="
+      },
+      {
+        "name": "Proxy-Search-PostExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.962449,
+        "ms": 0.053578,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "KRqpi3heTEA=",
+        "parentSpanId": "GsmaUiyLjJg="
+      },
+      {
+        "name": "searchReduceOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.975202,
+        "ms": 0.01766,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "VJXJMMRqd48=",
+        "parentSpanId": "KRqpi3heTEA="
+      },
+      {
+        "name": "reduceResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.976374,
+        "ms": 0.014691,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "dcrVweEGf2I=",
+        "parentSpanId": "vmJytUlLYOg="
+      },
+      {
+        "name": "decodeSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.977287,
+        "ms": 0.005868,
+        "traceId": "oSLd0kDeUc6gp+tJCA3acw==",
+        "spanId": "qHV4b5X0fiA=",
+        "parentSpanId": "dcrVweEGf2I="
+      }
+    ]
+  },
+  {
+    "label": "nvme-v83-confirm-with-vector-2",
+    "run": {
+      "label": "nvme-v83-confirm-with-vector-2",
+      "round": 0,
+      "start_ns": 1791644499925589752,
+      "before": "NotLoad",
+      "manual_load": false,
+      "release_wait_s": 62.0,
+      "release_rpc_ms": 3.714272,
+      "scenario": "with-vector",
+      "output_fields": [
+        "vector"
+      ],
+      "collection_id": 469658685339075637,
+      "index_type": "FLAT",
+      "latency_ms": 9.640484,
+      "return_ns": 1791644499935381636,
+      "process_fault_delta": {
+        "minor": 55,
+        "major": 0
+      },
+      "ids": [
+        123,
+        660,
+        322,
+        541,
+        913,
+        593,
+        694,
+        56,
+        947,
+        348
+      ],
+      "distances": [
+        0.9999998807907104,
+        0.10951204597949982,
+        0.10621106624603271,
+        0.10212098807096481,
+        0.09275553375482559,
+        0.09181385487318039,
+        0.08825279772281647,
+        0.08425603061914444,
+        0.08256486058235168,
+        0.08228766173124313
+      ],
+      "vectors_verified": true,
+      "returned_vector_count": 10,
+      "returned_vector_values": 7680,
+      "ok": true,
+      "end_ns": 1791644499936306881,
+      "after": "Loaded"
+    },
+    "minio": [
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/0_0752b749-cd8d-4c86-be38-501393469000.parquet",
+        "time": "2026-10-10T15:01:39.928102347Z",
+        "offset_ms": 2.512595,
+        "duration_ms": 0.48978,
+        "statusCode": 206,
+        "bytes": 6191
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/2_609a9ba3-1346-4e30-b72e-38390b757e79.parquet",
+        "time": "2026-10-10T15:01:39.928102357Z",
+        "offset_ms": 2.512605,
+        "duration_ms": 2.604909,
+        "statusCode": 206,
+        "bytes": 3073941
+      }
+    ],
+    "spans": [
+      {
+        "name": "milvus.proto.milvus.MilvusService/Search",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 1.012416,
+        "ms": 8.421045,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "LCiUnI6xyq4="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 1.211357,
+        "ms": 5.840639,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "2KETu/P1ah4=",
+        "parentSpanId": "LCiUnI6xyq4="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 1.32483,
+        "ms": 5.670271,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "SwRgVHaI/8o=",
+        "parentSpanId": "2KETu/P1ah4="
+      },
+      {
+        "name": "wal.broadcast",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 1.646824,
+        "ms": 2.253072,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "8NlMIYxl22Y=",
+        "parentSpanId": "SwRgVHaI/8o="
+      },
+      {
+        "name": "wal.append",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.21553,
+        "ms": 0.688873,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "kSkVMd5O5FQ=",
+        "parentSpanId": "8NlMIYxl22Y="
+      },
+      {
+        "name": "wal.appendimpl",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.254156,
+        "ms": 0.606608,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "IKSdj16wvag=",
+        "parentSpanId": "kSkVMd5O5FQ="
+      },
+      {
+        "name": "Write",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.294185,
+        "ms": 0.565834,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "/ZPhFqnKCIs=",
+        "parentSpanId": "IKSdj16wvag="
+      },
+      {
+        "name": "GetOrCreateWritableSegmentHandle",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.306132,
+        "ms": 0.03729,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "fKv2ptDVY+w=",
+        "parentSpanId": "/ZPhFqnKCIs="
+      },
+      {
+        "name": "GetLastAddConfirmed",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.310276,
+        "ms": 0.02933,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "tlJDkeHKF1k=",
+        "parentSpanId": "fKv2ptDVY+w="
+      },
+      {
+        "name": "GetQuorumInfo",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.312548,
+        "ms": 0.003137,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "4alZei9EHuM=",
+        "parentSpanId": "tlJDkeHKF1k="
+      },
+      {
+        "name": "GetSegmentBlockCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.324575,
+        "ms": 0.01254,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "DCezF4whazY=",
+        "parentSpanId": "tlJDkeHKF1k="
+      },
+      {
+        "name": "GetBlocksCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.330974,
+        "ms": 0.002391,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "NIYDb52qw8Q=",
+        "parentSpanId": "DCezF4whazY="
+      },
+      {
+        "name": "AppendAsync",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.345678,
+        "ms": 0.007945,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "jt/woxi19pA=",
+        "parentSpanId": "/ZPhFqnKCIs="
+      },
+      {
+        "name": "wal.bc_callback",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 3.23941,
+        "ms": 0.335181,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "oF6hjU1/J24=",
+        "parentSpanId": "8NlMIYxl22Y="
+      },
+      {
+        "name": "Proxy-Search",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.067412,
+        "ms": 2.19626,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "/sOV7a/539c=",
+        "parentSpanId": "LCiUnI6xyq4="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.120572,
+        "ms": 0.15399,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "rQjXlYfH1sI=",
+        "parentSpanId": "/sOV7a/539c="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.192787,
+        "ms": 0.040812,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "Jn9BvsRP5JA=",
+        "parentSpanId": "rQjXlYfH1sI="
+      },
+      {
+        "name": "SearchTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.309279,
+        "ms": 1.917306,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "a84iXITQTXw=",
+        "parentSpanId": "/sOV7a/539c="
+      },
+      {
+        "name": "Proxy-Search-PreExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.315518,
+        "ms": 0.138185,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "k3kvwt81Qrk=",
+        "parentSpanId": "a84iXITQTXw="
+      },
+      {
+        "name": "init search request",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.351209,
+        "ms": 0.083629,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "pbNPNkHmSOw=",
+        "parentSpanId": "k3kvwt81Qrk="
+      },
+      {
+        "name": "Proxy-Search-Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.455508,
+        "ms": 1.71944,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "vaWV7VelJhQ=",
+        "parentSpanId": "a84iXITQTXw="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.497864,
+        "ms": 0.213869,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "muDnAmKxXRY=",
+        "parentSpanId": "vaWV7VelJhQ="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.592156,
+        "ms": 0.088998,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "fByjb5fDOHw=",
+        "parentSpanId": "muDnAmKxXRY="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.734895,
+        "ms": 1.426822,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "pjMB+PvuvRg=",
+        "parentSpanId": "vaWV7VelJhQ="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.798086,
+        "ms": 1.298511,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "SJRyJoY8kwA=",
+        "parentSpanId": "pjMB+PvuvRg="
+      },
+      {
+        "name": "schedule",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.847914,
+        "ms": 0.003138,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "A4PtyWaeues=",
+        "parentSpanId": "SJRyJoY8kwA="
+      },
+      {
+        "name": "SegCoreSearch",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.002639,
+        "ms": 0.597214,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "2TBNO/YVnJM=",
+        "parentSpanId": "A4PtyWaeues="
+      },
+      {
+        "name": "ExecuteTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.029928,
+        "ms": 0.564512,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "Z5s/AjmOnzo=",
+        "parentSpanId": "2TBNO/YVnJM="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.042599,
+        "ms": 0.542907,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "ysz8TUVU5aU=",
+        "parentSpanId": "Z5s/AjmOnzo="
+      },
+      {
+        "name": "PhyMvccNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.152445,
+        "ms": 0.00678,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "FfvszYV9xpY=",
+        "parentSpanId": "ysz8TUVU5aU="
+      },
+      {
+        "name": "PhyVectorSearchNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.163851,
+        "ms": 0.419578,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "FTABui1GiNM=",
+        "parentSpanId": "ysz8TUVU5aU="
+      },
+      {
+        "name": "knowhere bf search with buf",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.234471,
+        "ms": 0.336205,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "IQ/m658jqQE=",
+        "parentSpanId": "2TBNO/YVnJM="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.587896,
+        "ms": 0.004591,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "q9t6FyrXRRc=",
+        "parentSpanId": "Z5s/AjmOnzo="
+      },
+      {
+        "name": "ReduceHelper::PreReduce",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.721951,
+        "ms": 0.025493,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "vKudopecTcY=",
+        "parentSpanId": "A4PtyWaeues="
+      },
+      {
+        "name": "ReduceHelper::FilterInvalidSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.7246,
+        "ms": 0.001533,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "zFos03noN8c=",
+        "parentSpanId": "vKudopecTcY="
+      },
+      {
+        "name": "ReduceHelper::FillPrimaryKey",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 8.728068,
+        "ms": 0.019125,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "jvJH1zxQmUU=",
+        "parentSpanId": "vKudopecTcY="
+      },
+      {
+        "name": "EncodeSearchResultData",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.023228,
+        "ms": 0.02079,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "RPf0VI5LObM=",
+        "parentSpanId": "A4PtyWaeues="
+      },
+      {
+        "name": "Proxy-Search-PostExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.178191,
+        "ms": 0.045957,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "4++hKnL26AE=",
+        "parentSpanId": "a84iXITQTXw="
+      },
+      {
+        "name": "searchReduceOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.188172,
+        "ms": 0.018978,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "H3uTmiSKnYM=",
+        "parentSpanId": "4++hKnL26AE="
+      },
+      {
+        "name": "reduceResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.18915,
+        "ms": 0.016487,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "A3sA5Y0YHxM=",
+        "parentSpanId": "/sOV7a/539c="
+      },
+      {
+        "name": "decodeSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 9.190063,
+        "ms": 0.008025,
+        "traceId": "6ntn/Pb5UHMET9RvrtKcZg==",
+        "spanId": "1CEQ96C6Eik=",
+        "parentSpanId": "A3sA5Y0YHxM="
+      }
+    ]
+  },
+  {
+    "label": "nvme-v81-prefetch-longest-first-with-vector-3",
+    "run": {
+      "label": "nvme-v81-prefetch-longest-first-with-vector-3",
+      "round": 0,
+      "start_ns": 1791643607287410563,
+      "before": "NotLoad",
+      "manual_load": false,
+      "release_wait_s": 0.1,
+      "release_rpc_ms": 3.724963,
+      "scenario": "with-vector",
+      "output_fields": [
+        "vector"
+      ],
+      "collection_id": 469658685339075637,
+      "index_type": "FLAT",
+      "latency_ms": 13.225701,
+      "return_ns": 1791643607300781903,
+      "process_fault_delta": {
+        "minor": 33,
+        "major": 0
+      },
+      "ids": [
+        123,
+        660,
+        322,
+        541,
+        913,
+        593,
+        694,
+        56,
+        947,
+        348
+      ],
+      "distances": [
+        0.9999998807907104,
+        0.10951204597949982,
+        0.10621106624603271,
+        0.10212098807096481,
+        0.09275553375482559,
+        0.09181385487318039,
+        0.08825279772281647,
+        0.08425603061914444,
+        0.08256486058235168,
+        0.08228766173124313
+      ],
+      "vectors_verified": true,
+      "returned_vector_count": 10,
+      "returned_vector_values": 7680,
+      "ok": true,
+      "end_ns": 1791643607311305428,
+      "after": "Loaded"
+    },
+    "minio": [
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/0_0752b749-cd8d-4c86-be38-501393469000.parquet",
+        "time": "2026-10-10T14:46:47.289745209Z",
+        "offset_ms": 2.334646,
+        "duration_ms": 1.149668,
+        "statusCode": 206,
+        "bytes": 6191
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/2_609a9ba3-1346-4e30-b72e-38390b757e79.parquet",
+        "time": "2026-10-10T14:46:47.294874743Z",
+        "offset_ms": 7.46418,
+        "duration_ms": 3.566014,
+        "statusCode": 206,
+        "bytes": 3073941
+      },
+      {
+        "api": "s3.GetObject",
+        "path": "/cold-search-qv/files/insert_log/469658685339075637/469658685339075638/469658685339276649/_data/2_609a9ba3-1346-4e30-b72e-38390b757e79.parquet",
+        "time": "2026-10-10T14:46:47.289742894Z",
+        "offset_ms": 2.332331,
+        "duration_ms": 20.694201,
+        "statusCode": 206,
+        "bytes": 3073941
+      }
+    ],
+    "spans": [
+      {
+        "name": "milvus.proto.milvus.MilvusService/Search",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 0.962979,
+        "ms": 12.041201,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "JZNBGTHszgc="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 1.175113,
+        "ms": 5.23256,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "VNXglsw24Ic=",
+        "parentSpanId": "JZNBGTHszgc="
+      },
+      {
+        "name": "milvus.proto.query.QueryCoord/EnsureCollectionReady",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 1.304145,
+        "ms": 5.048035,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "xkU4UGZ604Q=",
+        "parentSpanId": "VNXglsw24Ic="
+      },
+      {
+        "name": "wal.broadcast",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 1.631012,
+        "ms": 1.957119,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "JY46IuTzjJQ=",
+        "parentSpanId": "xkU4UGZ604Q="
+      },
+      {
+        "name": "wal.append",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.124034,
+        "ms": 0.666977,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "4vtU0fG8MPE=",
+        "parentSpanId": "JY46IuTzjJQ="
+      },
+      {
+        "name": "wal.appendimpl",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.160981,
+        "ms": 0.588136,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "LEBrsfvY5cA=",
+        "parentSpanId": "4vtU0fG8MPE="
+      },
+      {
+        "name": "Write",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.202156,
+        "ms": 0.54535,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "g6uEehEFldY=",
+        "parentSpanId": "LEBrsfvY5cA="
+      },
+      {
+        "name": "GetOrCreateWritableSegmentHandle",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.215105,
+        "ms": 0.038796,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "akWxwDH2tHg=",
+        "parentSpanId": "g6uEehEFldY="
+      },
+      {
+        "name": "GetLastAddConfirmed",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.219288,
+        "ms": 0.029607,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "rCE0QmiIgyY=",
+        "parentSpanId": "akWxwDH2tHg="
+      },
+      {
+        "name": "GetQuorumInfo",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.222664,
+        "ms": 0.001545,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "8dZTMmK9Sq0=",
+        "parentSpanId": "rCE0QmiIgyY="
+      },
+      {
+        "name": "GetSegmentBlockCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.232709,
+        "ms": 0.013154,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "ZSfl0fRt0Lw=",
+        "parentSpanId": "rCE0QmiIgyY="
+      },
+      {
+        "name": "GetBlocksCount",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.238884,
+        "ms": 0.003443,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "vN127C86JXk=",
+        "parentSpanId": "ZSfl0fRt0Lw="
+      },
+      {
+        "name": "AppendAsync",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 2.255068,
+        "ms": 0.008364,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "vpWSL138zmw=",
+        "parentSpanId": "g6uEehEFldY="
+      },
+      {
+        "name": "wal.bc_callback",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 3.082238,
+        "ms": 0.268154,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "g4Ujhec0tqU=",
+        "parentSpanId": "JY46IuTzjJQ="
+      },
+      {
+        "name": "Proxy-Search",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 6.421954,
+        "ms": 6.382333,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "0m+obK7/Un0=",
+        "parentSpanId": "JZNBGTHszgc="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 6.472646,
+        "ms": 0.186493,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "bHjDIbekm/I=",
+        "parentSpanId": "0m+obK7/Un0="
+      },
+      {
+        "name": "milvus.proto.rootcoord.RootCoord/AllocTimestamp",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 6.558823,
+        "ms": 0.054487,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "ZzTUflzixCU=",
+        "parentSpanId": "bHjDIbekm/I="
+      },
+      {
+        "name": "SearchTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 6.688596,
+        "ms": 6.073297,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "zDvHng1FLho=",
+        "parentSpanId": "0m+obK7/Un0="
+      },
+      {
+        "name": "Proxy-Search-PreExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 6.695003,
+        "ms": 0.139522,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "9S52/npeJho=",
+        "parentSpanId": "zDvHng1FLho="
+      },
+      {
+        "name": "init search request",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 6.734317,
+        "ms": 0.086825,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "wvp5beV0iYc=",
+        "parentSpanId": "9S52/npeJho="
+      },
+      {
+        "name": "Proxy-Search-Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 6.836246,
+        "ms": 5.864806,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "mV68yVuOqyk=",
+        "parentSpanId": "zDvHng1FLho="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 6.895085,
+        "ms": 0.198644,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "Q2sA0uIwEGI=",
+        "parentSpanId": "mV68yVuOqyk="
+      },
+      {
+        "name": "milvus.proto.view.QueryPlanService/GetQueryPlan",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 6.985742,
+        "ms": 0.083736,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "JN7+rDJNDok=",
+        "parentSpanId": "Q2sA0uIwEGI="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_CLIENT",
+        "offset_ms": 7.117036,
+        "ms": 5.566876,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "KDG5kmfElJc=",
+        "parentSpanId": "mV68yVuOqyk="
+      },
+      {
+        "name": "milvus.proto.view.ViewQueryService/SearchOnView",
+        "kind": "SPAN_KIND_SERVER",
+        "offset_ms": 7.177506,
+        "ms": 5.413076,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "cMLI38sENLg=",
+        "parentSpanId": "KDG5kmfElJc="
+      },
+      {
+        "name": "schedule",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.222392,
+        "ms": 0.003196,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "rXyAk/QYqTw=",
+        "parentSpanId": "cMLI38sENLg="
+      },
+      {
+        "name": "SegCoreSearch",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.380112,
+        "ms": 4.691694,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "CAR7/0DW2Uc=",
+        "parentSpanId": "rXyAk/QYqTw="
+      },
+      {
+        "name": "ExecuteTask",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.4118,
+        "ms": 4.655128,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "G+5ujONuHj8=",
+        "parentSpanId": "CAR7/0DW2Uc="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 7.42613,
+        "ms": 4.630713,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "yqB9JxZnxFY=",
+        "parentSpanId": "G+5ujONuHj8="
+      },
+      {
+        "name": "PhyMvccNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 11.633844,
+        "ms": 0.009803,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "6kOOIwtYcKQ=",
+        "parentSpanId": "yqB9JxZnxFY="
+      },
+      {
+        "name": "PhyVectorSearchNode::Execute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 11.648262,
+        "ms": 0.406008,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "l/yrv5rMt9A=",
+        "parentSpanId": "yqB9JxZnxFY="
+      },
+      {
+        "name": "knowhere bf search with buf",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 11.718798,
+        "ms": 0.322662,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "tJekejh01VE=",
+        "parentSpanId": "CAR7/0DW2Uc="
+      },
+      {
+        "name": "Task::Next",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 12.05962,
+        "ms": 0.004738,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "RC/UYctsPew=",
+        "parentSpanId": "G+5ujONuHj8="
+      },
+      {
+        "name": "ReduceHelper::PreReduce",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 12.142943,
+        "ms": 0.034637,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "VIzsuCTyf5U=",
+        "parentSpanId": "rXyAk/QYqTw="
+      },
+      {
+        "name": "ReduceHelper::FilterInvalidSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 12.145688,
+        "ms": 0.002394,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "ONwkxE8l7VU=",
+        "parentSpanId": "VIzsuCTyf5U="
+      },
+      {
+        "name": "ReduceHelper::FillPrimaryKey",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 12.149828,
+        "ms": 0.027462,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "Knz4w3keSh4=",
+        "parentSpanId": "VIzsuCTyf5U="
+      },
+      {
+        "name": "EncodeSearchResultData",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 12.504042,
+        "ms": 0.021557,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "Use7EXb/eBc=",
+        "parentSpanId": "rXyAk/QYqTw="
+      },
+      {
+        "name": "Proxy-Search-PostExecute",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 12.705024,
+        "ms": 0.053787,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "oQ5SGpY336c=",
+        "parentSpanId": "zDvHng1FLho="
+      },
+      {
+        "name": "searchReduceOperator",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 12.71602,
+        "ms": 0.021841,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "avjvbbM4AYI=",
+        "parentSpanId": "oQ5SGpY336c="
+      },
+      {
+        "name": "reduceResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 12.716894,
+        "ms": 0.019227,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "YlVeS1kPsIE=",
+        "parentSpanId": "0m+obK7/Un0="
+      },
+      {
+        "name": "decodeSearchResults",
+        "kind": "SPAN_KIND_INTERNAL",
+        "offset_ms": 12.717719,
+        "ms": 0.008632,
+        "traceId": "jru79jmDA8IUoeFctDVKpQ==",
+        "spanId": "lIqhF3YLx5s=",
+        "parentSpanId": "YlVeS1kPsIE="
+      }
+    ]
+  }
+]

@@ -1,0 +1,9 @@
+Matched short-cohort comparison. Same sn-persist-timing Go binary and storage DSO; same config including preferFieldDataWhenIndexHasRawData=true. v78 uses new core, v79 uses frozen v76 core. Three samples/scenario; all samples retained. Startup excluded separately.
+nvme-v79-pk-control id-only: samples=[9.703841, 9.538667, 9.717013];means_ms={'latency_ms': 9.653174, 'readiness_ms': 6.006587, 'execution_ms': 2.165713, 'fill_primary_keys': 0.147519, 'prepare_export': 0.204975, 'fill_output_fields': 0.086807, 'reduce_total': 0.449894}
+  actual_GET_waves=[1, 1, 1]; extra_window_S3=[[], [], [{'api': 's3.ListObjectsV2', 'path': '/cold-search-qv/', 'offset_ms': 9.215162}]]
+nvme-v79-pk-control with-vector: samples=[9.808849, 9.269295, 9.292461];means_ms={'latency_ms': 9.456868, 'readiness_ms': 5.65184, 'execution_ms': 2.311379, 'fill_primary_keys': 0.146258, 'prepare_export': 0.203789, 'fill_output_fields': 0.148008, 'reduce_total': 0.540144}
+  actual_GET_waves=[1, 1, 1]; extra_window_S3=[[], [], []]
+nvme-v78-int64-pk-output id-only: samples=[9.435955, 9.236696, 9.965181];means_ms={'latency_ms': 9.545944, 'readiness_ms': 5.928623, 'execution_ms': 2.027363, 'fill_primary_keys': 0.019071, 'prepare_export': 0.062237, 'fill_output_fields': 0.096316, 'reduce_total': 0.322723}
+  actual_GET_waves=[1, 1, 1]; extra_window_S3=[[], [], []]
+nvme-v78-int64-pk-output with-vector: samples=[9.696799, 9.448534, 8.937106];means_ms={'latency_ms': 9.360813, 'readiness_ms': 5.731319, 'execution_ms': 2.121185, 'fill_primary_keys': 0.017176, 'prepare_export': 0.060351, 'fill_output_fields': 0.130914, 'reduce_total': 0.386008}
+  actual_GET_waves=[1, 1, 1]; extra_window_S3=[[], [], []]

@@ -1,0 +1,25 @@
+v76 extended diagnosis, same sn-persist-timing binary as v74, lease0/wait0.1, ten samples per scenario. Not formal normal-lease acceptance. No source/runtime optimization changes from v74.
+nvme-v76-sn-persist-tail-id-only-0: SDK=9.943954ms Up-roundtrip=0.358410ms SNcatalog-save=0.263629ms
+nvme-v76-sn-persist-tail-id-only-1: SDK=9.173035ms Up-roundtrip=0.322823ms SNcatalog-save=0.252156ms
+nvme-v76-sn-persist-tail-id-only-2: SDK=9.547071ms Up-roundtrip=0.332349ms SNcatalog-save=0.250988ms
+nvme-v76-sn-persist-tail-id-only-3: SDK=9.523075ms Up-roundtrip=0.322535ms SNcatalog-save=0.242350ms
+nvme-v76-sn-persist-tail-id-only-4: SDK=9.010649ms Up-roundtrip=0.422451ms SNcatalog-save=0.350043ms
+nvme-v76-sn-persist-tail-id-only-5: SDK=9.208281ms Up-roundtrip=0.333894ms SNcatalog-save=0.257827ms
+nvme-v76-sn-persist-tail-id-only-6: SDK=9.276179ms Up-roundtrip=0.379237ms SNcatalog-save=0.287703ms
+nvme-v76-sn-persist-tail-id-only-7: SDK=8.883309ms Up-roundtrip=0.325598ms SNcatalog-save=0.249148ms
+nvme-v76-sn-persist-tail-id-only-8: SDK=9.388042ms Up-roundtrip=0.391937ms SNcatalog-save=0.309341ms
+nvme-v76-sn-persist-tail-id-only-9: SDK=9.556813ms Up-roundtrip=0.343613ms SNcatalog-save=0.262641ms
+id-only: mean=9.351041ms max=9.943954ms all_below_10=True
+nvme-v76-sn-persist-tail-with-vector-0: SDK=9.489545ms Up-roundtrip=0.418636ms SNcatalog-save=0.339977ms
+nvme-v76-sn-persist-tail-with-vector-1: SDK=9.281163ms Up-roundtrip=0.338637ms SNcatalog-save=0.259814ms
+nvme-v76-sn-persist-tail-with-vector-2: SDK=9.466262ms Up-roundtrip=0.322236ms SNcatalog-save=0.247938ms
+nvme-v76-sn-persist-tail-with-vector-3: SDK=9.215005ms Up-roundtrip=0.302718ms SNcatalog-save=0.243152ms
+nvme-v76-sn-persist-tail-with-vector-4: SDK=9.252346ms Up-roundtrip=0.327286ms SNcatalog-save=0.251192ms
+nvme-v76-sn-persist-tail-with-vector-5: SDK=9.309792ms Up-roundtrip=0.334510ms SNcatalog-save=0.252999ms
+nvme-v76-sn-persist-tail-with-vector-6: SDK=8.984155ms Up-roundtrip=0.347866ms SNcatalog-save=0.265356ms
+nvme-v76-sn-persist-tail-with-vector-7: SDK=9.613364ms Up-roundtrip=0.299820ms SNcatalog-save=0.240478ms
+nvme-v76-sn-persist-tail-with-vector-8: SDK=9.318256ms Up-roundtrip=0.341280ms SNcatalog-save=0.254016ms
+nvme-v76-sn-persist-tail-with-vector-9: SDK=9.556683ms Up-roundtrip=0.451944ms SNcatalog-save=0.236157ms
+with-vector: mean=9.348657ms max=9.613364ms all_below_10=True
+No 5ms Up outlier reproduced. Save and roundtrip timings remain nested, and no disk/etcd root cause has been proved. Earlier v73 formal tail remains in latest reports.
+All20 searches performed exactly one Go/native Load and two raw-data GETs. Actual GET overlap:19/20; id-only-7 had two sequential waves. with-vector-9 also had one ListObjectsV2 in the measurement window (bucket listing; not classified as a raw-data read), so window total3. These samples are retained.

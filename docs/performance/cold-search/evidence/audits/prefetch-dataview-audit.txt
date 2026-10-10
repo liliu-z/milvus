@@ -1,0 +1,7 @@
+Read-only audit after v70 (2026-10-10):
+Persisted DataView key cold-search-qv/meta/coord/dv/469658685339075637/versions/2/2 decoded from exact etcd JSON/base64 value (avoid etcd print-value newline for protobuf decoding).
+Collection 469658685339075637, partition 469658685339075638, segment 469658685339276649; segment_manifest_versions packed value 2, positive canonical mode; data_version=(2,2).
+Candidate: derive the immutable canonical manifest reference from this published descriptor for earlier speculative GET. NOT IMPLEMENTED.
+GetQueryViewSegmentLoadInfos is an in-process call (internal/coordinator/mix_coord.go -> internal/datacoord/services.go), NOT a network RPC. It snapshots collection/segment indexes, reads SegmentMeta, clones, recalculates row count and packs load info. Must not claim saving a network round trip.
+DataView balance snapshot already has version-bound row counts (queryview_balance_provider.go), but no authoritative actual-index-file admission field. Existing prefetch checks <=4096 rows, StorageV3 and absence of actual index files. Need preserve these gates or prove equivalent native manifest eligibility before bypassing this call. Canonical positive version alone does not prove eligibility.
+No source/runtime changes, no new benchmark. Formal v70 remains ID mean 9.851744 / vector mean 9.818669 ms, one ID sample 10.381176; goal active.

@@ -1,0 +1,242 @@
+[
+  {
+    "label": "nvme-v35-combined-id-only-0",
+    "client_rpc_intervals": [
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.400311,
+        "end_ms": 4.622226
+      },
+      {
+        "method": "DescribeCollection",
+        "start_ms": 4.412722,
+        "end_ms": 4.662089
+      },
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.697435,
+        "end_ms": 4.9131789999999995
+      }
+    ]
+  },
+  {
+    "label": "nvme-v35-combined-with-vector-0",
+    "client_rpc_intervals": [
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.222292,
+        "end_ms": 4.43405
+      },
+      {
+        "method": "DescribeCollection",
+        "start_ms": 4.256191,
+        "end_ms": 4.479525000000001
+      },
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.510708,
+        "end_ms": 4.6913800000000005
+      }
+    ]
+  },
+  {
+    "label": "nvme-v35-combined-id-only-1",
+    "client_rpc_intervals": [
+      {
+        "method": "DescribeCollection",
+        "start_ms": 4.554013,
+        "end_ms": 4.817761
+      },
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.554446,
+        "end_ms": 4.7708710000000005
+      },
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.868434,
+        "end_ms": 5.053147999999999
+      }
+    ]
+  },
+  {
+    "label": "nvme-v35-combined-with-vector-1",
+    "client_rpc_intervals": [
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.286006,
+        "end_ms": 4.511038
+      },
+      {
+        "method": "DescribeCollection",
+        "start_ms": 4.318983,
+        "end_ms": 4.532405000000001
+      },
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.571933,
+        "end_ms": 4.783767999999999
+      }
+    ]
+  },
+  {
+    "label": "nvme-v35-combined-id-only-2",
+    "client_rpc_intervals": [
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.241396,
+        "end_ms": 4.432244
+      },
+      {
+        "method": "DescribeCollection",
+        "start_ms": 4.256021,
+        "end_ms": 4.466616999999999
+      },
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.496998,
+        "end_ms": 4.68181
+      }
+    ]
+  },
+  {
+    "label": "nvme-v35-combined-with-vector-2",
+    "client_rpc_intervals": [
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.200986,
+        "end_ms": 4.413064
+      },
+      {
+        "method": "DescribeCollection",
+        "start_ms": 4.234263,
+        "end_ms": 4.4577670000000005
+      },
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.490621,
+        "end_ms": 4.668234
+      }
+    ]
+  },
+  {
+    "label": "nvme-v38-immutable-id-only-0",
+    "client_rpc_intervals": [
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.315579,
+        "end_ms": 4.522749999999999
+      },
+      {
+        "method": "DescribeCollection",
+        "start_ms": 4.330268,
+        "end_ms": 4.562898000000001
+      },
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.394185,
+        "end_ms": 4.559253
+      }
+    ]
+  },
+  {
+    "label": "nvme-v38-immutable-with-vector-0",
+    "client_rpc_intervals": [
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.474838,
+        "end_ms": 4.68851
+      },
+      {
+        "method": "DescribeCollection",
+        "start_ms": 4.535691,
+        "end_ms": 4.7780819999999995
+      },
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.591149,
+        "end_ms": 4.7672479999999995
+      }
+    ]
+  },
+  {
+    "label": "nvme-v38-immutable-id-only-1",
+    "client_rpc_intervals": [
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.445535,
+        "end_ms": 4.614585999999999
+      },
+      {
+        "method": "DescribeCollection",
+        "start_ms": 4.471713,
+        "end_ms": 4.703951
+      },
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.531795,
+        "end_ms": 4.695569
+      }
+    ]
+  },
+  {
+    "label": "nvme-v38-immutable-with-vector-1",
+    "client_rpc_intervals": [
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.272055,
+        "end_ms": 4.432162
+      },
+      {
+        "method": "DescribeCollection",
+        "start_ms": 4.343445,
+        "end_ms": 4.550967
+      },
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.420583,
+        "end_ms": 4.601806
+      }
+    ]
+  },
+  {
+    "label": "nvme-v38-immutable-id-only-2",
+    "client_rpc_intervals": [
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.176494,
+        "end_ms": 4.373895
+      },
+      {
+        "method": "DescribeCollection",
+        "start_ms": 4.216012,
+        "end_ms": 4.468532
+      },
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.275387,
+        "end_ms": 4.429907
+      }
+    ]
+  },
+  {
+    "label": "nvme-v38-immutable-with-vector-2",
+    "client_rpc_intervals": [
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.267658,
+        "end_ms": 4.460699
+      },
+      {
+        "method": "DescribeCollection",
+        "start_ms": 4.326652,
+        "end_ms": 4.543112
+      },
+      {
+        "method": "GetQueryViewLoadInfo",
+        "start_ms": 4.409138,
+        "end_ms": 4.567741
+      }
+    ]
+  }
+]

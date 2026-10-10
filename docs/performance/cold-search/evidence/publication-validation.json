@@ -1,0 +1,98 @@
+{
+  "date_utc": "2026-10-10",
+  "source_base": "2dd24a2189a11c7f61652eb5a4b1c17921348325",
+  "frozen_v83_tree": "05d67ed09dc9d96f7d8cd5c37012c56952f572ab",
+  "published_production_tree_matches_v83": true,
+  "private_dependency_overlay_matches_measured_sources": {
+    "grpc": 5,
+    "woodpecker": 2,
+    "milvus-storage": 5
+  },
+  "go_build": {
+    "result": "PASS",
+    "command": "BUILD_JOBS=5 bash tools/cold_search/build-go.sh",
+    "native_libraries": "Previously built and verified v83 core and storage, exposed temporarily via an untracked output symlink. No native source changes."
+  },
+  "native_check": {
+    "result": "PASS",
+    "check": "scoped-prefetch",
+    "initial_attempt": "Missing ld.lld on PATH; corrected linker PATH and rebuilt successfully. No source workaround to hide a test failure."
+  },
+  "analyzer_replay": "Every existing field of the archived nvme-v83-confirm-id-only-0 summary exactly matches the portable analyzer output.",
+  "config_validation": "Python compileall; rendered config; Docker Compose config -q passed. glog.conf is included.",
+  "functional_harness_smoke": "Two scenarios against the retained running v83 service; Release wait62 under normal lease60, exact output, one Go/native load each, two overlapping raw GET each. This does not benchmark the newly linked Go artifact.",
+  "limits": [
+    "No second full clean Conan/Cargo/native rebuild during packaging.",
+    "No full make test-go.",
+    "No P99 or high-concurrency claim.",
+    "Only selected Go tests were rerun; qvresource was rerun as a full package. Initial empty regex matches are recorded and actual relevant tests rerun."
+  ],
+  "logs": [
+    {
+      "name": "build-go.log",
+      "sha256": "a6e78d711f50884338d3dc47346b2af895f9e1d9981eafe8cdba1414cb3812c8",
+      "result_lines": []
+    },
+    {
+      "name": "go-selected-race.log",
+      "sha256": "f89bc5f2d6a247827fb8c23446b0cfbb793850d14132857c2daff7ba1b79e121",
+      "result_lines": [
+        "ok  \tgithub.com/milvus-io/milvus/internal/util/cgo\t17.825s",
+        "ok  \tgithub.com/milvus-io/milvus/internal/util/cgo/logging\t1.173s [no tests to run]",
+        "ok  \tgithub.com/milvus-io/milvus/internal/querynodev2/qvresource\t1.526s [no tests to run]",
+        "ok  \tgithub.com/milvus-io/milvus/internal/querycoordv2\t2.337s",
+        "ok  \tgithub.com/milvus-io/milvus/internal/storagev2/packed\t1.449s",
+        "ok  \tgithub.com/milvus-io/milvus/internal/metastore/kv/querycoord\t1.302s",
+        "ok  \tgithub.com/milvus-io/milvus/internal/views/coord/loadmgr\t1.305s"
+      ]
+    },
+    {
+      "name": "qvresource-race.log",
+      "sha256": "b444a07126a767aa4ac78e4c79dc0a30716c2fb1cf76ed2a8224006c89fd32c4",
+      "result_lines": [
+        "ok  \tgithub.com/milvus-io/milvus/internal/querynodev2/qvresource\t1.541s"
+      ]
+    },
+    {
+      "name": "go-search-config-probe.log",
+      "sha256": "ee1c300ab0a91187aa97d9bd2f372385a163984cadeb4285d5e29acc9455ba10",
+      "result_lines": [
+        "ok  \tgithub.com/milvus-io/milvus/internal/proxy/dql\t0.304s",
+        "ok  \tgithub.com/milvus-io/milvus/internal/util/initcore\t0.166s [no tests to run]",
+        "ok  \tgithub.com/milvus-io/milvus/internal/streamingnode/server/wal/snview\t0.256s"
+      ]
+    },
+    {
+      "name": "go-config.log",
+      "sha256": "ef5037ac141da83406cdf59411d5abb6c5a1c1b92f9d23ae476b8d2193661223",
+      "result_lines": [
+        "ok  \tgithub.com/milvus-io/milvus/internal/util/initcore\t0.185s"
+      ]
+    },
+    {
+      "name": "grpc-race.log",
+      "sha256": "42e53253f4daf22aa96c2d7042ab588578618e9f828b025cb0f41179316f06a2",
+      "result_lines": [
+        "ok  \tgoogle.golang.org/grpc\t1.213s",
+        "ok  \tgoogle.golang.org/grpc/internal/transport\t1.029s"
+      ]
+    },
+    {
+      "name": "build-check.log",
+      "sha256": "7ade28e8d5ab23346cf474d272dc48906bb0b7d2996457d48e6f3c80ad513411",
+      "result_lines": []
+    },
+    {
+      "name": "scoped-prefetch.log",
+      "sha256": "0b2470ff183132dfc132c8fec2d4d926fef61b1360d96e0f49213e037a6a4a49",
+      "result_lines": [
+        "PASS: scoped handoff, consume-once, real Parquet decode, fresh IO after release, identity isolation, byte/entry budgets, generation-safe cancel, queued foreground ownership, cancellation, failure/recovery/corruption status preservation, metadata reuse/accounting"
+      ]
+    },
+    {
+      "name": "harness-smoke.log",
+      "sha256": "ef790254db37036f2bd2ebb628ca13429e41075f2ef2e81d63a109ee409294db",
+      "result_lines": []
+    }
+  ]
+}

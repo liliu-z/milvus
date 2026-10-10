@@ -1,0 +1,5 @@
+v77 first INT64-PK candidate: NO whole-pipeline benefit claimed. Primary-key fill accelerates, but later materialization still triggers PK-index construction. v78 will address that source, controlled by the existing default-off preferFieldDataWhenIndexHasRawData setting.
+nvme-v76-sn-persist-tail id-only: n=10 SDKmean=9.351041ms {'fill_primary_keys': 0.140665, 'prepare_export': 0.188422, 'fill_output_fields': 0.087392}
+nvme-v76-sn-persist-tail with-vector: n=10 SDKmean=9.348657ms {'fill_primary_keys': 0.138618, 'prepare_export': 0.184208, 'fill_output_fields': 0.135274}
+nvme-v77-int64-pk id-only: n=3 SDKmean=9.386537ms {'fill_primary_keys': 0.018514, 'prepare_export': 0.061073, 'fill_output_fields': 0.216636}
+nvme-v77-int64-pk with-vector: n=3 SDKmean=9.693101ms {'fill_primary_keys': 0.022057, 'prepare_export': 0.070354, 'fill_output_fields': 0.254925}

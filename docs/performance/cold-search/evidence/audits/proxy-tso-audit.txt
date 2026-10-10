@@ -1,0 +1,13 @@
+2026-10-10: Proxy TSO investigation after formal v64. No source/runtime changes.
+
+Confirmed current source behavior:
+- SearchTask.CanSkipAllocTimestamp still requests a coordinator TSO for modern Strong queries (internal/proxy/dql/task_search.go:239).
+- BaseTaskQueue.Enqueue uses local wall-clock time plus independently allocated request ID only when CanSkipAllocTimestamp is true (internal/proxy/scheduler/task_scheduler.go:221).
+- The QueryView path is selected by a non-nil viewQueryClient; legacy execution remains a separate supported path (task_search.go:1464).
+- QueryView Strong/Session planning asks primary StreamingNode to generate persisted-WAL QueryPlanMVCC (internal/views/queryclient/shard_client.go:260). Node-specific legacy MvccTimestamp is then overwritten from that plan (same file:312).
+- This does NOT make the original Proxy timestamp generally unused. PreExecute derives EntityTtlPhysicalTime from GuaranteeTimestamp, and CollectionTtlTimestamps from the task's Base.Timestamp (task_search.go:419-472). Both fields flow into native query requests. Search iterator's first-page SessionTs also retains BeginTs as a fallback (task_search.go:1702).
+- Requery propagates BeginTs and GuaranteeTimestamp (internal/proxy/dql/search_pipeline.go:1289-1298,1338-1352). A blanket skip must audit that path and metadata changes as well.
+
+Decision: do not blindly return true for Strong or replace consistency timestamps with wall time. WAL-derived MVCC alone is insufficient proof of preserved TTL/iterator semantics. No latency benefit is claimed for this investigation. A narrow no-TTL/no-iterator optimization would still need metadata lifetime and all fallback consumers verified before implementation.
+
+Formal result remains v64: ID-only mean9.848825ms, with-vector mean10.122087333ms; samples and full phase breakdown in 10ms-v64-report.txt. Running service remains scoped-prefetch-async, Go2, normal60slease; no benchmark was run during this audit. Goal10ms remains active.

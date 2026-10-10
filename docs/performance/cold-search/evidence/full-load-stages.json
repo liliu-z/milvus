@@ -1,0 +1,2850 @@
+{
+  "nvme-baseline-id-repeat": [
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "clone_state"
+      },
+      "count": 1,
+      "sum_ms": 0.018498999999999988,
+      "mean_ms": 0.018498999999999988
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "column_groups"
+      },
+      "count": 1,
+      "sum_ms": 3.662033000000002,
+      "mean_ms": 3.662033000000002
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "create_text_indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.00020300000000000006,
+      "mean_ms": 0.00020300000000000006
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "default_fields"
+      },
+      "count": 1,
+      "sum_ms": 0.00022099999999999998,
+      "mean_ms": 0.00022099999999999998
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "field_data"
+      },
+      "count": 1,
+      "sum_ms": 0.00036899999999999997,
+      "mean_ms": 0.00036899999999999997
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "finalize"
+      },
+      "count": 1,
+      "sum_ms": 0.0030890000000000006,
+      "mean_ms": 0.0030890000000000006
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.0006800000000000003,
+      "mean_ms": 0.0006800000000000003
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "json_stats"
+      },
+      "count": 1,
+      "sum_ms": 0.06408,
+      "mean_ms": 0.06408
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "lock_wait"
+      },
+      "count": 1,
+      "sum_ms": 0.0013510000000000002,
+      "mean_ms": 0.0013510000000000002
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "prepare"
+      },
+      "count": 1,
+      "sum_ms": 0.1663599999999999,
+      "mean_ms": 0.1663599999999999
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "publish"
+      },
+      "count": 1,
+      "sum_ms": 0.023822000000000003,
+      "mean_ms": 0.023822000000000003
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "reload_columns"
+      },
+      "count": 1,
+      "sum_ms": 6.599999999999998e-05,
+      "mean_ms": 6.599999999999998e-05
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "text_indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.00015400000000000003,
+      "mean_ms": 0.00015400000000000003
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "text_lob"
+      },
+      "count": 1,
+      "sum_ms": 0.0016569999999999988,
+      "mean_ms": 0.0016569999999999988
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "total"
+      },
+      "count": 1,
+      "sum_ms": 3.942583999999999,
+      "mean_ms": 3.942583999999999
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "csegment_load"
+      },
+      "count": 1,
+      "sum_ms": 4.166484999999999,
+      "mean_ms": 4.166484999999999
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "delta_logs"
+      },
+      "count": 1,
+      "sum_ms": 0.17895,
+      "mean_ms": 0.17895
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "load_pool_queue"
+      },
+      "count": 1,
+      "sum_ms": 0.008834,
+      "mean_ms": 0.008834
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "load_segment"
+      },
+      "count": 1,
+      "sum_ms": 4.371318999999999,
+      "mean_ms": 4.371318999999999
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "local_segment_load"
+      },
+      "count": 1,
+      "sum_ms": 4.327378000000001,
+      "mean_ms": 4.327378000000001
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "new_segment"
+      },
+      "count": 1,
+      "sum_ms": 0.4097479999999997,
+      "mean_ms": 0.4097479999999997
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "on_loaded"
+      },
+      "count": 1,
+      "sum_ms": 0.013040999999999999,
+      "mean_ms": 0.013040999999999999
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "physical_load"
+      },
+      "count": 1,
+      "sum_ms": 6.5083600000000015,
+      "mean_ms": 6.5083600000000015
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "pk_candidate"
+      },
+      "count": 1,
+      "sum_ms": 1.5466619999999998,
+      "mean_ms": 1.5466619999999998
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "release_resource"
+      },
+      "count": 1,
+      "sum_ms": 0.0023569999999999997,
+      "mean_ms": 0.0023569999999999997
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "reserve_resource"
+      },
+      "count": 1,
+      "sum_ms": 0.40839599999999987,
+      "mean_ms": 0.40839599999999987
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_load"
+      },
+      "count": 1,
+      "sum_ms": 4.3576120000000005,
+      "mean_ms": 4.3576120000000005
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_post_load"
+      },
+      "count": 1,
+      "sum_ms": 0.005348,
+      "mean_ms": 0.005348
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_prepare"
+      },
+      "count": 1,
+      "sum_ms": 0.0011799999999999996,
+      "mean_ms": 0.0011799999999999996
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sync_json_stats"
+      },
+      "count": 1,
+      "sum_ms": 0.160312,
+      "mean_ms": 0.160312
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "total"
+      },
+      "count": 1,
+      "sum_ms": 6.955118,
+      "mean_ms": 6.955118
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "update_index_meta"
+      },
+      "count": 1,
+      "sum_ms": 0.016218999999999994,
+      "mean_ms": 0.016218999999999994
+    }
+  ],
+  "nvme-baseline-vector": [
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "clone_state"
+      },
+      "count": 1,
+      "sum_ms": 0.019942999999999995,
+      "mean_ms": 0.019942999999999995
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "column_groups"
+      },
+      "count": 1,
+      "sum_ms": 3.6267709999999993,
+      "mean_ms": 3.6267709999999993
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "create_text_indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.0001989999999999999,
+      "mean_ms": 0.0001989999999999999
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "default_fields"
+      },
+      "count": 1,
+      "sum_ms": 0.000363,
+      "mean_ms": 0.000363
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "field_data"
+      },
+      "count": 1,
+      "sum_ms": 0.00017500000000000003,
+      "mean_ms": 0.00017500000000000003
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "finalize"
+      },
+      "count": 1,
+      "sum_ms": 0.00429,
+      "mean_ms": 0.00429
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.0007309999999999999,
+      "mean_ms": 0.0007309999999999999
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "json_stats"
+      },
+      "count": 1,
+      "sum_ms": 0.07786799999999999,
+      "mean_ms": 0.07786799999999999
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "lock_wait"
+      },
+      "count": 1,
+      "sum_ms": 0.0011880000000000003,
+      "mean_ms": 0.0011880000000000003
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "prepare"
+      },
+      "count": 1,
+      "sum_ms": 0.160749,
+      "mean_ms": 0.160749
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "publish"
+      },
+      "count": 1,
+      "sum_ms": 0.024582999999999997,
+      "mean_ms": 0.024582999999999997
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "reload_columns"
+      },
+      "count": 1,
+      "sum_ms": 9.999999999999999e-05,
+      "mean_ms": 9.999999999999999e-05
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "text_indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.00012800000000000002,
+      "mean_ms": 0.00012800000000000002
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "text_lob"
+      },
+      "count": 1,
+      "sum_ms": 0.002518,
+      "mean_ms": 0.002518
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "total"
+      },
+      "count": 1,
+      "sum_ms": 3.919606000000001,
+      "mean_ms": 3.919606000000001
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "csegment_load"
+      },
+      "count": 1,
+      "sum_ms": 4.150276,
+      "mean_ms": 4.150276
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "delta_logs"
+      },
+      "count": 1,
+      "sum_ms": 0.15985100000000002,
+      "mean_ms": 0.15985100000000002
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "load_pool_queue"
+      },
+      "count": 1,
+      "sum_ms": 0.009270999999999998,
+      "mean_ms": 0.009270999999999998
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "load_segment"
+      },
+      "count": 1,
+      "sum_ms": 4.352857,
+      "mean_ms": 4.352857
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "local_segment_load"
+      },
+      "count": 1,
+      "sum_ms": 4.301177,
+      "mean_ms": 4.301177
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "new_segment"
+      },
+      "count": 1,
+      "sum_ms": 0.41456200000000026,
+      "mean_ms": 0.41456200000000026
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "on_loaded"
+      },
+      "count": 1,
+      "sum_ms": 0.013514,
+      "mean_ms": 0.013514
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "physical_load"
+      },
+      "count": 1,
+      "sum_ms": 6.406288000000001,
+      "mean_ms": 6.406288000000001
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "pk_candidate"
+      },
+      "count": 1,
+      "sum_ms": 1.477389,
+      "mean_ms": 1.477389
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "release_resource"
+      },
+      "count": 1,
+      "sum_ms": 0.002326,
+      "mean_ms": 0.002326
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "reserve_resource"
+      },
+      "count": 1,
+      "sum_ms": 0.41542999999999997,
+      "mean_ms": 0.41542999999999997
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_load"
+      },
+      "count": 1,
+      "sum_ms": 4.340565000000001,
+      "mean_ms": 4.340565000000001
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_post_load"
+      },
+      "count": 1,
+      "sum_ms": 0.01518,
+      "mean_ms": 0.01518
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_prepare"
+      },
+      "count": 1,
+      "sum_ms": 0.0010240000000000002,
+      "mean_ms": 0.0010240000000000002
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sync_json_stats"
+      },
+      "count": 1,
+      "sum_ms": 0.15020499999999998,
+      "mean_ms": 0.15020499999999998
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "total"
+      },
+      "count": 1,
+      "sum_ms": 6.861541000000001,
+      "mean_ms": 6.861541000000001
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "update_index_meta"
+      },
+      "count": 1,
+      "sum_ms": 0.017054999999999997,
+      "mean_ms": 0.017054999999999997
+    }
+  ],
+  "nvme-v83-confirm-id-only-0": [
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "clone_state"
+      },
+      "count": 1,
+      "sum_ms": 0.010796999999999998,
+      "mean_ms": 0.010796999999999998
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "column_groups"
+      },
+      "count": 1,
+      "sum_ms": 0.7330029999999998,
+      "mean_ms": 0.7330029999999998
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "create_text_indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.00022600000000000005,
+      "mean_ms": 0.00022600000000000005
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "default_fields"
+      },
+      "count": 1,
+      "sum_ms": 0.000174,
+      "mean_ms": 0.000174
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "field_data"
+      },
+      "count": 1,
+      "sum_ms": 0.00022700000000000004,
+      "mean_ms": 0.00022700000000000004
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "finalize"
+      },
+      "count": 1,
+      "sum_ms": 0.0023120000000000007,
+      "mean_ms": 0.0023120000000000007
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.0004550000000000001,
+      "mean_ms": 0.0004550000000000001
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "json_stats"
+      },
+      "count": 1,
+      "sum_ms": 0.046093999999999996,
+      "mean_ms": 0.046093999999999996
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "lock_wait"
+      },
+      "count": 1,
+      "sum_ms": 0.000513,
+      "mean_ms": 0.000513
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "prepare"
+      },
+      "count": 1,
+      "sum_ms": 0.11885799999999998,
+      "mean_ms": 0.11885799999999998
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "publish"
+      },
+      "count": 1,
+      "sum_ms": 0.013769,
+      "mean_ms": 0.013769
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "reload_columns"
+      },
+      "count": 1,
+      "sum_ms": 6.1000000000000005e-05,
+      "mean_ms": 6.1000000000000005e-05
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "text_indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.000124,
+      "mean_ms": 0.000124
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "text_lob"
+      },
+      "count": 1,
+      "sum_ms": 0.0007989999999999999,
+      "mean_ms": 0.0007989999999999999
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "total"
+      },
+      "count": 1,
+      "sum_ms": 0.9274119999999999,
+      "mean_ms": 0.9274119999999999
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "csegment_load"
+      },
+      "count": 1,
+      "sum_ms": 1.1066820000000004,
+      "mean_ms": 1.1066820000000004
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "delta_logs"
+      },
+      "count": 1,
+      "sum_ms": 0.058422999999999996,
+      "mean_ms": 0.058422999999999996
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "load_pool_queue"
+      },
+      "count": 1,
+      "sum_ms": 0.008263999999999999,
+      "mean_ms": 0.008263999999999999
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "load_segment"
+      },
+      "count": 1,
+      "sum_ms": 1.2310229999999995,
+      "mean_ms": 1.2310229999999995
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "local_segment_load"
+      },
+      "count": 1,
+      "sum_ms": 1.1642910000000004,
+      "mean_ms": 1.1642910000000004
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "new_segment"
+      },
+      "count": 1,
+      "sum_ms": 0.18033199999999996,
+      "mean_ms": 0.18033199999999996
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "on_loaded"
+      },
+      "count": 1,
+      "sum_ms": 0.007686999999999999,
+      "mean_ms": 0.007686999999999999
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "physical_load"
+      },
+      "count": 1,
+      "sum_ms": 1.4734129999999999,
+      "mean_ms": 1.4734129999999999
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "pk_candidate"
+      },
+      "count": 1,
+      "sum_ms": 0.002091,
+      "mean_ms": 0.002091
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "release_resource"
+      },
+      "count": 1,
+      "sum_ms": 0.004472,
+      "mean_ms": 0.004472
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "reserve_resource"
+      },
+      "count": 1,
+      "sum_ms": 0.152798,
+      "mean_ms": 0.152798
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_load"
+      },
+      "count": 1,
+      "sum_ms": 1.2250949999999998,
+      "mean_ms": 1.2250949999999998
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_post_load"
+      },
+      "count": 1,
+      "sum_ms": 0.003839,
+      "mean_ms": 0.003839
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_prepare"
+      },
+      "count": 1,
+      "sum_ms": 0.001475,
+      "mean_ms": 0.001475
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sync_json_stats"
+      },
+      "count": 1,
+      "sum_ms": 0.056983000000000006,
+      "mean_ms": 0.056983000000000006
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "total"
+      },
+      "count": 1,
+      "sum_ms": 1.6610779999999998,
+      "mean_ms": 1.6610779999999998
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "update_index_meta"
+      },
+      "count": 1,
+      "sum_ms": 0.016114,
+      "mean_ms": 0.016114
+    }
+  ],
+  "nvme-v83-confirm-with-vector-0": [
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "clone_state"
+      },
+      "count": 1,
+      "sum_ms": 0.010816999999999995,
+      "mean_ms": 0.010816999999999995
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "column_groups"
+      },
+      "count": 1,
+      "sum_ms": 0.6945949999999996,
+      "mean_ms": 0.6945949999999996
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "create_text_indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.00015800000000000002,
+      "mean_ms": 0.00015800000000000002
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "default_fields"
+      },
+      "count": 1,
+      "sum_ms": 0.00022800000000000004,
+      "mean_ms": 0.00022800000000000004
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "field_data"
+      },
+      "count": 1,
+      "sum_ms": 0.00022099999999999998,
+      "mean_ms": 0.00022099999999999998
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "finalize"
+      },
+      "count": 1,
+      "sum_ms": 0.009293000000000001,
+      "mean_ms": 0.009293000000000001
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.00058,
+      "mean_ms": 0.00058
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "json_stats"
+      },
+      "count": 1,
+      "sum_ms": 0.04066400000000001,
+      "mean_ms": 0.04066400000000001
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "lock_wait"
+      },
+      "count": 1,
+      "sum_ms": 0.000552,
+      "mean_ms": 0.000552
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "prepare"
+      },
+      "count": 1,
+      "sum_ms": 0.11333600000000002,
+      "mean_ms": 0.11333600000000002
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "publish"
+      },
+      "count": 1,
+      "sum_ms": 0.016642999999999998,
+      "mean_ms": 0.016642999999999998
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "reload_columns"
+      },
+      "count": 1,
+      "sum_ms": 7.5e-05,
+      "mean_ms": 7.5e-05
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "text_indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.000123,
+      "mean_ms": 0.000123
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "text_lob"
+      },
+      "count": 1,
+      "sum_ms": 0.000823,
+      "mean_ms": 0.000823
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "total"
+      },
+      "count": 1,
+      "sum_ms": 0.8881080000000003,
+      "mean_ms": 0.8881080000000003
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "csegment_load"
+      },
+      "count": 1,
+      "sum_ms": 1.0593089999999996,
+      "mean_ms": 1.0593089999999996
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "delta_logs"
+      },
+      "count": 1,
+      "sum_ms": 0.04250499999999997,
+      "mean_ms": 0.04250499999999997
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "load_pool_queue"
+      },
+      "count": 1,
+      "sum_ms": 0.008903,
+      "mean_ms": 0.008903
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "load_segment"
+      },
+      "count": 1,
+      "sum_ms": 1.1904530000000002,
+      "mean_ms": 1.1904530000000002
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "local_segment_load"
+      },
+      "count": 1,
+      "sum_ms": 1.123634,
+      "mean_ms": 1.123634
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "new_segment"
+      },
+      "count": 1,
+      "sum_ms": 0.18442099999999995,
+      "mean_ms": 0.18442099999999995
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "on_loaded"
+      },
+      "count": 1,
+      "sum_ms": 0.007193000000000001,
+      "mean_ms": 0.007193000000000001
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "physical_load"
+      },
+      "count": 1,
+      "sum_ms": 1.4205000000000008,
+      "mean_ms": 1.4205000000000008
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "pk_candidate"
+      },
+      "count": 1,
+      "sum_ms": 0.001746,
+      "mean_ms": 0.001746
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "release_resource"
+      },
+      "count": 1,
+      "sum_ms": 0.004784999999999999,
+      "mean_ms": 0.004784999999999999
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "reserve_resource"
+      },
+      "count": 1,
+      "sum_ms": 0.14616099999999996,
+      "mean_ms": 0.14616099999999996
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_load"
+      },
+      "count": 1,
+      "sum_ms": 1.1853660000000001,
+      "mean_ms": 1.1853660000000001
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_post_load"
+      },
+      "count": 1,
+      "sum_ms": 0.0030329999999999997,
+      "mean_ms": 0.0030329999999999997
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_prepare"
+      },
+      "count": 1,
+      "sum_ms": 0.0015010000000000002,
+      "mean_ms": 0.0015010000000000002
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sync_json_stats"
+      },
+      "count": 1,
+      "sum_ms": 0.06372000000000003,
+      "mean_ms": 0.06372000000000003
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "total"
+      },
+      "count": 1,
+      "sum_ms": 1.6142909999999995,
+      "mean_ms": 1.6142909999999995
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "update_index_meta"
+      },
+      "count": 1,
+      "sum_ms": 0.02909,
+      "mean_ms": 0.02909
+    }
+  ],
+  "nvme-v83-confirm-id-only-1": [
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "clone_state"
+      },
+      "count": 1,
+      "sum_ms": 0.013568000000000004,
+      "mean_ms": 0.013568000000000004
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "column_groups"
+      },
+      "count": 1,
+      "sum_ms": 0.7256149999999998,
+      "mean_ms": 0.7256149999999998
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "create_text_indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.00023499999999999997,
+      "mean_ms": 0.00023499999999999997
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "default_fields"
+      },
+      "count": 1,
+      "sum_ms": 0.00020099999999999995,
+      "mean_ms": 0.00020099999999999995
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "field_data"
+      },
+      "count": 1,
+      "sum_ms": 0.00022700000000000002,
+      "mean_ms": 0.00022700000000000002
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "finalize"
+      },
+      "count": 1,
+      "sum_ms": 0.0036940000000000024,
+      "mean_ms": 0.0036940000000000024
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.000468,
+      "mean_ms": 0.000468
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "json_stats"
+      },
+      "count": 1,
+      "sum_ms": 0.04526699999999999,
+      "mean_ms": 0.04526699999999999
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "lock_wait"
+      },
+      "count": 1,
+      "sum_ms": 0.0005580000000000004,
+      "mean_ms": 0.0005580000000000004
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "prepare"
+      },
+      "count": 1,
+      "sum_ms": 0.121887,
+      "mean_ms": 0.121887
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "publish"
+      },
+      "count": 1,
+      "sum_ms": 0.018818,
+      "mean_ms": 0.018818
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "reload_columns"
+      },
+      "count": 1,
+      "sum_ms": 6.400000000000001e-05,
+      "mean_ms": 6.400000000000001e-05
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "text_indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.000112,
+      "mean_ms": 0.000112
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "text_lob"
+      },
+      "count": 1,
+      "sum_ms": 0.0014920000000000003,
+      "mean_ms": 0.0014920000000000003
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "total"
+      },
+      "count": 1,
+      "sum_ms": 0.9322059999999996,
+      "mean_ms": 0.9322059999999996
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "csegment_load"
+      },
+      "count": 1,
+      "sum_ms": 1.0776299999999996,
+      "mean_ms": 1.0776299999999996
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "delta_logs"
+      },
+      "count": 1,
+      "sum_ms": 0.043069999999999976,
+      "mean_ms": 0.043069999999999976
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "load_pool_queue"
+      },
+      "count": 1,
+      "sum_ms": 0.012523000000000001,
+      "mean_ms": 0.012523000000000001
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "load_segment"
+      },
+      "count": 1,
+      "sum_ms": 1.2272439999999998,
+      "mean_ms": 1.2272439999999998
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "local_segment_load"
+      },
+      "count": 1,
+      "sum_ms": 1.1455939999999998,
+      "mean_ms": 1.1455939999999998
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "new_segment"
+      },
+      "count": 1,
+      "sum_ms": 0.17441000000000006,
+      "mean_ms": 0.17441000000000006
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "on_loaded"
+      },
+      "count": 1,
+      "sum_ms": 0.007474,
+      "mean_ms": 0.007474
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "physical_load"
+      },
+      "count": 1,
+      "sum_ms": 1.4482000000000002,
+      "mean_ms": 1.4482000000000002
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "pk_candidate"
+      },
+      "count": 1,
+      "sum_ms": 0.001977,
+      "mean_ms": 0.001977
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "release_resource"
+      },
+      "count": 1,
+      "sum_ms": 0.004370000000000001,
+      "mean_ms": 0.004370000000000001
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "reserve_resource"
+      },
+      "count": 1,
+      "sum_ms": 0.15746,
+      "mean_ms": 0.15746
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_load"
+      },
+      "count": 1,
+      "sum_ms": 1.2222120000000003,
+      "mean_ms": 1.2222120000000003
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_post_load"
+      },
+      "count": 1,
+      "sum_ms": 0.002841,
+      "mean_ms": 0.002841
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_prepare"
+      },
+      "count": 1,
+      "sum_ms": 0.001187,
+      "mean_ms": 0.001187
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sync_json_stats"
+      },
+      "count": 1,
+      "sum_ms": 0.06733199999999998,
+      "mean_ms": 0.06733199999999998
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "total"
+      },
+      "count": 1,
+      "sum_ms": 1.6414159999999998,
+      "mean_ms": 1.6414159999999998
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "update_index_meta"
+      },
+      "count": 1,
+      "sum_ms": 0.017918,
+      "mean_ms": 0.017918
+    }
+  ],
+  "nvme-v83-confirm-with-vector-1": [
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "clone_state"
+      },
+      "count": 1,
+      "sum_ms": 0.011493000000000007,
+      "mean_ms": 0.011493000000000007
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "column_groups"
+      },
+      "count": 1,
+      "sum_ms": 0.6959440000000005,
+      "mean_ms": 0.6959440000000005
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "create_text_indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.00015600000000000008,
+      "mean_ms": 0.00015600000000000008
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "default_fields"
+      },
+      "count": 1,
+      "sum_ms": 0.00021000000000000012,
+      "mean_ms": 0.00021000000000000012
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "field_data"
+      },
+      "count": 1,
+      "sum_ms": 0.000186,
+      "mean_ms": 0.000186
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "finalize"
+      },
+      "count": 1,
+      "sum_ms": 0.0027950000000000097,
+      "mean_ms": 0.0027950000000000097
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.0004750000000000001,
+      "mean_ms": 0.0004750000000000001
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "json_stats"
+      },
+      "count": 1,
+      "sum_ms": 0.04638400000000001,
+      "mean_ms": 0.04638400000000001
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "lock_wait"
+      },
+      "count": 1,
+      "sum_ms": 0.0005869999999999996,
+      "mean_ms": 0.0005869999999999996
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "prepare"
+      },
+      "count": 1,
+      "sum_ms": 0.11015199999999997,
+      "mean_ms": 0.11015199999999997
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "publish"
+      },
+      "count": 1,
+      "sum_ms": 0.015079999999999998,
+      "mean_ms": 0.015079999999999998
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "reload_columns"
+      },
+      "count": 1,
+      "sum_ms": 8.299999999999998e-05,
+      "mean_ms": 8.299999999999998e-05
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "text_indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.00011999999999999996,
+      "mean_ms": 0.00011999999999999996
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "text_lob"
+      },
+      "count": 1,
+      "sum_ms": 0.000873,
+      "mean_ms": 0.000873
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "total"
+      },
+      "count": 1,
+      "sum_ms": 0.8845379999999998,
+      "mean_ms": 0.8845379999999998
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "csegment_load"
+      },
+      "count": 1,
+      "sum_ms": 1.024568,
+      "mean_ms": 1.024568
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "delta_logs"
+      },
+      "count": 1,
+      "sum_ms": 0.060470000000000024,
+      "mean_ms": 0.060470000000000024
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "load_pool_queue"
+      },
+      "count": 1,
+      "sum_ms": 0.014003000000000002,
+      "mean_ms": 0.014003000000000002
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "load_segment"
+      },
+      "count": 1,
+      "sum_ms": 1.1241649999999999,
+      "mean_ms": 1.1241649999999999
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "local_segment_load"
+      },
+      "count": 1,
+      "sum_ms": 1.0849229999999999,
+      "mean_ms": 1.0849229999999999
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "new_segment"
+      },
+      "count": 1,
+      "sum_ms": 0.18071800000000007,
+      "mean_ms": 0.18071800000000007
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "on_loaded"
+      },
+      "count": 1,
+      "sum_ms": 0.05014599999999999,
+      "mean_ms": 0.05014599999999999
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "physical_load"
+      },
+      "count": 1,
+      "sum_ms": 1.3685650000000005,
+      "mean_ms": 1.3685650000000005
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "pk_candidate"
+      },
+      "count": 1,
+      "sum_ms": 0.0017999999999999997,
+      "mean_ms": 0.0017999999999999997
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "release_resource"
+      },
+      "count": 1,
+      "sum_ms": 0.003957,
+      "mean_ms": 0.003957
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "reserve_resource"
+      },
+      "count": 1,
+      "sum_ms": 0.15203699999999995,
+      "mean_ms": 0.15203699999999995
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_load"
+      },
+      "count": 1,
+      "sum_ms": 1.1184659999999993,
+      "mean_ms": 1.1184659999999993
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_post_load"
+      },
+      "count": 1,
+      "sum_ms": 0.004145000000000002,
+      "mean_ms": 0.004145000000000002
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_prepare"
+      },
+      "count": 1,
+      "sum_ms": 0.001967,
+      "mean_ms": 0.001967
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sync_json_stats"
+      },
+      "count": 1,
+      "sum_ms": 0.05969800000000001,
+      "mean_ms": 0.05969800000000001
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "total"
+      },
+      "count": 1,
+      "sum_ms": 1.5970410000000004,
+      "mean_ms": 1.5970410000000004
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "update_index_meta"
+      },
+      "count": 1,
+      "sum_ms": 0.016179999999999996,
+      "mean_ms": 0.016179999999999996
+    }
+  ],
+  "nvme-v83-confirm-id-only-2": [
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "clone_state"
+      },
+      "count": 1,
+      "sum_ms": 0.014112000000000003,
+      "mean_ms": 0.014112000000000003
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "column_groups"
+      },
+      "count": 1,
+      "sum_ms": 0.7090080000000005,
+      "mean_ms": 0.7090080000000005
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "create_text_indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.00018799999999999993,
+      "mean_ms": 0.00018799999999999993
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "default_fields"
+      },
+      "count": 1,
+      "sum_ms": 0.00020600000000000002,
+      "mean_ms": 0.00020600000000000002
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "field_data"
+      },
+      "count": 1,
+      "sum_ms": 0.00019699999999999996,
+      "mean_ms": 0.00019699999999999996
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "finalize"
+      },
+      "count": 1,
+      "sum_ms": 0.0029129999999999907,
+      "mean_ms": 0.0029129999999999907
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.0004820000000000002,
+      "mean_ms": 0.0004820000000000002
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "json_stats"
+      },
+      "count": 1,
+      "sum_ms": 0.040521000000000015,
+      "mean_ms": 0.040521000000000015
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "lock_wait"
+      },
+      "count": 1,
+      "sum_ms": 0.0005760000000000001,
+      "mean_ms": 0.0005760000000000001
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "prepare"
+      },
+      "count": 1,
+      "sum_ms": 0.12602399999999997,
+      "mean_ms": 0.12602399999999997
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "publish"
+      },
+      "count": 1,
+      "sum_ms": 0.014940000000000002,
+      "mean_ms": 0.014940000000000002
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "reload_columns"
+      },
+      "count": 1,
+      "sum_ms": 8.8e-05,
+      "mean_ms": 8.8e-05
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "text_indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.00013000000000000002,
+      "mean_ms": 0.00013000000000000002
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "text_lob"
+      },
+      "count": 1,
+      "sum_ms": 0.0009439999999999997,
+      "mean_ms": 0.0009439999999999997
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "total"
+      },
+      "count": 1,
+      "sum_ms": 0.9103289999999996,
+      "mean_ms": 0.9103289999999996
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "csegment_load"
+      },
+      "count": 1,
+      "sum_ms": 1.0616129999999995,
+      "mean_ms": 1.0616129999999995
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "delta_logs"
+      },
+      "count": 1,
+      "sum_ms": 0.039619000000000015,
+      "mean_ms": 0.039619000000000015
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "load_pool_queue"
+      },
+      "count": 1,
+      "sum_ms": 0.012332999999999998,
+      "mean_ms": 0.012332999999999998
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "load_segment"
+      },
+      "count": 1,
+      "sum_ms": 1.2008260000000004,
+      "mean_ms": 1.2008260000000004
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "local_segment_load"
+      },
+      "count": 1,
+      "sum_ms": 1.1219760000000003,
+      "mean_ms": 1.1219760000000003
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "new_segment"
+      },
+      "count": 1,
+      "sum_ms": 0.17179400000000006,
+      "mean_ms": 0.17179400000000006
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "on_loaded"
+      },
+      "count": 1,
+      "sum_ms": 0.007213000000000001,
+      "mean_ms": 0.007213000000000001
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "physical_load"
+      },
+      "count": 1,
+      "sum_ms": 1.4152639999999994,
+      "mean_ms": 1.4152639999999994
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "pk_candidate"
+      },
+      "count": 1,
+      "sum_ms": 0.0016490000000000007,
+      "mean_ms": 0.0016490000000000007
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "release_resource"
+      },
+      "count": 1,
+      "sum_ms": 0.00405,
+      "mean_ms": 0.00405
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "reserve_resource"
+      },
+      "count": 1,
+      "sum_ms": 0.16501199999999996,
+      "mean_ms": 0.16501199999999996
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_load"
+      },
+      "count": 1,
+      "sum_ms": 1.1963730000000006,
+      "mean_ms": 1.1963730000000006
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_post_load"
+      },
+      "count": 1,
+      "sum_ms": 0.0027850000000000015,
+      "mean_ms": 0.0027850000000000015
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_prepare"
+      },
+      "count": 1,
+      "sum_ms": 0.0014120000000000003,
+      "mean_ms": 0.0014120000000000003
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sync_json_stats"
+      },
+      "count": 1,
+      "sum_ms": 0.05979899999999998,
+      "mean_ms": 0.05979899999999998
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "total"
+      },
+      "count": 1,
+      "sum_ms": 1.614664,
+      "mean_ms": 1.614664
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "update_index_meta"
+      },
+      "count": 1,
+      "sum_ms": 0.017217999999999997,
+      "mean_ms": 0.017217999999999997
+    }
+  ],
+  "nvme-v83-confirm-with-vector-2": [
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "clone_state"
+      },
+      "count": 1,
+      "sum_ms": 0.012704999999999994,
+      "mean_ms": 0.012704999999999994
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "column_groups"
+      },
+      "count": 1,
+      "sum_ms": 0.7281449999999995,
+      "mean_ms": 0.7281449999999995
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "create_text_indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.0001420000000000001,
+      "mean_ms": 0.0001420000000000001
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "default_fields"
+      },
+      "count": 1,
+      "sum_ms": 0.00029399999999999983,
+      "mean_ms": 0.00029399999999999983
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "field_data"
+      },
+      "count": 1,
+      "sum_ms": 0.00023200000000000006,
+      "mean_ms": 0.00023200000000000006
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "finalize"
+      },
+      "count": 1,
+      "sum_ms": 0.0027189999999999988,
+      "mean_ms": 0.0027189999999999988
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.0005020000000000005,
+      "mean_ms": 0.0005020000000000005
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "json_stats"
+      },
+      "count": 1,
+      "sum_ms": 0.04332799999999998,
+      "mean_ms": 0.04332799999999998
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "lock_wait"
+      },
+      "count": 1,
+      "sum_ms": 0.000671,
+      "mean_ms": 0.000671
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "prepare"
+      },
+      "count": 1,
+      "sum_ms": 0.12318300000000001,
+      "mean_ms": 0.12318300000000001
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "publish"
+      },
+      "count": 1,
+      "sum_ms": 0.015087999999999989,
+      "mean_ms": 0.015087999999999989
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "reload_columns"
+      },
+      "count": 1,
+      "sum_ms": 7.199999999999996e-05,
+      "mean_ms": 7.199999999999996e-05
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "text_indexes"
+      },
+      "count": 1,
+      "sum_ms": 0.00015199999999999998,
+      "mean_ms": 0.00015199999999999998
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "text_lob"
+      },
+      "count": 1,
+      "sum_ms": 0.0012089999999999998,
+      "mean_ms": 0.0012089999999999998
+    },
+    {
+      "metric": "internal_core_segment_load_duration_seconds",
+      "labels": {
+        "result": "success",
+        "stage": "total"
+      },
+      "count": 1,
+      "sum_ms": 0.9284420000000007,
+      "mean_ms": 0.9284420000000007
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "csegment_load"
+      },
+      "count": 1,
+      "sum_ms": 1.0614379999999997,
+      "mean_ms": 1.0614379999999997
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "delta_logs"
+      },
+      "count": 1,
+      "sum_ms": 0.04095200000000002,
+      "mean_ms": 0.04095200000000002
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "load_pool_queue"
+      },
+      "count": 1,
+      "sum_ms": 0.011753999999999997,
+      "mean_ms": 0.011753999999999997
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "load_segment"
+      },
+      "count": 1,
+      "sum_ms": 1.1824929999999998,
+      "mean_ms": 1.1824929999999998
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "local_segment_load"
+      },
+      "count": 1,
+      "sum_ms": 1.1121180000000004,
+      "mean_ms": 1.1121180000000004
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "new_segment"
+      },
+      "count": 1,
+      "sum_ms": 0.16726200000000005,
+      "mean_ms": 0.16726200000000005
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "on_loaded"
+      },
+      "count": 1,
+      "sum_ms": 0.006465,
+      "mean_ms": 0.006465
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "physical_load"
+      },
+      "count": 1,
+      "sum_ms": 1.3938939999999997,
+      "mean_ms": 1.3938939999999997
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "pk_candidate"
+      },
+      "count": 1,
+      "sum_ms": 0.001736,
+      "mean_ms": 0.001736
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "release_resource"
+      },
+      "count": 1,
+      "sum_ms": 0.004216000000000002,
+      "mean_ms": 0.004216000000000002
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "reserve_resource"
+      },
+      "count": 1,
+      "sum_ms": 0.15295499999999998,
+      "mean_ms": 0.15295499999999998
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_load"
+      },
+      "count": 1,
+      "sum_ms": 1.1780290000000007,
+      "mean_ms": 1.1780290000000007
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_post_load"
+      },
+      "count": 1,
+      "sum_ms": 0.0029599999999999987,
+      "mean_ms": 0.0029599999999999987
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sealed_prepare"
+      },
+      "count": 1,
+      "sum_ms": 0.0016019999999999993,
+      "mean_ms": 0.0016019999999999993
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "sync_json_stats"
+      },
+      "count": 1,
+      "sum_ms": 0.050093000000000026,
+      "mean_ms": 0.050093000000000026
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "total"
+      },
+      "count": 1,
+      "sum_ms": 1.5799720000000006,
+      "mean_ms": 1.5799720000000006
+    },
+    {
+      "metric": "milvus_qv_stage_duration_seconds",
+      "labels": {
+        "component": "queryNode",
+        "operation": "segment_load_attempt",
+        "result": "success",
+        "stage": "update_index_meta"
+      },
+      "count": 1,
+      "sum_ms": 0.015992999999999993,
+      "mean_ms": 0.015992999999999993
+    }
+  ]
+}

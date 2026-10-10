@@ -1,0 +1,190 @@
+[
+  {
+    "label": "publication-harness-20261010-id-only-0",
+    "scenario": "id-only",
+    "latency_ms": 9.748019,
+    "output_fields": [],
+    "round": 0,
+    "readiness_ms": 5.889715000000003,
+    "execution_ms": 2.500492,
+    "retry_wait_ms": 0,
+    "total_ms": 8.390206999999997,
+    "sdk_grpc_residual_ms": 1.3578120000000027,
+    "wal_impl_ms": 0.5461429999999998,
+    "qn_load_ms": 1.6297260000000016,
+    "native_load_ms": 0.9419689999999991,
+    "vector_prefetch_ms": 0.003428000000000002,
+    "go_load_count": 1,
+    "native_load_count": 1,
+    "bf_compute_ms": 0.304554,
+    "post_execute_ms": 0.041457,
+    "GetQueryPlan_rpc_count": 1,
+    "GetQueryPlan_rpc_ms": 0.475286,
+    "SearchOnView_rpc_count": 1,
+    "SearchOnView_rpc_ms": 1.513133,
+    "QueryOnView_rpc_count": 0,
+    "QueryOnView_rpc_ms": 0,
+    "wal_messages": [
+      "AlterLoadConfig"
+    ],
+    "segment_ids": [
+      "469658685339276649"
+    ],
+    "minio_requests": 2,
+    "minio_window_requests": 2,
+    "minio_other_window_requests": [],
+    "minio_common_overlap_ms": 0.540441,
+    "minio_returned_bytes": 3080132,
+    "minio_server_sum_ms": 3.096182,
+    "minio_wave_definition": "interval-connected; inspect fallback dispatch separately",
+    "minio_waves": 1,
+    "minio_wave_request_counts": [
+      2
+    ],
+    "returned_vector_count": 0,
+    "raw": {
+      "label": "publication-harness-20261010-id-only-0",
+      "round": 0,
+      "start_ns": 1791657540772417948,
+      "before": "NotLoad",
+      "manual_load": false,
+      "release_wait_s": 62.0,
+      "release_rpc_ms": 5.294741,
+      "scenario": "id-only",
+      "output_fields": [],
+      "collection_id": 469658685339075637,
+      "index_type": "FLAT",
+      "latency_ms": 9.748019,
+      "return_ns": 1791657540782336506,
+      "process_fault_delta": {
+        "minor": 242,
+        "major": 0
+      },
+      "ids": [
+        123,
+        660,
+        322,
+        541,
+        913,
+        593,
+        694,
+        56,
+        947,
+        348
+      ],
+      "distances": [
+        0.9999998807907104,
+        0.10951204597949982,
+        0.10621106624603271,
+        0.10212098807096481,
+        0.09275553375482559,
+        0.09181385487318039,
+        0.08825279772281647,
+        0.08425603061914444,
+        0.08256486058235168,
+        0.08228766173124313
+      ],
+      "id_only_verified": true,
+      "ok": true,
+      "end_ns": 1791657540786305067,
+      "after": "Loaded"
+    }
+  },
+  {
+    "label": "publication-harness-20261010-with-vector-0",
+    "scenario": "with-vector",
+    "latency_ms": 9.454053,
+    "output_fields": [
+      "vector"
+    ],
+    "round": 0,
+    "readiness_ms": 5.865801000000004,
+    "execution_ms": 2.1213890000000015,
+    "retry_wait_ms": 0,
+    "total_ms": 7.987190000000005,
+    "sdk_grpc_residual_ms": 1.4668629999999947,
+    "wal_impl_ms": 0.5707259999999997,
+    "qn_load_ms": 1.6326200000000013,
+    "native_load_ms": 0.9079650000000001,
+    "vector_prefetch_ms": 0.003910999999999997,
+    "go_load_count": 1,
+    "native_load_count": 1,
+    "bf_compute_ms": 0.333511,
+    "post_execute_ms": 0.050284,
+    "GetQueryPlan_rpc_count": 1,
+    "GetQueryPlan_rpc_ms": 0.189086,
+    "SearchOnView_rpc_count": 1,
+    "SearchOnView_rpc_ms": 1.39825,
+    "QueryOnView_rpc_count": 0,
+    "QueryOnView_rpc_ms": 0,
+    "wal_messages": [
+      "AlterLoadConfig"
+    ],
+    "segment_ids": [
+      "469658685339276649"
+    ],
+    "minio_requests": 2,
+    "minio_window_requests": 2,
+    "minio_other_window_requests": [],
+    "minio_common_overlap_ms": 0.4473830000000003,
+    "minio_returned_bytes": 3080132,
+    "minio_server_sum_ms": 2.807683,
+    "minio_wave_definition": "interval-connected; inspect fallback dispatch separately",
+    "minio_waves": 1,
+    "minio_wave_request_counts": [
+      2
+    ],
+    "returned_vector_count": 10,
+    "raw": {
+      "label": "publication-harness-20261010-with-vector-0",
+      "round": 0,
+      "start_ns": 1791657612262244201,
+      "before": "NotLoad",
+      "manual_load": false,
+      "release_wait_s": 62.0,
+      "release_rpc_ms": 3.535952,
+      "scenario": "with-vector",
+      "output_fields": [
+        "vector"
+      ],
+      "collection_id": 469658685339075637,
+      "index_type": "FLAT",
+      "latency_ms": 9.454053,
+      "return_ns": 1791657612271873967,
+      "process_fault_delta": {
+        "minor": 33,
+        "major": 0
+      },
+      "ids": [
+        123,
+        660,
+        322,
+        541,
+        913,
+        593,
+        694,
+        56,
+        947,
+        348
+      ],
+      "distances": [
+        0.9999998807907104,
+        0.10951204597949982,
+        0.10621106624603271,
+        0.10212098807096481,
+        0.09275553375482559,
+        0.09181385487318039,
+        0.08825279772281647,
+        0.08425603061914444,
+        0.08256486058235168,
+        0.08228766173124313
+      ],
+      "vectors_verified": true,
+      "returned_vector_count": 10,
+      "returned_vector_values": 7680,
+      "ok": true,
+      "end_ns": 1791657612272838353,
+      "after": "Loaded"
+    }
+  }
+]
