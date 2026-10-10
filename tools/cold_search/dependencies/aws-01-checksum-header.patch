@@ -1,0 +1,18 @@
+--- a/src/aws-cpp-sdk-core/source/http/curl/CurlHttpClient.cpp
++++ b/src/aws-cpp-sdk-core/source/http/curl/CurlHttpClient.cpp
+@@ -203,9 +203,12 @@
+ 
+         for (const auto& hashIterator : context->m_request->GetResponseValidationHashes())
+         {
+-          std::stringstream headerStr;
+-          headerStr<<"x-amz-checksum-"<<hashIterator.first;
+-          if(context->m_response->HasHeader(headerStr.str().c_str()))
++          // Header names are plain byte strings; no locale-aware formatting
++          // is needed on each response-body callback. Keep the same checksum
++          // candidates, header checks, ordering and hash updates.
++          Aws::String headerName("x-amz-checksum-");
++          headerName.append(hashIterator.first);
++          if(context->m_response->HasHeader(headerName.c_str()))
+           {
+             hashIterator.second->Update(reinterpret_cast<unsigned char*>(ptr), sizeToWrite);
+             break;

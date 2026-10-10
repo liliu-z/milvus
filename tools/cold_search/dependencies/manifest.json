@@ -23,6 +23,8 @@
     "conan_reference": "aws-sdk-cpp/1.11.842@milvus/dev#363556887f622db23a10168c108dd55d",
     "source_file": "src/aws-cpp-sdk-core/source/http/curl/CurlHttpClient.cpp",
     "source_sha256": "3452803a35f0f4b02f22bb332f90e902db5735510f746539a392f3cc45530279",
-    "patches": []
+    "patches": [
+      "aws-01-checksum-header.patch"
+    ]
   }
 }
