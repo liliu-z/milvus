@@ -24,6 +24,7 @@ import (
 	"github.com/milvus-io/milvus/pkg/v3/proto/indexpb"
 	"github.com/milvus-io/milvus/pkg/v3/proto/querypb"
 	"github.com/milvus-io/milvus/pkg/v3/util/merr"
+	"github.com/milvus-io/milvus/pkg/v3/util/paramtable"
 	"github.com/milvus-io/milvus/pkg/v3/util/stage"
 )
 
@@ -51,6 +52,7 @@ type StatsResolver struct {
 	manifestLoaded bool
 	manifestErr    error
 	manifestOrigin ManifestReadOrigin
+	cacheLoadStats bool
 }
 
 // NewStatsResolver creates a StatsResolver. Pass a non-empty manifestPath
@@ -66,12 +68,13 @@ func NewStatsResolver(manifestPath string, storageConfig *indexpb.StorageConfig)
 // SegmentLoadInfo. This is the preferred constructor for QueryNode call sites.
 func NewStatsResolverFromLoadInfo(loadInfo *querypb.SegmentLoadInfo) *StatsResolver {
 	return &StatsResolver{
-		manifestPath:  loadInfo.GetManifestPath(),
-		storageConfig: CreateStorageConfig(),
-		statslogs:     loadInfo.GetStatslogs(),
-		bm25Logs:      loadInfo.GetBm25Logs(),
-		textStatsLogs: loadInfo.GetTextStatsLogs(),
-		jsonKeyStats:  loadInfo.GetJsonKeyStatsLogs(),
+		cacheLoadStats: true,
+		manifestPath:   loadInfo.GetManifestPath(),
+		storageConfig:  CreateStorageConfig(),
+		statslogs:      loadInfo.GetStatslogs(),
+		bm25Logs:       loadInfo.GetBm25Logs(),
+		textStatsLogs:  loadInfo.GetTextStatsLogs(),
+		jsonKeyStats:   loadInfo.GetJsonKeyStatsLogs(),
 	}
 }
 
@@ -383,7 +386,11 @@ func (r *StatsResolver) loadManifest() error {
 	r.manifestLoaded = true
 
 	statsTimer := manifestStats.Begin()
-	stats, err := getManifestStats(r.manifestPath, r.storageConfig, r.manifestOrigin)
+	read := getManifestStats
+	if r.cacheLoadStats && paramtable.Get().CommonCfg.ManifestStatsCacheEnabled.GetAsBool() {
+		read = getCachedLoadManifestStats
+	}
+	stats, err := read(r.manifestPath, r.storageConfig, r.manifestOrigin)
 	statsTimer.End(err)
 	if err != nil {
 		r.manifestErr = merr.Wrap(err, "failed to get manifest stats")

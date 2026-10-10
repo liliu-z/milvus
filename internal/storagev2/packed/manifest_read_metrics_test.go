@@ -15,6 +15,7 @@
 package packed
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -54,7 +55,7 @@ func TestManifestReadMetricsRecordEveryPhaseOnError(t *testing.T) {
 
 func TestManifestResolverOriginsAndLocalCache(t *testing.T) {
 	cfg := manifestTestStorageConfig(t)
-	manifestPath, err := CommitManifestUpdates("metrics/segment", ManifestEarliest, cfg, &ManifestUpdates{
+	manifestPath, err := CommitManifestUpdates(filepath.Join(cfg.RootPath, "metrics/segment"), ManifestEarliest, cfg, &ManifestUpdates{
 		Stats: []StatEntry{{Key: "bloom_filter.100", Files: []string{"metrics/bf"}}},
 	})
 	require.NoError(t, err)

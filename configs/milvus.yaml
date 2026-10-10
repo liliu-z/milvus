@@ -1286,6 +1286,7 @@ internaltls:
 
 common:
   autoLoadFilePrefetchEnabled: false # Experimental scoped standalone read-ahead during WAL broadcast.
+  manifestStatsCacheEnabled: false # Experimental immutable load-manifest metadata cache; no raw data.
   inProcessGRPCEnabled: false # Experimental internal gRPC byte transport; standalone performance experiments.
   nodeScheduler:
     maxConcurrencyRatio: 100

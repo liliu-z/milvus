@@ -329,6 +329,7 @@ func (p *ComponentParam) CleanEvent() {
 type commonConfig struct {
 	InProcessGRPCEnabled        ParamItem `refreshable:"false"`
 	AutoLoadFilePrefetchEnabled ParamItem `refreshable:"false"`
+	ManifestStatsCacheEnabled   ParamItem `refreshable:"false"`
 	ClusterPrefix               ParamItem `refreshable:"false"`
 
 	RootCoordTimeTick   ParamItem `refreshable:"true"`
@@ -519,6 +520,14 @@ func (p *commonConfig) ResolveLoadAdmissionLimits(asyncEnabled bool) (budgetByte
 }
 
 func (p *commonConfig) init(base *BaseTable) {
+	p.ManifestStatsCacheEnabled = ParamItem{
+		Key:          "common.manifestStatsCacheEnabled",
+		DefaultValue: "false",
+		Version:      "3.0.0",
+		Doc:          "Experimental immutable load-manifest stats metadata cache, bounded to 128 entries and 16 MiB accounted bytes; no raw segment data. Requires restart.",
+		Export:       true,
+	}
+	p.ManifestStatsCacheEnabled.Init(base.mgr)
 	p.AutoLoadFilePrefetchEnabled = ParamItem{
 		Key:          "common.autoLoadFilePrefetchEnabled",
 		DefaultValue: "false",

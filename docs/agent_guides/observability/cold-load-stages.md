@@ -88,6 +88,18 @@ The Go family uses `component="storage"` and one of five fixed operations:
 `manifest_reopen`, `manifest_other`. Resolver-local repeated lookups reuse the
 same result and do not produce another FFI read.
 
+With experimental `common.manifestStatsCacheEnabled`, resolvers constructed from
+SegmentLoadInfo may also reuse immutable, explicitly versioned manifest stats
+across load phases and Release cycles. This stores descriptions only, not raw
+segment data or stat-file contents. Keys include the exact manifest string and
+a fingerprint of the full storage configuration. Mutable/latest references,
+implicit configuration and failures are not cached; callers receive independent
+maps and slices. The cache is bounded to 128 entries and 16 MiB accounted bytes
+(container allowances, not an allocator-exact heap measurement).
+`milvus_storage_manifest_stats_cache_requests_total{result}` distinguishes
+`hit`, `miss`, and `bypass`. Hits remain inside the outer stats-resolution timer
+but produce no FFI manifest-phase samples. The default is disabled.
+
 Each GetManifestStats attempt records all five stages once with its final outcome:
 
 ```text
@@ -108,8 +120,8 @@ file reads, deserialization, path resolution and any SDK retries performed by
 the call. The existing FFI does not expose those internal boundaries or cache
 hit/miss, byte and 503/retry counters. These metrics cannot separate them or
 attribute the entire call to S3. All instrumentation stays in Milvus and uses
-the unchanged dependency ABI. No new production locks or per-object labels are
-added.
+the unchanged dependency ABI. The optional metadata cache uses a mutex around
+its bounded LRU; the phase timers add no locks or per-object labels.
 
 ## Queries
 
