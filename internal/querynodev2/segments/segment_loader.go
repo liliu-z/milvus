@@ -1573,7 +1573,7 @@ func (loader *segmentLoader) loadDeltalogs(ctx context.Context, segment Segment,
 			}
 		} else {
 			// V3: delta data lives in manifest.
-			paths, err := packed.GetDeltaLogPathsFromManifest(manifestPath, createStorageConfig())
+			paths, err := packed.GetLoadDeltaLogPathsFromManifest(manifestPath, createStorageConfig())
 			if err != nil {
 				return err
 			}

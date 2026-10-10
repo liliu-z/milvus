@@ -100,6 +100,15 @@ maps and slices. The cache is bounded to 128 entries and 16 MiB accounted bytes
 `hit`, `miss`, and `bypass`. Hits remain inside the outer stats-resolution timer
 but produce no FFI manifest-phase samples. The default is disabled.
 
+The same switch enables a separate cache of ordinary load-manifest delta-file
+paths, bounded to 128 entries and 1 MiB accounted bytes, with identical immutable
+version/storage-identity rules. `milvus_storage_manifest_delta_paths_cache_requests_total{result}`
+reports its lookups. Empty lists and zero-entry marker filtering retain the
+ordinary reader's semantics. Parent and compact-to child manifests have separate
+keys; external real-PK source resolution keeps its existing uncached reader.
+Only paths are reused: each load still opens the delete files, propagates their
+read errors and applies the records. Neither cache retains segment data.
+
 Each GetManifestStats attempt records all five stages once with its final outcome:
 
 ```text

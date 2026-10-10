@@ -524,7 +524,7 @@ func (p *commonConfig) init(base *BaseTable) {
 		Key:          "common.manifestStatsCacheEnabled",
 		DefaultValue: "false",
 		Version:      "3.0.0",
-		Doc:          "Experimental immutable load-manifest stats metadata cache, bounded to 128 entries and 16 MiB accounted bytes; no raw segment data. Requires restart.",
+		Doc:          "Experimental immutable load-manifest metadata caches: stats (128 entries, 16 MiB accounted bytes) and delta paths (128 entries, 1 MiB); no raw segment data. Requires restart.",
 		Export:       true,
 	}
 	p.ManifestStatsCacheEnabled.Init(base.mgr)

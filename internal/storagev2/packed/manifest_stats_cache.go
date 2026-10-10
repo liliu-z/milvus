@@ -26,6 +26,7 @@ import (
 
 	"github.com/milvus-io/milvus/pkg/v3/metrics"
 	"github.com/milvus-io/milvus/pkg/v3/proto/indexpb"
+	"github.com/milvus-io/milvus/pkg/v3/util/paramtable"
 )
 
 // These are immutable manifest descriptions, never segment data or stat-file
@@ -33,11 +34,19 @@ import (
 // this avoids repeating their C/Go conversion for each load phase.
 var loadManifestStatsCache = newManifestStatsCache(128, 16<<20)
 
+// Delta paths are metadata too. The delete files themselves remain uncached and
+// are opened by each load, including compact-to child-manifest overlays.
+var loadManifestDeltaPathsCache = newManifestMetadataCache(128, 1<<20, slices.Clone[[]string], manifestDeltaPathsBytes)
+
 var (
 	manifestStatsCacheMetricsOnce sync.Once
 	manifestStatsCacheRequests    = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: "milvus_storage_manifest_stats_cache_requests_total",
 		Help: "Immutable load-manifest stats cache lookups by outcome.",
+	}, []string{"result"})
+	manifestDeltaPathsCacheRequests = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: "milvus_storage_manifest_delta_paths_cache_requests_total",
+		Help: "Immutable load-manifest delta-path cache lookups by outcome.",
 	}, []string{"result"})
 )
 
@@ -46,24 +55,31 @@ type manifestStatsKey struct {
 	storage [sha256.Size]byte
 }
 
-type manifestStatsEntry struct {
+type manifestMetadataEntry[V any] struct {
 	key   manifestStatsKey
-	stats map[string]ManifestStat
+	value V
 	bytes int
 }
 
-type manifestStatsCache struct {
+type manifestMetadataCache[V any] struct {
 	mu                          sync.Mutex
 	entries                     map[manifestStatsKey]*list.Element
 	lru                         *list.List
 	maxEntries, maxBytes, bytes int
+	clone                       func(V) V
+	size                        func(manifestStatsKey, V) int
 }
 
-func newManifestStatsCache(entries, bytes int) *manifestStatsCache {
-	return &manifestStatsCache{
+func newManifestMetadataCache[V any](entries, bytes int, clone func(V) V, size func(manifestStatsKey, V) int) *manifestMetadataCache[V] {
+	return &manifestMetadataCache[V]{
 		entries: make(map[manifestStatsKey]*list.Element), lru: list.New(),
 		maxEntries: entries, maxBytes: bytes,
+		clone: clone, size: size,
 	}
+}
+
+func newManifestStatsCache(entries, bytes int) *manifestMetadataCache[map[string]ManifestStat] {
+	return newManifestMetadataCache(entries, bytes, cloneManifestStats, manifestStatsBytes)
 }
 
 func makeManifestStatsKey(path string, storage *indexpb.StorageConfig) (manifestStatsKey, bool) {
@@ -106,26 +122,27 @@ func manifestStatsBytes(key manifestStatsKey, stats map[string]ManifestStat) int
 	return n
 }
 
-func (c *manifestStatsCache) get(key manifestStatsKey) (map[string]ManifestStat, bool) {
+func (c *manifestMetadataCache[V]) get(key manifestStatsKey) (V, bool) {
 	c.mu.Lock()
 	entry, found := c.entries[key]
 	if !found {
 		c.mu.Unlock()
-		return nil, false
+		var zero V
+		return zero, false
 	}
 	c.lru.MoveToFront(entry)
-	stats := entry.Value.(*manifestStatsEntry).stats
+	value := entry.Value.(*manifestMetadataEntry[V]).value
 	c.mu.Unlock()
 	// Published entries are immutable. Readers own all returned maps/slices.
-	return cloneManifestStats(stats), true
+	return c.clone(value), true
 }
 
-func (c *manifestStatsCache) put(key manifestStatsKey, stats map[string]ManifestStat) {
-	bytes := manifestStatsBytes(key, stats)
+func (c *manifestMetadataCache[V]) put(key manifestStatsKey, value V) {
+	bytes := c.size(key, value)
 	if c.maxEntries <= 0 || bytes > c.maxBytes {
 		return
 	}
-	entry := &manifestStatsEntry{key: key, stats: cloneManifestStats(stats), bytes: bytes}
+	entry := &manifestMetadataEntry[V]{key: key, value: c.clone(value), bytes: bytes}
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if old, found := c.entries[key]; found {
@@ -134,7 +151,7 @@ func (c *manifestStatsCache) put(key manifestStatsKey, stats map[string]Manifest
 	}
 	for len(c.entries) >= c.maxEntries || c.bytes+bytes > c.maxBytes {
 		old := c.lru.Back()
-		value := old.Value.(*manifestStatsEntry)
+		value := old.Value.(*manifestMetadataEntry[V])
 		delete(c.entries, value.key)
 		c.bytes -= value.bytes
 		c.lru.Remove(old)
@@ -143,9 +160,9 @@ func (c *manifestStatsCache) put(key manifestStatsKey, stats map[string]Manifest
 	c.bytes += bytes
 }
 
-func (c *manifestStatsCache) read(path string, storage *indexpb.StorageConfig,
-	read func() (map[string]ManifestStat, error),
-) (map[string]ManifestStat, string, error) {
+func (c *manifestMetadataCache[V]) read(path string, storage *indexpb.StorageConfig,
+	read func() (V, error),
+) (V, string, error) {
 	key, cacheable := makeManifestStatsKey(path, storage)
 	if !cacheable {
 		stats, err := read()
@@ -164,10 +181,39 @@ func (c *manifestStatsCache) read(path string, storage *indexpb.StorageConfig,
 }
 
 func getCachedLoadManifestStats(path string, storage *indexpb.StorageConfig, origin ManifestReadOrigin) (map[string]ManifestStat, error) {
-	manifestStatsCacheMetricsOnce.Do(func() { metrics.GetRegisterer().MustRegister(manifestStatsCacheRequests) })
+	registerManifestMetadataCacheMetrics()
 	stats, result, err := loadManifestStatsCache.read(path, storage, func() (map[string]ManifestStat, error) {
 		return getManifestStats(path, storage, origin)
 	})
 	manifestStatsCacheRequests.WithLabelValues(result).Inc()
 	return stats, err
+}
+
+func registerManifestMetadataCacheMetrics() {
+	manifestStatsCacheMetricsOnce.Do(func() {
+		metrics.GetRegisterer().MustRegister(manifestStatsCacheRequests, manifestDeltaPathsCacheRequests)
+	})
+}
+
+func manifestDeltaPathsBytes(key manifestStatsKey, paths []string) int {
+	n := 256 + len(key.path)
+	for _, path := range paths {
+		n += 32 + len(path)
+	}
+	return n
+}
+
+// GetLoadDeltaLogPathsFromManifest is the ordinary, non-extfs load reader with
+// optional reuse of immutable delta-path descriptions. Keep the original reader
+// as the miss/bypass path, including marker filtering and error propagation.
+func GetLoadDeltaLogPathsFromManifest(path string, storage *indexpb.StorageConfig) ([]string, error) {
+	if !paramtable.Get().CommonCfg.ManifestStatsCacheEnabled.GetAsBool() {
+		return GetDeltaLogPathsFromManifest(path, storage)
+	}
+	registerManifestMetadataCacheMetrics()
+	paths, result, err := loadManifestDeltaPathsCache.read(path, storage, func() ([]string, error) {
+		return GetDeltaLogPathsFromManifest(path, storage)
+	})
+	manifestDeltaPathsCacheRequests.WithLabelValues(result).Inc()
+	return paths, err
 }
