@@ -1,9 +1,11 @@
 name: cold-search-local
 services:
   etcd:
+    cpuset: "${ETCD_CPUS:-7}"
     image: quay.io/coreos/etcd:v3.5.25
     network_mode: host
     environment:
+      GOMAXPROCS: "1"
       ETCD_AUTO_COMPACTION_MODE: revision
       ETCD_AUTO_COMPACTION_RETENTION: "1000"
       ETCD_QUOTA_BACKEND_BYTES: "4294967296"
@@ -11,9 +13,11 @@ services:
       - ${COLD_SEARCH_ROOT:?set an absolute dedicated data directory}/etcd:/etcd
     command: [etcd, --data-dir=/etcd, --listen-client-urls=http://127.0.0.1:2379, --advertise-client-urls=http://127.0.0.1:2379, --listen-peer-urls=http://127.0.0.1:2380, --initial-advertise-peer-urls=http://127.0.0.1:2380, --initial-cluster=default=http://127.0.0.1:2380]
   minio:
+    cpuset: "${MINIO_CPUS:-5-6}"
     image: milvusdb/minio:RELEASE.2024-12-18T13-15-44Z
     network_mode: host
     environment:
+      GOMAXPROCS: "2"
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     volumes:

@@ -34,10 +34,17 @@ common:
   arrow:
     reader:
       parquetWholeFilePrefetchLimitBytes: 4194304
+    ioThreadPoolCoefficient: 1
+    ioThreadPoolMaxCapacity: 8
   localResourcePath: ${COLD_SEARCH_ROOT}/resources
   requery:
     searchPolicy: OutputText
   bloomFilterEnabled: false
+  threadCoreCoefficient:
+    highPriority: 1
+    middlePriority: 1
+    lowPriority: 1
+    maxThreadsSize: 8
 log:
   level: warn
   format: json
@@ -57,10 +64,21 @@ queryNode:
         vectorField: async
         vectorIndex: async
       lazyColumnGroupEnabled: true
+    cgoPoolSizeRatio: 1
   mmap:
     vectorField: false
     vectorIndex: false
     scalarField: false
     scalarIndex: false
+  scheduler:
+    maxReadConcurrentRatio: 1
+  queryView:
+    transformLogDrainConcurrency: 4
+    segmentCatchupConcurrency: 4
 queryView:
   leaseDuration: 60s
+streaming:
+  queryView:
+    liveEventDispatchConcurrencyPerPChannel: 4
+  transformLog:
+    catchupConcurrencyPerStream: 4
