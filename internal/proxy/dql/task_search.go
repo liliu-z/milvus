@@ -1134,6 +1134,10 @@ func (t *SearchTask) initSearchRequest(ctx context.Context) error {
 			t.needRequery = true
 		case "outputfields":
 			t.needRequery = len(t.request.GetOutputFields()) > 0
+		case "outputtext":
+			// Fetch vectors with the search result to avoid a second query RPC.
+			// TEXT still requires requery to resolve its LOB references.
+			t.needRequery = len(textOutputFields) > 0
 		case "outputvector":
 			fallthrough
 		default:

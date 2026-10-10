@@ -5013,6 +5013,11 @@ func genTestSearchResultData(nq int64, topk int64, dType schemapb.DataType, fiel
 }
 
 func TestSearchTask_InitSearchRequestWithStructArrayFields(t *testing.T) {
+	paramtable.Init()
+	policy := &paramtable.Get().CommonCfg.SearchRequeryPolicy
+	originalPolicy := policy.GetValue()
+	require.NoError(t, paramtable.Get().Save(policy.Key, "OutputVector"))
+	t.Cleanup(func() { paramtable.Get().Save(policy.Key, originalPolicy) })
 	ctx := context.Background()
 
 	schema := &schemapb.CollectionSchema{
@@ -7638,6 +7643,7 @@ func TestSearchTask_SearchRequeryPolicy(t *testing.T) {
 			{FieldID: 100, Name: "pk", DataType: schemapb.DataType_Int64, IsPrimaryKey: true},
 			{FieldID: 101, Name: "vec", DataType: schemapb.DataType_FloatVector, TypeParams: []*commonpb.KeyValuePair{{Key: common.DimKey, Value: "128"}}},
 			{FieldID: 102, Name: "title", DataType: schemapb.DataType_VarChar, TypeParams: []*commonpb.KeyValuePair{{Key: common.MaxLengthKey, Value: "256"}}},
+			{FieldID: 103, Name: "body", DataType: schemapb.DataType_Text},
 		},
 	}
 	schemaInfo := mustNewSchemaInfo(schema)
@@ -7716,6 +7722,22 @@ func TestSearchTask_SearchRequeryPolicy(t *testing.T) {
 			expectedRequery: false,
 		},
 		{
+			name: "outputtext_policy_vector_direct", policy: "OutputText",
+			outputFields: []string{"pk", "vec"}, expectedRequery: false,
+		},
+		{
+			name: "outputtext_policy_no_output", policy: "outputtext",
+			outputFields: []string{}, expectedRequery: false,
+		},
+		{
+			name: "outputtext_policy_text_requery", policy: "outputtext",
+			outputFields: []string{"pk", "body"}, expectedRequery: true,
+		},
+		{
+			name: "outputtext_policy_vector_and_text_requery", policy: "outputtext",
+			outputFields: []string{"pk", "vec", "body"}, expectedRequery: true,
+		},
+		{
 			name:            "default_fallback_to_outputvector_with_vector",
 			policy:          "unknown_value",
 			outputFields:    []string{"pk", "vec"},
@@ -7735,9 +7757,26 @@ func TestSearchTask_SearchRequeryPolicy(t *testing.T) {
 			defer paramtable.Get().Save(paramtable.Get().CommonCfg.SearchRequeryPolicy.Key, "OutputVector")
 
 			task := buildTask(tt.outputFields)
+			for _, field := range schema.Fields {
+				for _, name := range tt.outputFields {
+					if field.GetName() == name {
+						task.OutputFieldsId = append(task.OutputFieldsId, field.GetFieldID())
+					}
+				}
+			}
 			err := task.initSearchRequest(ctx)
 			assert.NoError(t, err)
 			assert.Equal(t, tt.expectedRequery, task.needRequery, tt.name)
+			plan := &planpb.PlanNode{}
+			require.NoError(t, proto.Unmarshal(task.SerializedExprPlan, plan))
+			if !tt.expectedRequery {
+				assert.Contains(t, plan.GetOutputFieldIds(), int64(100))
+				for _, id := range task.OutputFieldsId {
+					assert.Contains(t, plan.GetOutputFieldIds(), id)
+				}
+			} else {
+				assert.Empty(t, plan.GetOutputFieldIds())
+			}
 		})
 	}
 

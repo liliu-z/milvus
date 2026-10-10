@@ -1918,7 +1918,7 @@ If enabled, IPv6 ULA/global addresses will be prioritized ahead of IPv4.`,
 		Key:          "common.requery.searchPolicy",
 		Version:      "2.6.15",
 		DefaultValue: "OutputVector",
-		Doc:          `the policy to decide when to do requery in search, support "always", "outputvector" and "outputfields"`,
+		Doc:          `the policy to decide when to do requery in search, support "always", "outputvector", "outputfields" and "outputtext". OutputText returns vectors in the search response and only requeries TEXT fields; this reduces RPCs but can increase intermediate result size across segments.`,
 		Export:       false,
 	}
 	p.SearchRequeryPolicy.Init(base.mgr)

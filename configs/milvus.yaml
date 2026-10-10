@@ -1287,7 +1287,7 @@ common:
   nodeScheduler:
     maxConcurrencyRatio: 100
   requery:
-    searchPolicy: Always
+    searchPolicy: Always # Always, OutputFields, OutputVector, or OutputText (vectors returned directly; TEXT still uses requery).
   defaultPartitionName: _default # Name of the default partition when a collection is created
   defaultIndexName: _default_idx # Name of the index when it is created with name unspecified
   indexSliceSize: 16 # Index slice size in MB
