@@ -8,7 +8,8 @@
     "module": "github.com/zilliztech/woodpecker",
     "version": "v0.1.45",
     "patches": [
-      "woodpecker-01-owner-fence.patch"
+      "woodpecker-01-owner-fence.patch",
+      "woodpecker-02-flush-notification.patch"
     ]
   },
   "milvus-storage": {

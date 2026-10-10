@@ -1,0 +1,77 @@
+--- a/server/storage/disk/writer_impl.go
++++ b/server/storage/disk/writer_impl.go
+@@ -99,7 +99,8 @@
+ 	lastSubmittedFlushingEntryID atomic.Int64
+ 	lastSubmittedFlushingBlockID atomic.Int64
+ 	allUploadingTaskDone         atomic.Bool
+-	flushMu                      sync.Mutex // the mutex ensures sequential writing for each flush batch
++	flushTasksDone               chan struct{} // Closed only after the flush queue drains.
++	flushMu                      sync.Mutex    // the mutex ensures sequential writing for each flush batch
+ 
+ 	// Close management
+ 	fileClose chan struct{} // Close signal
+@@ -165,6 +166,7 @@
+ 		maxBufferEntries: int64(maxBufferEntries),                    // Default max entries per buffer
+ 		maxIntervalMs:    maxInterval,                                // 10ms default sync interval for more responsive syncing
+ 		flushTaskChan:    make(chan *blockFlushTask, flushQueueSize), // Increased buffer size to reduce blocking
++		flushTasksDone:   make(chan struct{}),
+ 		runCtx:           runCtx,
+ 		runCancel:        runCancel,
+ 	}
+@@ -308,6 +310,7 @@
+ 				logger.Ctx(context.TODO()).Debug("received termination signal, marking all upload tasks as done",
+ 					zap.String("segmentFilePath", w.segmentFilePath))
+ 				w.allUploadingTaskDone.Store(true)
++				close(w.flushTasksDone)
+ 				metrics.WpFileWriters.WithLabelValues(metrics.NodeID, w.logNs, w.logIdStr).Dec()
+ 				return
+ 			}
+@@ -657,32 +660,24 @@
+ 		return ctx.Err()
+ 	}
+ 
+-	// Wait for ack goroutine to set the done flag
++	// Wait for the flush goroutine's completion notification. The flag remains
++	// the idempotent fast path; the channel avoids a 25ms polling delay on rolls.
+ 	ackWaitTime := 15 * time.Second // TODO configurable
+ 	ackStartTime := time.Now()
+-
+-	for {
+-		if f.allUploadingTaskDone.Load() {
+-			logger.Ctx(ctx).Info("ack goroutine completed processing all tasks", zap.String("segmentFilePath", f.segmentFilePath))
+-			return nil
+-		}
+-
+-		// Check timeout
+-		if time.Since(ackStartTime) > ackWaitTime {
+-			logger.Ctx(ctx).Warn("timeout waiting for ack goroutine to complete",
+-				zap.String("segmentFilePath", f.segmentFilePath),
+-				zap.Bool("allUploadingTaskDone", f.allUploadingTaskDone.Load()),
+-				zap.Duration("elapsed", time.Since(ackStartTime)))
+-			return errors.New("timeout waiting for ack goroutine to complete")
+-		}
+-
+-		// Short sleep to avoid busy waiting
+-		select {
+-		case <-ctx.Done():
+-			return ctx.Err()
+-		case <-time.After(25 * time.Millisecond):
+-			continue
+-		}
++	timer := time.NewTimer(ackWaitTime)
++	defer timer.Stop()
++	select {
++	case <-f.flushTasksDone:
++		logger.Ctx(ctx).Info("ack goroutine completed processing all tasks", zap.String("segmentFilePath", f.segmentFilePath))
++		return nil
++	case <-ctx.Done():
++		return ctx.Err()
++	case <-timer.C:
++		logger.Ctx(ctx).Warn("timeout waiting for ack goroutine to complete",
++			zap.String("segmentFilePath", f.segmentFilePath),
++			zap.Bool("allUploadingTaskDone", f.allUploadingTaskDone.Load()),
++			zap.Duration("elapsed", time.Since(ackStartTime)))
++		return errors.New("timeout waiting for ack goroutine to complete")
+ 	}
+ }
+ 
