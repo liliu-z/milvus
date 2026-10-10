@@ -31,6 +31,7 @@ func initCGO() {
 		nodeID := paramtable.GetStringNodeID()
 		initCaller(nodeID)
 		initExecutor()
+		nativeFutureWaitSlots = make(chan struct{}, min(64, max(0, paramtable.Get().QueryNodeCfg.NativeFutureWaiters.GetAsInt())))
 
 		numShards := hardware.GetCPUNum() / coresPerShard
 		if numShards < 1 {

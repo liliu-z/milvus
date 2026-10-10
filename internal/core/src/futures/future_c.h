@@ -26,6 +26,10 @@ future_cancel(CFuture* future);
 bool
 future_is_ready(CFuture* future);
 
+// Blocks the calling native thread; cancellation must be signalled separately.
+void
+future_wait_until_ready(CFuture* future);
+
 void
 future_register_ready_callback(CFuture* future,
                                CUnlockGoMutexFn unlockFn,

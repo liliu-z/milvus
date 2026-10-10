@@ -21,13 +21,19 @@ import "C"
 import (
 	"context"
 	"sync"
+	"time"
 	"unsafe"
 
 	"github.com/cockroachdb/errors"
 
 	_ "github.com/milvus-io/milvus/internal/util/cgo/logging"
+	"github.com/milvus-io/milvus/pkg/v3/metrics"
 	"github.com/milvus-io/milvus/pkg/v3/util/merr"
 )
+
+// Independently bounded: holding the regular CGO semaphore while waiting could
+// starve the cancellation calls that make these futures complete.
+var nativeFutureWaitSlots chan struct{}
 
 // Would put this in futures.go but for the documented issue with
 // exports and functions in preamble
@@ -190,12 +196,22 @@ func (f *futureImpl) blockUntilReady() {
 		return
 	}
 
-	mu := &sync.Mutex{}
-	mu.Lock()
-	getCGOCaller().call("future_go_register_ready_callback", func() {
-		C.future_go_register_ready_callback(f.future, (*C.CLockedGoMutex)(unsafe.Pointer(mu)))
-	})
-	mu.Lock()
+	select {
+	case nativeFutureWaitSlots <- struct{}{}:
+		start := time.Now()
+		// CGO releases the Go P while this bounded native thread waits. No
+		// foreign-thread callback needs a Go P to publish completion.
+		C.future_wait_until_ready(f.future)
+		<-nativeFutureWaitSlots
+		metrics.CGODuration.WithLabelValues(getCGOCaller().nodeID, "future_wait_until_ready").Observe(time.Since(start).Seconds())
+	default:
+		mu := &sync.Mutex{}
+		mu.Lock()
+		getCGOCaller().call("future_go_register_ready_callback", func() {
+			C.future_go_register_ready_callback(f.future, (*C.CLockedGoMutex)(unsafe.Pointer(mu)))
+		})
+		mu.Lock()
+	}
 
 	// mark the future as ready at go side to avoid more cgo calls.
 	f.state.IntoReady()

@@ -4719,7 +4719,8 @@ type queryNodeConfig struct {
 	SchedulePolicyMaxPendingTaskPerUser   ParamItem `refreshable:"true"`
 
 	// CGOPoolSize ratio to MaxReadConcurrency
-	CGOPoolSizeRatio ParamItem `refreshable:"true"`
+	CGOPoolSizeRatio    ParamItem `refreshable:"true"`
+	NativeFutureWaiters ParamItem `refreshable:"false"`
 
 	// MutatePoolSizeFactor controls the size of the online-write CGO pool
 	// (segment Insert/Delete) as CPUNum * factor. The mutate pool is isolated
@@ -6041,6 +6042,14 @@ user-task-polling:
 		Doc:          "cgo pool size ratio to max read concurrency",
 	}
 	p.CGOPoolSizeRatio.Init(base.mgr)
+	p.NativeFutureWaiters = ParamItem{
+		Key:          "queryNode.segcore.nativeFutureWaiters",
+		Version:      "3.0.0",
+		DefaultValue: "0",
+		Doc:          "Maximum native threads waiting for futures without a Go callback (clamped to 0..64); zero disables. Other waiters use the existing callback path.",
+		Export:       true,
+	}
+	p.NativeFutureWaiters.Init(base.mgr)
 
 	p.MutatePoolSizeFactor = ParamItem{
 		Key:          "queryNode.segcore.mutatePoolSizeFactor",

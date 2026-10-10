@@ -16,6 +16,7 @@
 #include "Executor.h"
 #include "Future.h"
 #include "folly/executors/CPUThreadPoolExecutor.h"
+#include "folly/synchronization/Baton.h"
 #include "future_c.h"
 #include "common/CGoCatch.h"
 #include "futures/future_c_types.h"
@@ -40,6 +41,18 @@ extern "C" bool
 future_is_ready(CFuture* future) {
     return static_cast<milvus::futures::IFuture*>(static_cast<void*>(future))
         ->isReady();
+}
+
+extern "C" void
+future_wait_until_ready(CFuture* future) {
+    folly::Baton<> ready;
+    static_cast<milvus::futures::IFuture*>(static_cast<void*>(future))
+        ->registerReadyCallback(
+            [](CLockedGoMutex* state) {
+                reinterpret_cast<folly::Baton<>*>(state)->post();
+            },
+            reinterpret_cast<CLockedGoMutex*>(&ready));
+    ready.wait();
 }
 
 extern "C" void
