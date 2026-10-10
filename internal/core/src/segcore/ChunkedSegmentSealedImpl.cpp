@@ -282,12 +282,20 @@ ChunkedSegmentSealedImpl::PrepareManifestLoadTasks(
             field_metas.begin(), field_metas.end(), [](const auto& entry) {
                 return IsVectorDataType(entry.second.get_data_type());
             });
-        task.lazy_materialization =
+        const auto policy =
             getCacheWarmupPolicy(warmup_policy,
                                  is_vector,
                                  /*is_index=*/false,
-                                 /*in_load_list=*/task.eager_load) ==
-                CacheWarmupPolicy::CacheWarmupPolicy_Disable &&
+                                 /*in_load_list=*/task.eager_load);
+        const bool async_vector =
+            policy == CacheWarmupPolicy::CacheWarmupPolicy_Async &&
+            field_metas.size() == 1 &&
+            field_metas.begin()->second.get_data_type() ==
+                DataType::VECTOR_FLOAT &&
+            cachinglayer::Manager::GetInstance().GetPrefetchPool() != nullptr;
+        task.lazy_materialization =
+            (policy == CacheWarmupPolicy::CacheWarmupPolicy_Disable ||
+             async_vector) &&
             CanUseLazyManifestColumnGroup(
                 field_metas, segment_load_info, schema_snapshot);
     }
@@ -376,6 +384,7 @@ struct ColumnGroupMaterializationParams {
     std::string cache_key_suffix;
     int64_t fallback_bytes_per_row;
     std::string insert_channel;
+    std::string warmup_policy;
 };
 
 std::unique_ptr<cachinglayer::Translator<GroupChunk>>
@@ -410,6 +419,8 @@ CreateColumnGroupTranslator(const ColumnGroupMaterializationParams& context,
     if (context.size_estimate_state != nullptr) {
         column_size_estimate = context.size_estimate_state->Get(*chunk_reader);
     }
+    CheckCancellation(
+        op_ctx, context.segment_id, "CreateColumnGroupTranslator() after open");
 
     auto translator =
         std::make_unique<storagev2translator::ManifestGroupTranslator>(
@@ -425,8 +436,8 @@ CreateColumnGroupTranslator(const ColumnGroupMaterializationParams& context,
             context.mmap_dir_path,
             static_cast<int64_t>(context.needed_columns->size()),
             context.load_priority,
-            /*eager_load=*/false,
-            /*warmup_policy=*/"disable",
+            /*eager_load=*/context.warmup_policy == "async",
+            context.warmup_policy,
             context.cache_key_suffix,
             context.fallback_bytes_per_row,
             context.insert_channel,
@@ -2427,6 +2438,7 @@ ChunkedSegmentSealedImpl::LoadLazyColumnGroup(
     const SegmentLoadInfo& segment_load_info,
     const SchemaPtr& schema_snapshot,
     bool enable_async_load,
+    bool async_prepare,
     bool use_mmap,
     bool is_replace,
     milvus::OpContext* op_ctx,
@@ -2467,6 +2479,7 @@ ChunkedSegmentSealedImpl::LoadLazyColumnGroup(
         .cache_key_suffix = std::to_string(milvus_field_ids.front().get()),
         .fallback_bytes_per_row = segment_load_info.GetEstimatedBytesPerRow(),
         .insert_channel = segment_load_info.GetInsertChannel(),
+        .warmup_policy = async_prepare ? "async" : "disable",
     };
     auto lazy_group = std::make_shared<ChunkedColumnGroup>(
         segment_load_info.GetNumOfRows(),
@@ -2489,6 +2502,11 @@ ChunkedSegmentSealedImpl::LoadLazyColumnGroup(
                                op_ctx,
                                &committer);
         columns.emplace_back(field_id, column);
+    }
+
+    if (async_prepare) {
+        lazy_group->PrepareAsync(
+            cachinglayer::Manager::GetInstance().GetPrefetchPool());
     }
 
     committer.Commit([&](RuntimeResourceState& target_runtime,
@@ -9128,6 +9146,11 @@ ChunkedSegmentSealedImpl::LoadColumnGroup(
     const bool use_mmap = has_mmap_setting ? mmap_enabled : global_use_mmap;
 
     if (lazy_materialization) {
+        const auto warmup_policy = resolve_field_data_group_warmup_policy(
+            field_metas, segment_load_info, schema_snapshot);
+        const bool async_prepare =
+            getCacheWarmupPolicy(warmup_policy, is_vector, false, eager_load) ==
+            CacheWarmupPolicy::CacheWarmupPolicy_Async;
         const std::shared_ptr<const std::vector<std::string>>
             column_group_columns(column_group, &column_group->columns);
         LoadLazyColumnGroup(committer.runtime()->reader,
@@ -9138,6 +9161,7 @@ ChunkedSegmentSealedImpl::LoadColumnGroup(
                             segment_load_info,
                             schema_snapshot,
                             enable_async_load,
+                            async_prepare,
                             use_mmap,
                             is_replace,
                             op_ctx,

@@ -1496,6 +1496,7 @@ class ChunkedSegmentSealedImpl : public SegmentSealed {
         const SegmentLoadInfo& segment_load_info,
         const SchemaPtr& schema_snapshot,
         bool enable_async_load,
+        bool async_prepare,
         bool use_mmap,
         bool is_replace,
         milvus::OpContext* op_ctx,

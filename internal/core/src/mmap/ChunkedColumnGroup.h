@@ -53,7 +53,8 @@ using GroupChunkVector = std::vector<std::shared_ptr<GroupChunk>>;
 using namespace milvus::cachinglayer;
 
 // ChunkedColumnGroup represents a collection of group chunks
-class ChunkedColumnGroup {
+class ChunkedColumnGroup
+    : public std::enable_shared_from_this<ChunkedColumnGroup> {
  public:
     using TranslatorFactory =
         std::function<std::unique_ptr<Translator<GroupChunk>>(OpContext*)>;
@@ -104,6 +105,38 @@ class ChunkedColumnGroup {
         (void)EnsureMaterialized(op_ctx);
     }
 
+    // Defer the reader open as well as cell warmup. The factory retains all
+    // load-generation inputs; queued work does not keep a released group alive.
+    // Cell warmup itself still uses CacheSlot's policy, timeout and admission.
+    void
+    PrepareAsync(const std::shared_ptr<folly::CPUThreadPoolExecutor>& pool) {
+        if (!lazy_init_ || !pool ||
+            lazy_init_->prepare_started.exchange(true)) {
+            return;
+        }
+        auto token = lazy_init_->prepare_cancel.getToken();
+        pool->add([weak_self = weak_from_this(), token]() {
+            auto self = weak_self.lock();
+            if (!self || token.isCancellationRequested()) {
+                return;
+            }
+            try {
+                OpContext prepare_ctx(token);
+                self->Prepare(&prepare_ctx);
+                // Cancellation can race with slot publication. In that case
+                // stop the newly created slot's own asynchronous warmup too.
+                if (token.isCancellationRequested()) {
+                    self->CancelWarmup();
+                }
+            } catch (const std::exception& e) {
+                if (!token.isCancellationRequested()) {
+                    LOG_ERROR("[MCL] Async column-group preparation failed: {}",
+                              e.what());
+                }
+            }
+        });
+    }
+
     void
     ManualEvictCache() const {
         if (auto slot = GetSlotIfReady()) {
@@ -113,6 +146,9 @@ class ChunkedColumnGroup {
 
     void
     CancelWarmup() {
+        if (lazy_init_) {
+            lazy_init_->prepare_cancel.requestCancellation();
+        }
         if (auto slot = GetSlotIfReady()) {
             slot->CancelWarmup();
         }
@@ -283,6 +319,8 @@ class ChunkedColumnGroup {
         TranslatorFactory factory;
         std::mutex mutex;
         std::atomic<bool> ready{false};
+        std::atomic<bool> prepare_started{false};
+        folly::CancellationSource prepare_cancel;
     };
 
     // Safe to borrow: slot_ is never reset or replaced after publication.

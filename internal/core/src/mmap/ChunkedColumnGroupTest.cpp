@@ -368,6 +368,155 @@ TEST_F(ChunkedColumnGroupTest, DeferredInitializationFailureAllowsRetry) {
     EXPECT_EQ(factory_calls, 2);
 }
 
+TEST_F(ChunkedColumnGroupTest,
+       AsyncPreparationOverlapsAndSharesForegroundOpen) {
+    auto pool = std::make_shared<folly::CPUThreadPoolExecutor>(1);
+    std::promise<void> started;
+    auto started_future = started.get_future();
+    std::promise<void> release;
+    auto release_future = release.get_future().share();
+    std::atomic<int> calls{0};
+    auto group =
+        std::make_shared<ChunkedColumnGroup>(5, 2, [&](OpContext* ctx) {
+            EXPECT_NE(ctx, nullptr);
+            if (++calls == 1) {
+                started.set_value();
+            }
+            release_future.wait();
+            return MakeGroupTranslator("async-preparation-shared");
+        });
+    group->PrepareAsync(pool);
+    const auto status = started_future.wait_for(std::chrono::seconds(5));
+    EXPECT_FALSE(group->IsMaterialized());
+    group->PrepareAsync(pool);
+    auto query = std::async(std::launch::async, [group] {
+        return group->GetGroupChunk(nullptr, 0).get()->RowNums();
+    });
+    EXPECT_EQ(query.wait_for(std::chrono::milliseconds(10)),
+              std::future_status::timeout);
+    release.set_value();
+    EXPECT_EQ(status, std::future_status::ready);
+    EXPECT_EQ(query.get(), 5);
+    pool->join();
+    EXPECT_EQ(calls.load(), 1);
+    EXPECT_TRUE(group->IsMaterialized());
+}
+
+TEST_F(ChunkedColumnGroupTest, AsyncPreparationQueuedReleaseDoesNotOpen) {
+    auto pool = std::make_shared<folly::CPUThreadPoolExecutor>(1);
+    std::promise<void> release_worker;
+    auto released = release_worker.get_future().share();
+    pool->add([released] { released.wait(); });
+    std::atomic<int> calls{0};
+    auto make_group = [&] {
+        return std::make_shared<ChunkedColumnGroup>(5, 2, [&](OpContext*) {
+            ++calls;
+            return MakeGroupTranslator("async-preparation-queued");
+        });
+    };
+    auto cancelled = make_group();
+    cancelled->PrepareAsync(pool);
+    cancelled->CancelWarmup();
+    auto destroyed = make_group();
+    std::weak_ptr<ChunkedColumnGroup> weak = destroyed;
+    destroyed->PrepareAsync(pool);
+    destroyed.reset();
+    EXPECT_TRUE(weak.expired());
+    release_worker.set_value();
+    pool->join();
+    EXPECT_EQ(calls.load(), 0);
+    // Cancelling background preparation does not cancel a foreground request.
+    EXPECT_EQ(cancelled->num_chunks(), 1);
+    EXPECT_EQ(calls.load(), 1);
+}
+
+TEST_F(ChunkedColumnGroupTest, AsyncPreparationReleaseCancelsRunningFactory) {
+    auto pool = std::make_shared<folly::CPUThreadPoolExecutor>(1);
+    std::promise<void> started;
+    auto started_future = started.get_future();
+    std::promise<void> release;
+    auto released = release.get_future().share();
+    std::atomic<bool> saw_cancel{false};
+    auto group =
+        std::make_shared<ChunkedColumnGroup>(5, 1, [&](OpContext* ctx) {
+            started.set_value();
+            released.wait();
+            saw_cancel = ctx->cancellation_token.isCancellationRequested();
+            segcore::CheckCancellation(ctx, 1, "async release test");
+            return MakeGroupTranslator("async-preparation-release");
+        });
+    auto column =
+        std::make_shared<ProxyChunkColumn>(group, FieldId(1), int64_field_meta);
+    std::weak_ptr<ChunkedColumnGroup> weak = group;
+    group->PrepareAsync(pool);
+    const auto status = started_future.wait_for(std::chrono::seconds(5));
+    column.reset();
+    group.reset();
+    release.set_value();
+    pool->join();
+    EXPECT_EQ(status, std::future_status::ready);
+    EXPECT_TRUE(saw_cancel.load());
+    EXPECT_TRUE(weak.expired());
+}
+
+TEST_F(ChunkedColumnGroupTest,
+       AsyncPreparationFailurePreservesForegroundError) {
+    auto pool = std::make_shared<folly::CPUThreadPoolExecutor>(1);
+    std::atomic<int> calls{0};
+    auto group = std::make_shared<ChunkedColumnGroup>(5, 2, [&](OpContext*) {
+        ++calls;
+        ThrowInfo(ErrorCode::Unsupported, "injected permanent reader failure");
+        return MakeGroupTranslator("async-preparation-failure");
+    });
+    group->PrepareAsync(pool);
+    pool->join();
+    EXPECT_FALSE(group->IsMaterialized());
+    EXPECT_EQ(calls.load(), 1);
+    try {
+        group->Prepare(nullptr);
+        FAIL() << "expected the original foreground error";
+    } catch (const SegcoreError& error) {
+        EXPECT_EQ(error.get_error_code(), ErrorCode::Unsupported);
+    }
+    EXPECT_EQ(calls.load(), 2);
+}
+
+TEST_F(ChunkedColumnGroupTest, AsyncPreparationAllocationFailureAllowsRetry) {
+    auto pool = std::make_shared<folly::CPUThreadPoolExecutor>(1);
+    std::atomic<int> calls{0};
+    auto group = std::make_shared<ChunkedColumnGroup>(5, 2, [&](OpContext*) {
+        if (++calls == 1) {
+            throw std::bad_alloc();
+        }
+        return MakeGroupTranslator("async-preparation-allocation-retry");
+    });
+    group->PrepareAsync(pool);
+    pool->join();
+    EXPECT_FALSE(group->IsMaterialized());
+    EXPECT_EQ(group->GetGroupChunk(nullptr, 0).get()->RowNums(), 5);
+    EXPECT_EQ(calls.load(), 2);
+}
+
+TEST_F(ChunkedColumnGroupTest, AsyncPreparationRetainsCellWarmupPolicy) {
+    auto pool = std::make_shared<folly::CPUThreadPoolExecutor>(1);
+    auto group = std::make_shared<ChunkedColumnGroup>(5, 2, [&](OpContext*) {
+        auto translator = MakeGroupTranslator("async-preparation-cell-warmup");
+        translator->meta()->cache_warmup_policy =
+            CacheWarmupPolicy::CacheWarmupPolicy_Async;
+        return translator;
+    });
+    group->PrepareAsync(pool);
+    pool->join();
+    const auto deadline =
+        std::chrono::steady_clock::now() + std::chrono::seconds(5);
+    while (!group->CellsLoaded({0}) &&
+           std::chrono::steady_clock::now() < deadline) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    // No foreground pin or read may be used to make this assertion pass.
+    EXPECT_TRUE(group->CellsLoaded({0}));
+}
+
 TEST_F(ChunkedColumnGroupTest, DeferredRowCountMismatchAllowsRetry) {
     int factory_calls = 0;
     auto group = std::make_shared<ChunkedColumnGroup>(5, 2, [&](OpContext*) {
