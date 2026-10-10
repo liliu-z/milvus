@@ -1,0 +1,428 @@
+diff --git a/internal/transport/http2_client.go b/internal/transport/http2_client.go
+--- a/internal/transport/http2_client.go
++++ b/internal/transport/http2_client.go
+@@ -184,6 +184,15 @@
+ 	}
+ 	if opts, present := proxyattributes.Get(addr); present {
+ 		return proxyDial(ctx, addr, grpcUA, opts)
++	}
++	if networkType == "tcp" {
++		if entry, ok := inProcessDialers.Load(address); ok {
++			conn, err := entry.(*inProcessDialer).dial(ctx)
++			if err == nil {
++				InProcessDialCount.Add(1)
++			}
++			return conn, err
++		}
+ 	}
+ 	return internal.NetDialerWithTCPKeepalive().DialContext(ctx, networkType, address)
+ }
+diff --git a/internal/transport/inprocess.go b/internal/transport/inprocess.go
+new file mode 100644
+--- /dev/null
++++ b/internal/transport/inprocess.go
+@@ -0,0 +1,28 @@
++// Copyright 2026 gRPC authors.
++// Licensed under the Apache License, Version 2.0.
++
++package transport
++
++import (
++	"context"
++	"net"
++	"sync"
++	"sync/atomic"
++)
++
++type inProcessDialer struct {
++	dial func(context.Context) (net.Conn, error)
++}
++
++var inProcessDialers sync.Map
++var InProcessDialCount atomic.Uint64
++
++// RegisterInProcessDialer installs an exact-address transport. Custom dialers
++// and proxy routing take precedence. Unregister only removes this generation.
++func RegisterInProcessDialer(address string, dial func(context.Context) (net.Conn, error)) (func(), bool) {
++	entry := &inProcessDialer{dial: dial}
++	if _, loaded := inProcessDialers.LoadOrStore(address, entry); loaded {
++		return nil, false
++	}
++	return func() { inProcessDialers.CompareAndDelete(address, entry) }, true
++}
+diff --git a/internal/transport/inprocess_test.go b/internal/transport/inprocess_test.go
+new file mode 100644
+--- /dev/null
++++ b/internal/transport/inprocess_test.go
+@@ -0,0 +1,76 @@
++// Copyright 2026 gRPC authors.
++// Licensed under the Apache License, Version 2.0.
++
++package transport
++
++import (
++	"context"
++	"errors"
++	"net"
++	"net/http"
++	"net/http/httptest"
++	"strings"
++	"testing"
++	"time"
++
++	"google.golang.org/grpc/internal/proxyattributes"
++	"google.golang.org/grpc/resolver"
++)
++
++func TestInProcessRegistrationGeneration(t *testing.T) {
++	address := "127.0.0.1:30002"
++	unregister, ok := RegisterInProcessDialer(address, nil)
++	if !ok {
++		t.Fatal("initial registration failed")
++	}
++	if _, ok := RegisterInProcessDialer(address, nil); ok {
++		t.Fatal("duplicate replaced live registration")
++	}
++	unregister()
++	newUnregister, ok := RegisterInProcessDialer(address, nil)
++	if !ok {
++		t.Fatal("new generation could not register")
++	}
++	defer newUnregister()
++	unregister()
++	if _, ok := inProcessDialers.Load(address); !ok {
++		t.Fatal("old generation removed new listener")
++	}
++}
++
++func TestInProcessProxyPrecedence(t *testing.T) {
++	seen := make(chan string, 1)
++	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		seen <- r.Method
++		w.WriteHeader(http.StatusForbidden)
++	}))
++	defer server.Close()
++	address := strings.TrimPrefix(server.URL, "http://")
++	called := false
++	unregister, ok := RegisterInProcessDialer(address, func(context.Context) (net.Conn, error) {
++		called = true
++		return nil, errors.New("local path must not bypass configured proxy")
++	})
++	if !ok {
++		t.Fatal("registration failed")
++	}
++	defer unregister()
++	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
++	defer cancel()
++	addr := proxyattributes.Set(resolver.Address{Addr: address}, proxyattributes.Options{ConnectAddr: "backend.invalid:1234"})
++	if conn, err := dial(ctx, nil, addr, "test"); err == nil {
++		conn.Close()
++		t.Fatal("proxy rejection lost")
++	}
++	if called {
++		t.Fatal("configured proxy bypassed")
++	}
++	select {
++	case method := <-seen:
++		if method != http.MethodConnect {
++			t.Fatal(method)
++		}
++	case <-ctx.Done():
++		t.Fatal("proxy not contacted")
++	}
++}
+diff --git a/inprocess.go b/inprocess.go
+new file mode 100644
+--- /dev/null
++++ b/inprocess.go
+@@ -0,0 +1,58 @@
++// Copyright 2026 gRPC authors.
++// Licensed under the Apache License, Version 2.0.
++
++package grpc
++
++import (
++	"fmt"
++	"sync"
++
++	"google.golang.org/grpc/internal/transport"
++	"google.golang.org/grpc/test/bufconn"
++)
++
++// ServeInProcess serves the existing HTTP/2 gRPC protocol over bounded memory
++// connections for one exact advertised address. It does not replace a TCP
++// listener. Credentials, codecs, interceptors, stats and message limits remain
++// on the ordinary client/server paths. Other addresses keep ordinary dialing.
++//
++// This is an experimental opt-in API for standalone deployment measurements.
++// Stop and GracefulStop include these connections. The returned cleanup closes
++// this listener and unregisters its address; active connections are owned by s.
++func (s *Server) ServeInProcess(address string, bufferSize int) (func(), error) {
++	if address == "" || bufferSize <= 0 {
++		return nil, fmt.Errorf("grpc: invalid in-process listener configuration")
++	}
++	s.mu.Lock()
++	stopped := s.lis == nil
++	s.mu.Unlock()
++	if stopped {
++		return nil, ErrServerStopped
++	}
++	lis := bufconn.Listen(bufferSize)
++	unregister, ok := transport.RegisterInProcessDialer(address, lis.DialContext)
++	if !ok {
++		lis.Close()
++		return nil, fmt.Errorf("grpc: in-process address already registered: %s", address)
++	}
++	done := make(chan struct{})
++	go func() {
++		defer close(done)
++		defer unregister()
++		defer lis.Close()
++		// A concurrent Stop may win before this goroutine starts. Serve then
++		// closes lis and returns ErrServerStopped without accepting a connection.
++		_ = s.Serve(lis)
++	}()
++	var once sync.Once
++	return func() {
++		once.Do(func() {
++			unregister()
++			lis.Close()
++			<-done
++		})
++	}, nil
++}
++
++// InProcessDialCount returns successful in-process connections in this process.
++func InProcessDialCount() uint64 { return transport.InProcessDialCount.Load() }
+diff --git a/inprocess_test.go b/inprocess_test.go
+new file mode 100644
+--- /dev/null
++++ b/inprocess_test.go
+@@ -0,0 +1,227 @@
++// Copyright 2026 gRPC authors.
++// Licensed under the Apache License, Version 2.0.
++
++package grpc_test
++
++import (
++	"context"
++	"crypto/ecdsa"
++	"crypto/elliptic"
++	"crypto/rand"
++	"crypto/tls"
++	"crypto/x509"
++	"math/big"
++	"net"
++	"strings"
++	"sync"
++	"testing"
++	"time"
++
++	"google.golang.org/grpc"
++	"google.golang.org/grpc/codes"
++	"google.golang.org/grpc/credentials"
++	"google.golang.org/grpc/credentials/insecure"
++	healthpb "google.golang.org/grpc/health/grpc_health_v1"
++	"google.golang.org/grpc/metadata"
++	"google.golang.org/grpc/peer"
++	"google.golang.org/grpc/status"
++)
++
++type localHealth struct {
++	healthpb.UnimplementedHealthServer
++}
++
++func (*localHealth) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
++	if req.Service == "deadline" {
++		<-ctx.Done()
++		return nil, status.FromContextError(ctx.Err()).Err()
++	}
++	if req.Service == "abort" {
++		return nil, status.Error(codes.Aborted, "original failure")
++	}
++	p, _ := peer.FromContext(ctx)
++	grpc.SetHeader(ctx, metadata.Pairs("network", p.Addr.Network(), "echo", req.Service))
++	return &healthpb.HealthCheckResponse{Status: healthpb.HealthCheckResponse_SERVING}, nil
++}
++
++func (*localHealth) Watch(req *healthpb.HealthCheckRequest, stream healthpb.Health_WatchServer) error {
++	for i := 0; i < 3; i++ {
++		if err := stream.Send(&healthpb.HealthCheckResponse{Status: healthpb.HealthCheckResponse_SERVING}); err != nil {
++			return err
++		}
++	}
++	<-stream.Context().Done()
++	return status.FromContextError(stream.Context().Err()).Err()
++}
++
++func localTestServer(t *testing.T, address string, opts ...grpc.ServerOption) (*grpc.Server, string, func()) {
++	t.Helper()
++	lis, err := net.Listen("tcp", address)
++	if err != nil {
++		t.Fatal(err)
++	}
++	s := grpc.NewServer(opts...)
++	healthpb.RegisterHealthServer(s, &localHealth{})
++	clean, err := s.ServeInProcess(lis.Addr().String(), 1024)
++	if err != nil {
++		t.Fatal(err)
++	}
++	done := make(chan struct{})
++	go func() { defer close(done); _ = s.Serve(lis) }()
++	t.Cleanup(func() { s.Stop(); clean(); <-done })
++	return s, lis.Addr().String(), clean
++}
++
++func localDial(t *testing.T, address string, options ...grpc.DialOption) *grpc.ClientConn {
++	t.Helper()
++	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
++	defer cancel()
++	conn, err := grpc.DialContext(ctx, address, append([]grpc.DialOption{grpc.WithBlock(), grpc.WithTransportCredentials(insecure.NewCredentials())}, options...)...)
++	if err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(func() { conn.Close() })
++	return conn
++}
++
++func TestInProcessProtocolAndTCPFallback(t *testing.T) {
++	_, addr, clean := localTestServer(t, "127.0.0.1:0", grpc.UnaryInterceptor(func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
++		md, _ := metadata.FromIncomingContext(ctx)
++		if len(md.Get("permit")) == 0 {
++			return nil, status.Error(codes.PermissionDenied, "missing permit")
++		}
++		return handler(ctx, req)
++	}))
++	before := grpc.InProcessDialCount()
++	c := healthpb.NewHealthClient(localDial(t, addr))
++	if grpc.InProcessDialCount() != before+1 {
++		t.Fatal("did not select in-process connection")
++	}
++	if _, err := c.Check(context.Background(), &healthpb.HealthCheckRequest{}); status.Code(err) != codes.PermissionDenied {
++		t.Fatal(err)
++	}
++	ctx := metadata.AppendToOutgoingContext(context.Background(), "permit", "yes")
++	var header metadata.MD
++	payload := strings.Repeat("x", 128*1024)
++	if _, err := c.Check(ctx, &healthpb.HealthCheckRequest{Service: payload}, grpc.Header(&header)); err != nil {
++		t.Fatal(err)
++	}
++	if header.Get("network")[0] != "bufconn" || header.Get("echo")[0] != payload {
++		t.Fatal("wire payload/header mismatch", header.Get("network"))
++	}
++	if _, err := c.Check(ctx, &healthpb.HealthCheckRequest{Service: "abort"}); status.Code(err) != codes.Aborted {
++		t.Fatal(err)
++	}
++	dctx, cancel := context.WithTimeout(ctx, 30*time.Millisecond)
++	defer cancel()
++	if _, err := c.Check(dctx, &healthpb.HealthCheckRequest{Service: "deadline"}); status.Code(err) != codes.DeadlineExceeded {
++		t.Fatal(err)
++	}
++	clean()
++	before = grpc.InProcessDialCount()
++	tcp := healthpb.NewHealthClient(localDial(t, addr))
++	header = nil
++	if _, err := tcp.Check(ctx, &healthpb.HealthCheckRequest{}, grpc.Header(&header)); err != nil {
++		t.Fatal(err)
++	}
++	if header.Get("network")[0] != "tcp" || grpc.InProcessDialCount() != before {
++		t.Fatal("TCP fallback not preserved")
++	}
++}
++
++func TestInProcessCustomDialerPrecedence(t *testing.T) {
++	_, addr, _ := localTestServer(t, "127.0.0.1:0")
++	before := grpc.InProcessDialCount()
++	conn := localDial(t, addr, grpc.WithContextDialer(func(ctx context.Context, address string) (net.Conn, error) {
++		return (&net.Dialer{}).DialContext(ctx, "tcp", address)
++	}))
++	var header metadata.MD
++	if _, err := healthpb.NewHealthClient(conn).Check(context.Background(), &healthpb.HealthCheckRequest{}, grpc.Header(&header)); err != nil {
++		t.Fatal(err)
++	}
++	if header.Get("network")[0] != "tcp" || grpc.InProcessDialCount() != before {
++		t.Fatal("custom dialer was bypassed")
++	}
++}
++
++func TestInProcessStreamCancelAndGracefulStop(t *testing.T) {
++	s, addr, _ := localTestServer(t, "127.0.0.1:0")
++	c := healthpb.NewHealthClient(localDial(t, addr))
++	ctx, cancel := context.WithCancel(context.Background())
++	stream, err := c.Watch(ctx, &healthpb.HealthCheckRequest{})
++	if err != nil {
++		t.Fatal(err)
++	}
++	for i := 0; i < 3; i++ {
++		if _, err := stream.Recv(); err != nil {
++			t.Fatal(err)
++		}
++	}
++	done := make(chan struct{})
++	go func() { s.GracefulStop(); close(done) }()
++	select {
++	case <-done:
++		t.Fatal("stopped with a live stream")
++	case <-time.After(10 * time.Millisecond):
++	}
++	cancel()
++	if _, err := stream.Recv(); status.Code(err) != codes.Canceled {
++		t.Fatal(err)
++	}
++	select {
++	case <-done:
++	case <-time.After(3 * time.Second):
++		t.Fatal("graceful shutdown stuck")
++	}
++}
++
++func TestInProcessTLSValidation(t *testing.T) {
++	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
++	if err != nil {
++		t.Fatal(err)
++	}
++	tmpl := &x509.Certificate{SerialNumber: big.NewInt(1), DNSNames: []string{"bench.local"}, NotBefore: time.Now().Add(-time.Hour), NotAfter: time.Now().Add(time.Hour), IsCA: true, BasicConstraintsValid: true, KeyUsage: x509.KeyUsageCertSign | x509.KeyUsageDigitalSignature, ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}}
++	der, err := x509.CreateCertificate(rand.Reader, tmpl, tmpl, key.Public(), key)
++	if err != nil {
++		t.Fatal(err)
++	}
++	cert, err := x509.ParseCertificate(der)
++	if err != nil {
++		t.Fatal(err)
++	}
++	roots := x509.NewCertPool()
++	roots.AddCert(cert)
++	_, addr, _ := localTestServer(t, "127.0.0.1:0", grpc.Creds(credentials.NewTLS(&tls.Config{Certificates: []tls.Certificate{{Certificate: [][]byte{der}, PrivateKey: key}}})))
++	conn := localDial(t, addr, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{RootCAs: roots, ServerName: "bench.local"})))
++	if _, err := healthpb.NewHealthClient(conn).Check(context.Background(), &healthpb.HealthCheckRequest{}); err != nil {
++		t.Fatal(err)
++	}
++	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
++	defer cancel()
++	bad, err := grpc.DialContext(ctx, addr, grpc.WithBlock(), grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{RootCAs: roots, ServerName: "wrong.local"})))
++	if bad != nil {
++		bad.Close()
++	}
++	if err == nil {
++		t.Fatal("TLS hostname validation bypassed")
++	}
++}
++
++func TestInProcessConcurrentStopAndRegister(t *testing.T) {
++	for i := 0; i < 100; i++ {
++		s := grpc.NewServer()
++		var wg sync.WaitGroup
++		wg.Add(2)
++		go func() { defer wg.Done(); s.Stop() }()
++		go func() {
++			defer wg.Done()
++			clean, err := s.ServeInProcess("127.0.0.1:30001", 1024)
++			if err == nil {
++				clean()
++			} else if err != grpc.ErrServerStopped {
++				t.Errorf("unexpected registration error: %v", err)
++			}
++		}()
++		wg.Wait()
++	}
++}

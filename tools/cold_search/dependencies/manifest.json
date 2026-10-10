@@ -2,7 +2,9 @@
   "grpc": {
     "module": "google.golang.org/grpc",
     "version": "v1.83.2",
-    "patches": []
+    "patches": [
+      "grpc-01-inprocess.patch"
+    ]
   },
   "woodpecker": {
     "module": "github.com/zilliztech/woodpecker",

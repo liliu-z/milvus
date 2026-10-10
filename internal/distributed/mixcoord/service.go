@@ -268,7 +268,7 @@ func (s *Server) startGrpcLoop() {
 	ctx, cancel := context.WithCancel(s.ctx)
 	defer cancel()
 	go funcutil.CheckGrpcReady(ctx, s.grpcErrChan)
-	if err := s.grpcServer.Serve(s.listener); err != nil {
+	if err := utils.ServeGRPC(s.grpcServer, s.listener); err != nil {
 		select {
 		case s.grpcErrChan <- err:
 		case <-s.ctx.Done():

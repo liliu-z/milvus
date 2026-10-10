@@ -274,7 +274,7 @@ func (s *Server) startGrpcLoop() {
 	defer cancel()
 
 	go funcutil.CheckGrpcReady(ctx, s.grpcErrChan)
-	if err := s.grpcServer.Serve(s.listener); err != nil {
+	if err := utils.ServeGRPC(s.grpcServer, s.listener); err != nil {
 		mlog.Debug(s.ctx, "QueryNode Start Grpc Failed!!!!")
 		s.grpcErrChan <- err
 	}

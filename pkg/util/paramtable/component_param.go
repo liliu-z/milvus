@@ -327,7 +327,8 @@ func (p *ComponentParam) CleanEvent() {
 // --- common ---
 
 type commonConfig struct {
-	ClusterPrefix ParamItem `refreshable:"false"`
+	InProcessGRPCEnabled ParamItem `refreshable:"false"`
+	ClusterPrefix        ParamItem `refreshable:"false"`
 
 	RootCoordTimeTick   ParamItem `refreshable:"true"`
 	RootCoordStatistics ParamItem `refreshable:"true"`
@@ -517,6 +518,15 @@ func (p *commonConfig) ResolveLoadAdmissionLimits(asyncEnabled bool) (budgetByte
 }
 
 func (p *commonConfig) init(base *BaseTable) {
+	p.InProcessGRPCEnabled = ParamItem{
+		Key:          "common.inProcessGRPCEnabled",
+		DefaultValue: "false",
+		Version:      "3.0.0",
+		Doc:          "Experimental bounded in-process gRPC byte transport for co-located internal servers. Keeps the full gRPC stack and TCP endpoint; requires restart.",
+		Export:       true,
+	}
+	p.InProcessGRPCEnabled.Init(base.mgr)
+
 	// must init cluster prefix first
 	p.ClusterPrefix = ParamItem{
 		Key:          "msgChannel.chanNamePrefix.cluster",
