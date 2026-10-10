@@ -21,6 +21,10 @@ woodpecker:
   storage:
     type: local
     rootPath: ${COLD_SEARCH_ROOT}/wal/qv-experiment
+  logstore:
+    segmentSyncPolicy:
+      maxIntervalForLocalStorage: 10ms
+      maxEntries: 1
 localStorage:
   path: ${COLD_SEARCH_ROOT}/data
 common:
