@@ -51,5 +51,10 @@ queryNode:
   preferFieldDataWhenIndexHasRawData: true
   segcore:
     nativeFutureWaiters: 1
+  mmap:
+    vectorField: false
+    vectorIndex: false
+    scalarField: false
+    scalarIndex: false
 queryView:
   leaseDuration: 60s
