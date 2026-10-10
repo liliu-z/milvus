@@ -37,6 +37,7 @@ common:
   localResourcePath: ${COLD_SEARCH_ROOT}/resources
   requery:
     searchPolicy: OutputText
+  bloomFilterEnabled: false
 log:
   level: warn
   format: json
