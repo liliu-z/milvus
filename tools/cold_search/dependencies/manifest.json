@@ -1,0 +1,23 @@
+{
+  "grpc": {
+    "module": "google.golang.org/grpc",
+    "version": "v1.83.2",
+    "patches": []
+  },
+  "woodpecker": {
+    "module": "github.com/zilliztech/woodpecker",
+    "version": "v0.1.45",
+    "patches": []
+  },
+  "milvus-storage": {
+    "repository": "https://github.com/milvus-io/milvus-storage.git",
+    "revision": "e6e1ab0817ab85a140f37ba7c920a5e6ebba0d71",
+    "patches": []
+  },
+  "aws-sdk-cpp": {
+    "conan_reference": "aws-sdk-cpp/1.11.842@milvus/dev#363556887f622db23a10168c108dd55d",
+    "source_file": "src/aws-cpp-sdk-core/source/http/curl/CurlHttpClient.cpp",
+    "source_sha256": "3452803a35f0f4b02f22bb332f90e902db5735510f746539a392f3cc45530279",
+    "patches": []
+  }
+}

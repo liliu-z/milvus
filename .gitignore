@@ -138,3 +138,7 @@ docs/plans/
 
 # Local run artifacts of internal/querynodev2/segments TestFlushData* (SegmentBasePath under suite.rootPath)
 internal/querynodev2/segments/TestSegmentLoader/
+
+# Local, reproducible cold-search experiment overlays and outputs.
+.cold-search-deps/
+.cold-search-results/
