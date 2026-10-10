@@ -1,0 +1,128 @@
+--- a/server/storage/disk/writer_impl.go
++++ b/server/storage/disk/writer_impl.go
+@@ -89,6 +89,7 @@
+ 	finalizing    atomic.Bool
+ 	fenced        atomic.Bool
+ 	recovered     atomic.Bool
++	lockMu        sync.Mutex   // Serializes ownership checks with releasing the flock.
+ 	lockFile      *flock.Flock // Lock file handle
+ 	lockFilePath  string       // Path to the lock file
+ 
+@@ -1094,8 +1090,15 @@
+ 			zap.Error(writeErr))
+ 	}
+ 
+-	// wait if necessary
+-	_ = waitForFenceCheckIntervalIfLockExists(ctx, w.baseDir, w.logId, w.segmentId, fenceFlagPath)
++	// This writer has already rejected new appends and drained its writes above.
++	// While it still owns the exclusive flock, there is no other normal writer
++	// that needs to observe the fence flag. Keep the ownership stable until this
++	// fence returns; recovery handles do not own a flock and retain the wait.
++	w.lockMu.Lock()
++	defer w.lockMu.Unlock()
++	if w.lockFile == nil || !w.lockFile.Locked() {
++		_ = waitForFenceCheckIntervalIfLockExists(ctx, w.baseDir, w.logId, w.segmentId, fenceFlagPath)
++	}
+ 
+ 	lastEntryId := w.GetLastEntryId(ctx)
+ 	logger.Ctx(ctx).Info("Successfully created fence flag file and marked LocalFileWriter as fenced",
+@@ -1369,6 +1372,8 @@
+ 
+ // createSegmentLock creates a lock file for the segment to ensure exclusive access
+ func (s *LocalFileWriter) createSegmentLock(ctx context.Context) error {
++	s.lockMu.Lock()
++	defer s.lockMu.Unlock()
+ 	ctx, sp := logger.NewIntentCtxWithParent(ctx, WriterScope, "createSegmentLock")
+ 	defer sp.End()
+ 
+@@ -1419,6 +1424,8 @@
+ 
+ // releaseSegmentLock releases the segment lock and removes the lock file
+ func (s *LocalFileWriter) releaseSegmentLock(ctx context.Context) error {
++	s.lockMu.Lock()
++	defer s.lockMu.Unlock()
+ 	ctx, sp := logger.NewIntentCtxWithParent(ctx, WriterScope, "releaseSegmentLock")
+ 	defer sp.End()
+ 
+--- /dev/null
++++ b/server/storage/disk/fence_owner_test.go
+@@ -0,0 +1,79 @@
++// Copyright (C) 2025 Zilliz. All rights reserved.
++//
++// This file is part of the Woodpecker project.
++//
++// Woodpecker is dual-licensed under the GNU Affero General Public License v3.0
++// (AGPLv3) and the Server Side Public License v1 (SSPLv1). You may use this
++// file under either license, at your option.
++//
++// AGPLv3 License: https://www.gnu.org/licenses/agpl-3.0.html
++// SSPLv1 License: https://www.mongodb.com/licensing/server-side-public-license
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under these licenses is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the license texts for specific language governing permissions and
++// limitations under the licenses.
++
++package disk
++
++import (
++	"context"
++	"testing"
++	"time"
++
++	"github.com/stretchr/testify/require"
++
++	"github.com/zilliztech/woodpecker/common/config"
++	"github.com/zilliztech/woodpecker/common/werr"
++)
++
++func TestFenceOwnedWriterDrainsWithoutRemoteWait(t *testing.T) {
++	ctx := context.Background()
++	dir := t.TempDir()
++	cfg, err := config.NewConfiguration()
++	require.NoError(t, err)
++	w, err := NewLocalFileWriter(ctx, dir, 81, 0, cfg)
++	require.NoError(t, err)
++	t.Cleanup(func() { require.NoError(t, w.Close(ctx)) })
++	for i := int64(0); i < 3; i++ {
++		_, err := w.WriteDataAsync(ctx, i, []byte("persist before fence returns"), nil)
++		require.NoError(t, err)
++	}
++	started := time.Now()
++	last, err := w.Fence(ctx)
++	elapsed := time.Since(started)
++	require.NoError(t, err)
++	require.Equal(t, int64(2), last)
++	require.Less(t, elapsed, time.Second, "own flock must not wait for a remote writer")
++	_, err = w.WriteDataAsync(ctx, 3, []byte("must reject"), nil)
++	require.True(t, werr.ErrSegmentFenced.Is(err))
++	require.NoError(t, w.Close(ctx))
++	recovered, err := NewLocalFileWriterWithMode(ctx, dir, 81, 0, cfg, true)
++	require.NoError(t, err)
++	defer recovered.Close(ctx)
++	require.Equal(t, int64(2), recovered.GetLastEntryId(ctx))
++	require.True(t, recovered.fenced.Load())
++	t.Logf("owned Fence completed in %s; three entries recovered", elapsed)
++}
++
++func TestFenceRecoveryWriterRetainsRemoteWait(t *testing.T) {
++	ctx := context.Background()
++	dir := t.TempDir()
++	cfg, err := config.NewConfiguration()
++	require.NoError(t, err)
++	owner, err := NewLocalFileWriter(ctx, dir, 82, 0, cfg)
++	require.NoError(t, err)
++	defer owner.Close(ctx)
++	recovery, err := NewLocalFileWriterWithMode(ctx, dir, 82, 0, cfg, true)
++	require.NoError(t, err)
++	defer recovery.Close(ctx)
++	started := time.Now()
++	_, err = recovery.Fence(ctx)
++	require.NoError(t, err)
++	require.GreaterOrEqual(t, time.Since(started), 5*time.Second,
++		"recovery handle does not own the writer flock")
++	require.Eventually(t, func() bool { return owner.fenced.Load() }, time.Second, time.Millisecond)
++	_, err = owner.WriteDataAsync(ctx, 0, []byte("must reject"), nil)
++	require.True(t, werr.ErrSegmentFenced.Is(err))
++}

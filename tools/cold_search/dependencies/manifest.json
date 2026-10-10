@@ -7,7 +7,9 @@
   "woodpecker": {
     "module": "github.com/zilliztech/woodpecker",
     "version": "v0.1.45",
-    "patches": []
+    "patches": [
+      "woodpecker-01-owner-fence.patch"
+    ]
   },
   "milvus-storage": {
     "repository": "https://github.com/milvus-io/milvus-storage.git",
