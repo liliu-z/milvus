@@ -51,6 +51,11 @@ queryNode:
   preferFieldDataWhenIndexHasRawData: true
   segcore:
     nativeFutureWaiters: 1
+    tieredStorage:
+      warmup:
+        vectorField: async
+        vectorIndex: async
+      lazyColumnGroupEnabled: true
   mmap:
     vectorField: false
     vectorIndex: false
