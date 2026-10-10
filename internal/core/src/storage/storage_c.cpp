@@ -41,7 +41,8 @@
 #include "milvus-storage/filesystem/fs.h"
 #include "milvus-storage/format/parquet/scoped_file_prefetch.h"
 #include "milvus-storage/manifest.h"
-#include "cachinglayer/Manager.h"
+#include <folly/executors/CPUThreadPoolExecutor.h>
+#include <folly/executors/thread_factory/NamedThreadFactory.h>
 #include <algorithm>
 #include <unordered_set>
 
@@ -125,8 +126,17 @@ BeginAutoLoadFilePrefetch(const char* manifest,
                 scope->files.push_back(std::move(prepared));
             }
         }
-        auto pool =
-            milvus::cachinglayer::Manager::GetInstance().GetPrefetchPool();
+        if (scope->files.empty()) {
+            return scope.release();
+        }
+        // Keep two IO workers available across idle periods. The shared cache
+        // warmup executor may shrink to one thread after 60 seconds, and also
+        // runs the consumers of these speculative reads. Only admitted work
+        // reaches this opt-in pool; file and byte budgets remain process-wide.
+        static const auto pool =
+            std::make_shared<folly::CPUThreadPoolExecutor>(
+                std::make_pair(size_t{2}, size_t{2}),
+                std::make_shared<folly::NamedThreadFactory>("autoload_io"));
         for (const auto& file : scope->files) {
             pool->add([file] { file->Run(); });
         }
