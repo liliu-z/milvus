@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
+#include <cstring>
 #include <exception>
 #include <future>
 #include <limits>
@@ -208,6 +209,36 @@ SegmentInternalInterface::FillPrimaryKeys(const query::Plan* plan,
         trace_id = milvus::tracer::GetRequestTraceID(op_ctx);
     }
     milvus::tracer::ScopedOpContextTraceID local_trace(&local_ctx, trace_id);
+    // A sealed segment can already own the INT64 PK column. Read its pinned
+    // cells directly, avoiding scalar-index reverse lookups and a temporary
+    // protobuf array. Index-only and external segments retain bulk_subscript.
+    if (SegcoreConfig::default_config()
+            .get_prefer_field_data_when_index_has_raw_data() &&
+        (*schema)[pk_field_id].get_data_type() == DataType::INT64 &&
+        !schema->is_external_collection()) {
+        if (auto sealed =
+                dynamic_cast<const ChunkedSegmentSealedImpl*>(this)) {
+            if (auto column = sealed->GetChunkedColumn(pk_field_id)) {
+                results.pk_type_ = DataType::INT64;
+                if (size != 0) {
+                    column->BulkValueAt(
+                        &local_ctx,
+                        [&results](const char* value, size_t offset) {
+                            int64_t pk;
+                            std::memcpy(&pk, value, sizeof(pk));
+                            results.primary_keys_[offset] = pk;
+                        },
+                        results.seg_offsets_.data(),
+                        size);
+                }
+                results.search_storage_cost_.scanned_remote_bytes +=
+                    local_ctx.storage_usage.scanned_cold_bytes.load();
+                results.search_storage_cost_.scanned_total_bytes +=
+                    local_ctx.storage_usage.scanned_total_bytes.load();
+                return;
+            }
+        }
+    }
     auto field_data = bulk_subscript(
         &local_ctx, pk_field_id, results.seg_offsets_.data(), size);
     results.pk_type_ = DataType(field_data->type());

@@ -6913,20 +6913,29 @@ ChunkedSegmentSealedImpl::bulk_subscript_from_state(
         return fill_with_empty(field_id, count);
     }
 
-    // Fast path for int64 PK field: use compressed offset2pk index
+    // Only PK lookup needs the compressed offset2pk index. Pinning it for
+    // unrelated fields can build an unused index during output materialization.
+    // Honor the explicit field-data preference for PKs too.
     auto pk_field_id = snapshot->schema->get_primary_field_id();
-    auto pk_index = PinPkIndex(snapshot->runtime, op_ctx);
     if (pk_field_id.has_value() && pk_field_id.value() == field_id &&
-        field_meta.get_data_type() == DataType::INT64 &&
-        pk_index.get() != nullptr && pk_index.get()->has_int64_pk_index()) {
-        auto ret = fill_with_empty(field_id, count);
-        auto* output = ret->mutable_scalars()
-                           ->mutable_long_data()
-                           ->mutable_data()
-                           ->mutable_data();
-        pk_index.get()->bulk_get_int64_pks_by_offsets(
-            seg_offsets, count, output);
-        return ret;
+        field_meta.get_data_type() == DataType::INT64) {
+        if (SegcoreConfig::default_config()
+                .get_prefer_field_data_when_index_has_raw_data() &&
+            !snapshot->schema->is_external_collection() &&
+            get_column(snapshot->runtime, field_id) != nullptr) {
+            return get_raw_data(op_ctx, field_id, field_meta, seg_offsets, count);
+        }
+        auto pk_index = PinPkIndex(snapshot->runtime, op_ctx);
+        if (pk_index.get() != nullptr && pk_index.get()->has_int64_pk_index()) {
+            auto ret = fill_with_empty(field_id, count);
+            auto* output = ret->mutable_scalars()
+                               ->mutable_long_data()
+                               ->mutable_data()
+                               ->mutable_data();
+            pk_index.get()->bulk_get_int64_pks_by_offsets(
+                seg_offsets, count, output);
+            return ret;
+        }
     }
 
     // Decide once whether to serve this retrieve from column data instead of
