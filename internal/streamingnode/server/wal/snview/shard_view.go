@@ -12,6 +12,7 @@ import (
 	"github.com/milvus-io/milvus/internal/views/worknode/handler"
 	"github.com/milvus-io/milvus/pkg/v3/proto/viewpb"
 	"github.com/milvus-io/milvus/pkg/v3/util/merr"
+	"github.com/milvus-io/milvus/pkg/v3/util/stage"
 )
 
 // snShardView manages all query view state machines for a single shard on a StreamingNode.
@@ -384,7 +385,10 @@ func (s *snShardView) consumeAndPersist(entry *snViewEntry) bool {
 		return true
 	}
 	qvobserve.Observe(s.ctx, qvobserve.StreamingNodePersistViewEvent{View: entry.View.QueryViewKey(), State: qviews.QueryViewState(persist.Meta.State)})
-	if err := s.catalog.SaveQueryViews(s.ctx, s.pchannel, []*viewpb.QueryViewOfShard{persist}); err != nil {
+	timer := viewCatalogSave.Begin()
+	err := s.catalog.SaveQueryViews(s.ctx, s.pchannel, []*viewpb.QueryViewOfShard{persist})
+	timer.End(err)
+	if err != nil {
 		if s.ctx.Err() != nil {
 			return false
 		}
@@ -392,6 +396,8 @@ func (s *snShardView) consumeAndPersist(entry *snViewEntry) bool {
 	}
 	return true
 }
+
+var viewCatalogSave = stage.New("streamingNode", "view_persist", "catalog_save")
 
 // consumeAndRelease drains pending release and calls ResourceManager.Release.
 // Caller must hold s.mu.

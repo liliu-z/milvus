@@ -43,6 +43,17 @@ intervals remain in their parents; these Go stages are not an exact partition.
 Do not add parent and child means. Manifest reads, native Load calls, and Go
 scheduler attempts are different populations, especially on failures or retries.
 
+## StreamingNode recovery metadata
+
+StreamingNode separately records `component="streamingNode",operation="view_persist",stage="catalog_save"`
+around each `SaveQueryViews` call. This includes metadata packing and catalog/etcd
+I/O, not only disk sync. It excludes acquisition of the shard lock and transport
+to/from Coord. Both Up recovery saves and cleanup deletions are counted; no
+sample is emitted when there is no pending persist. Success, cancellation and
+error are observed before the existing report/terminal-error behavior. The Up
+save remains strictly before activation/reporting and is contained in Coord's
+`sync_up/roundtrip`; do not add the two durations.
+
 ## Native Load phases and parallel tasks
 
 `internal_core_segment_load_duration_seconds{stage,result}` records one sample

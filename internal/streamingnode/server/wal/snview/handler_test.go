@@ -9,12 +9,15 @@ import (
 	"time"
 
 	"github.com/bytedance/mockey"
+	"github.com/prometheus/client_golang/prometheus"
+	dto "github.com/prometheus/client_model/go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/milvus-io/milvus/internal/metastore"
 	"github.com/milvus-io/milvus/internal/views/qviews"
 	"github.com/milvus-io/milvus/internal/views/worknode/handler"
+	"github.com/milvus-io/milvus/pkg/v3/metrics"
 	"github.com/milvus-io/milvus/pkg/v3/proto/viewpb"
 	"github.com/milvus-io/milvus/pkg/v3/util/merr"
 )
@@ -332,6 +335,7 @@ func TestSNHandler_ResourceManagerCallback_TransitionToReady(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestSNHandler_CoordUp_PersistsRecoveryInfo(t *testing.T) {
+	before := viewPersistSamples(t, "success")
 	cat := newMockCatalog()
 	mgr := newMockResourceManager()
 	h := recoverSNQueryViewHandler(context.Background(), testPChannel, cat, mgr, nil)
@@ -354,9 +358,11 @@ func TestSNHandler_CoordUp_PersistsRecoveryInfo(t *testing.T) {
 	require.Equal(t, 3, rc.count()) // Preparing + Ready + Up
 	assert.Equal(t, qviews.QueryViewStateUp, rc.last().State())
 	assert.Equal(t, 1, cat.savedCount())
+	assert.Equal(t, before+1, viewPersistSamples(t, "success"))
 }
 
 func TestSNHandler_PersistCancellationDoesNotReport(t *testing.T) {
+	before := viewPersistSamples(t, "canceled")
 	cat := newMockCatalog()
 	mgr := newMockResourceManager()
 	ctx, cancel := context.WithCancel(context.Background())
@@ -383,9 +389,11 @@ func TestSNHandler_PersistCancellationDoesNotReport(t *testing.T) {
 		}})
 	})
 	assert.Equal(t, 2, rc.count(), "unpersisted Up must not be reported")
+	assert.Equal(t, before+1, viewPersistSamples(t, "canceled"))
 }
 
 func TestSNHandler_PersistFailureIsTerminal(t *testing.T) {
+	before := viewPersistSamples(t, "error")
 	cat := newMockCatalog()
 	mgr := newMockResourceManager()
 	h := recoverSNQueryViewHandler(context.Background(), testPChannel, cat, mgr, nil)
@@ -408,6 +416,15 @@ func TestSNHandler_PersistFailureIsTerminal(t *testing.T) {
 		}})
 	})
 	assert.Equal(t, 2, rc.count(), "unpersisted Up must not be reported")
+	assert.Equal(t, before+1, viewPersistSamples(t, "error"))
+}
+
+func viewPersistSamples(t *testing.T, result string) uint64 {
+	t.Helper()
+	var metric dto.Metric
+	observer := metrics.QueryStageDuration.WithLabelValues("streamingNode", "view_persist", "catalog_save", result)
+	require.NoError(t, observer.(prometheus.Metric).Write(&metric))
+	return metric.GetHistogram().GetSampleCount()
 }
 
 func TestSNHandler_ApplyRetriesAfterShardDetached(t *testing.T) {
