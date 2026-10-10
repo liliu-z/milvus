@@ -1,0 +1,23 @@
+--- a/cmake/Corrosion.cmake
++++ b/cmake/Corrosion.cmake
+@@ -777,6 +777,10 @@
+         list(APPEND corrosion_cc_rs_flags "SDKROOT=${CMAKE_OSX_SYSROOT}")
+     endif()
+ 
++    # Local native experiment: CC/CXX are already exported by build-native.sh.
++    # Preserve the exact Cargo environment used by the ahead-of-time build.
++    set(corrosion_cc_rs_flags)
++
+     corrosion_add_target_local_rustflags("${target_name}" "$<$<BOOL:${corrosion_link_args}>:-Clink-args=${corrosion_link_args}>")
+ 
+     # todo: this should probably also be guarded by if_not_host_build_condition.
+@@ -797,7 +801,8 @@
+     unset(default_linker)
+     # With the MSVC ABI rustc only supports directly invoking the linker - Invoking cl as the linker driver is not supported.
+     if(NOT (Rust_CARGO_TARGET_ENV STREQUAL "msvc" OR COR_NO_LINKER_OVERRIDE))
+-        set(default_linker "$<IF:$<BOOL:${target_uses_cxx}>,${CMAKE_CXX_COMPILER},${CMAKE_C_COMPILER}>")
++        # Native Rust static archives use the default linker, as in cargo build.
++        set(default_linker "")
+     endif()
+     # Used to set a linker for a specific target-triple.
+     set(cargo_target_linker_var "CARGO_TARGET_${_CORROSION_RUST_CARGO_TARGET_UPPER}_LINKER")

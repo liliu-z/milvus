@@ -6,6 +6,7 @@ cd "$repo"
 deps=${COLD_SEARCH_DEPS:-"$repo/.cold-search-deps"}
 python3 tools/cold_search/prepare.py go --output "$deps"
 source scripts/setenv.sh
+set -e
 export GOWORK=off
 export GOFLAGS="-modfile=$deps/milvus.mod"
 export CC=${CC:-gcc-12} CXX=${CXX:-g++-12}
