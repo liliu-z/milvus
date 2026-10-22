@@ -483,9 +483,9 @@ func (pi *ParamItem) GetAsFloat() float64 {
 
 // cachedDuration is what GetAsDuration stores in the config cache. The raw config
 // value is unit-less (e.g. "5000"), so the unit the caller asked for is part of the
-// conversion and therefore has to be part of the cache entry: the same key is read at
-// different units from different call sites (see QueryCoordCfg.BrokerTimeout), and a
-// bare time.Duration in the cache cannot tell them apart.
+// conversion and therefore has to be part of the cache entry: the same key may be read
+// at different units from different call sites, and a bare time.Duration in the cache
+// cannot tell them apart.
 type cachedDuration struct {
 	unit  time.Duration
 	value time.Duration

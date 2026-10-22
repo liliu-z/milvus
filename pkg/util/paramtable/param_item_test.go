@@ -203,9 +203,8 @@ func TestGetWithRaw_FallbackKeyCacheSuccess(t *testing.T) {
 func TestGetAsDuration_UnitIsPartOfCacheKey(t *testing.T) {
 	// GetAsDuration caches the converted time.Duration. The unit takes part in the
 	// conversion, so a value cached for one unit must never be served to a caller
-	// asking for another unit. QueryCoordCfg.BrokerTimeout ("5000") is read at
-	// time.Millisecond by the coordinator brokers and at time.Second by the
-	// querycoordv2 observers, so both orders happen in a real process.
+	// asking for another unit. Different call sites may read the same key at
+	// different units, in either order.
 	const rawValue = "5000"
 
 	type read struct {

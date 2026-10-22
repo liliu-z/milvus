@@ -84,6 +84,42 @@ func (suite *LeaderCacheObserverTestSuite) TestInvalidateShardLeaderCache() {
 	}, 3*time.Second, 1*time.Second)
 }
 
+// queryCoord.brokerTimeout is documented and read in milliseconds ("5000" = 5s) by the
+// coordinator brokers. The InvalidateShardLeaderCache call issued from the observer's
+// event loop must use the same unit; reading it as seconds turns 5s into 5000s.
+func (suite *LeaderCacheObserverTestSuite) TestHandleEventUsesBrokerTimeoutInMilliseconds() {
+	proxyManager := proxyutil.NewMockProxyClientManager(suite.T())
+	observer := NewLeaderCacheObserver(proxyManager)
+
+	remainingCh := make(chan time.Duration, 1)
+	proxyManager.EXPECT().InvalidateShardLeaderCache(mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, req *proxypb.InvalidateShardLeaderCacheRequest) error {
+			deadline, ok := ctx.Deadline()
+			suite.True(ok, "InvalidateShardLeaderCache must be called with a deadline")
+			select {
+			case remainingCh <- time.Until(deadline):
+			default:
+			}
+			return nil
+		}).Once()
+
+	observer.Start(context.Background())
+	defer observer.Stop()
+	observer.RegisterEvent(1)
+
+	var remaining time.Duration
+	select {
+	case remaining = <-remainingCh:
+	case <-time.After(10 * time.Second):
+		suite.FailNow("InvalidateShardLeaderCache was not called")
+	}
+
+	brokerTimeout := paramtable.Get().QueryCoordCfg.BrokerTimeout.GetAsDuration(time.Millisecond)
+	suite.Greater(remaining, time.Duration(0))
+	suite.LessOrEqual(remaining, brokerTimeout,
+		"remaining %v exceeds queryCoord.brokerTimeout %v: the timeout is not read in milliseconds", remaining, brokerTimeout)
+}
+
 func TestLeaderCacheObserverTestSuite(t *testing.T) {
 	suite.Run(t, new(LeaderCacheObserverTestSuite))
 }

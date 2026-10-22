@@ -93,7 +93,7 @@ func (o *LeaderCacheObserver) schedule(ctx context.Context) {
 }
 
 func (o *LeaderCacheObserver) HandleEvent(ctx context.Context, collectionIDs ...int64) {
-	ctx, cancel := context.WithTimeout(ctx, paramtable.Get().QueryCoordCfg.BrokerTimeout.GetAsDuration(time.Second))
+	ctx, cancel := context.WithTimeout(ctx, paramtable.Get().QueryCoordCfg.BrokerTimeout.GetAsDuration(time.Millisecond))
 	defer cancel()
 	err := o.proxyManager.InvalidateShardLeaderCache(ctx, &proxypb.InvalidateShardLeaderCacheRequest{
 		CollectionIDs: collectionIDs,

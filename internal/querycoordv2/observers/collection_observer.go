@@ -444,7 +444,7 @@ func (ob *CollectionObserver) observeCollectionLoadStatus(ctx context.Context, c
 }
 
 func (ob *CollectionObserver) invalidateCache(ctx context.Context, collectionID int64) {
-	ctx, cancel := context.WithTimeout(ctx, paramtable.Get().QueryCoordCfg.BrokerTimeout.GetAsDuration(time.Second))
+	ctx, cancel := context.WithTimeout(ctx, paramtable.Get().QueryCoordCfg.BrokerTimeout.GetAsDuration(time.Millisecond))
 	defer cancel()
 	err := ob.proxyManager.InvalidateCollectionMetaCache(ctx, &proxypb.InvalidateCollMetaCacheRequest{
 		CollectionID: collectionID,

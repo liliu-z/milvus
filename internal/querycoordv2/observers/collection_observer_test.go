@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/samber/lo"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -39,6 +40,7 @@ import (
 	"github.com/milvus-io/milvus/pkg/v3/kv"
 	"github.com/milvus-io/milvus/pkg/v3/mlog"
 	"github.com/milvus-io/milvus/pkg/v3/proto/datapb"
+	"github.com/milvus-io/milvus/pkg/v3/proto/proxypb"
 	"github.com/milvus-io/milvus/pkg/v3/proto/querypb"
 	"github.com/milvus-io/milvus/pkg/v3/util/etcd"
 	"github.com/milvus-io/milvus/pkg/v3/util/merr"
@@ -625,6 +627,32 @@ func (suite *CollectionObserverSuite) load(collection int64) {
 
 func TestCollectionObserver(t *testing.T) {
 	suite.Run(t, new(CollectionObserverSuite))
+}
+
+// queryCoord.brokerTimeout is documented and read in milliseconds ("5000" = 5s) by the
+// coordinator brokers. The InvalidateCollectionMetaCache call issued when a collection
+// becomes fully loaded must use the same unit; reading it as seconds turns 5s into 5000s.
+func TestCollectionObserverInvalidateCacheUsesBrokerTimeoutInMilliseconds(t *testing.T) {
+	paramtable.Init()
+
+	proxyManager := proxyutil.NewMockProxyClientManager(t)
+	var remaining time.Duration
+	proxyManager.EXPECT().InvalidateCollectionMetaCache(mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, req *proxypb.InvalidateCollMetaCacheRequest, opts ...proxyutil.ExpireCacheOpt) error {
+			deadline, ok := ctx.Deadline()
+			assert.True(t, ok, "InvalidateCollectionMetaCache must be called with a deadline")
+			remaining = time.Until(deadline)
+			assert.Equal(t, int64(1), req.GetCollectionID())
+			return nil
+		}).Once()
+
+	ob := &CollectionObserver{proxyManager: proxyManager}
+	ob.invalidateCache(context.Background(), 1)
+
+	brokerTimeout := paramtable.Get().QueryCoordCfg.BrokerTimeout.GetAsDuration(time.Millisecond)
+	assert.Greater(t, remaining, time.Duration(0))
+	assert.LessOrEqual(t, remaining, brokerTimeout,
+		"remaining %v exceeds queryCoord.brokerTimeout %v: the timeout is not read in milliseconds", remaining, brokerTimeout)
 }
 
 func genSegmentsInfo(count int, start int, collID int64, partitionID int64, insertChannel string) []*datapb.SegmentInfo {
